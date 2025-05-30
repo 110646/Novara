@@ -30,5 +30,7 @@ urlpatterns = [
     # Protected
     path('dashboard/', core_views.dashboard, name='dashboard'),
     path('portfolio/', core_views.portfolio, name='portfolio'),
+    path('account/', core_views.account, name='account'),
+    path('payments/', core_views.payments, name='payments'),
 ]
 

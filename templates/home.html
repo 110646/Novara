@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+
+<!-- Logo -->
+<img src="{% static 'images/logo.png' %}" alt="Novara Logo" width="200">
+
+<h1>Welcome to Novara</h1>
+<p>This is the Home Page.</p>
+
+<section id="about">
+    <h2>About Us</h2>
+    <p>Learn more about Novara's mission to connect students with professors.</p>
+</section>
+
+<section id="contact">
+    <h2>Contact Us</h2>
+    <p>Reach out to us at support@novara.com or fill out the form below.</p>
+    <!-- Contact form or placeholder goes here -->
+</section>
+
+{% endblock %}

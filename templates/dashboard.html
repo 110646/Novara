@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+{% load socialaccount %}
+
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<h1>Dashboard</h1>
+<img src="{% static 'images/logo.png' %}" alt="Banner" width="200">
+<p>Welcome {{ user.get_full_name|default:user.email }}!</p>
+
+{% if not google_connected %}
+    <p style="color: red;">You must connect your Google account to use email features.</p>
+    <a href="{% provider_login_url 'google' %}?next={{ request.path }}" class="btn btn-primary">
+    Connect Google</a>
+{% endif %}
+
+<a href="{% url 'portfolio' %}">Go to Portfolio</a>
+{% endblock %}
