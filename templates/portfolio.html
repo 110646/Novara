@@ -3,6 +3,56 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/portfolio.css' %}">
-<h1>Your Portfolio</h1>
-<p>This is your portfolio page.</p>
+
+<h1>Portfolio</h1>
+
+{% if not editing %}
+<a href="?edit=1" class="btn btn-secondary">Edit Portfolio</a>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <label for="id_major">Major:</label>
+    {{ form.major }}
+    <p>Select your major from the dropdown.</p>
+
+    <label for="id_class_year">Academic Level:</label>
+    {{ form.class_year }}
+    <p>Select your current academic level (e.g., High School, Freshman, Senior).</p>
+
+    <label for="id_university">University:</label>
+    {{ form.university }}
+    <p>Enter the name of your university.</p>
+
+    <label for="id_goals">Goals:</label>
+    <p>Describe your goals (e.g., dream jobs, positions, career aspirations).</p>
+    {{ form.goals }}
+
+    <label for="id_resume">Resume (PDF, max 5MB):</label>
+    {{ form.resume }}
+    <p>Upload a PDF resume to display here and for email generation.</p>
+
+    {% if editing %}
+    <button type="submit">Save Portfolio</button>
+    {% endif %}
+</form>
+
+{% if portfolio and not editing %}
+<h2>Last Updated: {{ portfolio.updated_at }}</h2>
+
+<h3>Current Portfolio Information</h3>
+<ul>
+    <li><strong>Major:</strong> {{ portfolio.major }}</li>
+    <li><strong>Academic Level:</strong> {{ portfolio.class_year }}</li>
+    <li><strong>University:</strong> {{ portfolio.university }}</li>
+    <li><strong>Goals:</strong> {{ portfolio.goals }}</li>
+</ul>
+
+{% if portfolio.resume %}
+<h3>Resume Preview</h3>
+<iframe src="{{ portfolio.resume.url }}" width="100%" height="600px" style="border: none;"></iframe>
+{% endif %}
+{% endif %}
+
 {% endblock %}
