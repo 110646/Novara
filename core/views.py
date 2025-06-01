@@ -15,11 +15,6 @@ def dashboard(request):
     google_connected = request.user.socialaccount_set.filter(provider='google').exists()
     return render(request, 'dashboard.html', {'google_connected': google_connected})
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from .forms import PortfolioForm
-from .models import Portfolio
-
 @login_required
 def portfolio(request):
     portfolio, created = Portfolio.objects.get_or_create(user=request.user)
