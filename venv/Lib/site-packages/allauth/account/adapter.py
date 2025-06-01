@@ -1,6 +1,5 @@
 import html
 import json
-import string
 import typing
 import warnings
 from urllib.parse import urlparse
@@ -37,6 +36,7 @@ from allauth.account import app_settings, signals
 from allauth.core import context
 from allauth.core.internal import ratelimit
 from allauth.core.internal.adapter import BaseAdapter
+from allauth.core.internal.cryptokit import generate_user_code
 from allauth.core.internal.httpkit import (
     headed_redirect_response,
     is_headless_request,
@@ -587,6 +587,13 @@ class DefaultAccountAdapter(BaseAdapter):
         # get_host already validates the given host, so no need to check it again
         allowed_hosts = {context.request.get_host()} | set(settings.ALLOWED_HOSTS)
 
+        # Include hosts derived from CSRF_TRUSTED_ORIGINS
+        trusted_hosts = {
+            urlparse(origin).netloc for origin in settings.CSRF_TRUSTED_ORIGINS
+        }
+        allowed_hosts.update(trusted_hosts)
+
+        # Handle wildcard case
         if "*" in allowed_hosts:
             parsed_host = urlparse(url).netloc
             allowed_host = {parsed_host} if parsed_host else None
@@ -840,32 +847,25 @@ class DefaultAccountAdapter(BaseAdapter):
         """
         Generates a new login code.
         """
-        return self._generate_code()
+        return generate_user_code()
 
     def generate_password_reset_code(self) -> str:
         """
         Generates a new password reset code.
         """
-        return self._generate_code(length=8)
+        return generate_user_code(length=8)
 
     def generate_email_verification_code(self) -> str:
         """
         Generates a new email verification code.
         """
-        return self._generate_code()
+        return generate_user_code()
 
     def generate_phone_verification_code(self) -> str:
         """
         Generates a new phone verification code.
         """
-        return self._generate_code()
-
-    def _generate_code(self, length=6):
-        forbidden_chars = "0OI18B2ZAEU"
-        allowed_chars = string.ascii_uppercase + string.digits
-        for ch in forbidden_chars:
-            allowed_chars = allowed_chars.replace(ch, "")
-        return get_random_string(length=length, allowed_chars=allowed_chars)
+        return generate_user_code()
 
     def is_login_by_code_required(self, login) -> bool:
         """
