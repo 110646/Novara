@@ -4,17 +4,25 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/home.css' %}">
 
-<h1>Welcome to Novara</h1>
-<p>This is the Home Page.</p>
-
-<section id="about">
-    <h2>About Us</h2>
-    <p>Learn more about Novara's mission to connect students with professors.</p>
+<!-- Hero Section -->
+<section class="hero-slogan">
+  <h1><span>One Click.</span><br />100s of Professors <span class="done">Done.</span></h1>
 </section>
 
-<section id="contact">
+<!-- Content Sections -->
+<section class="post-slogan">
+  <h1>Welcome to Novara</h1>
+  <p>This is the Home Page.</p>
+
+  <section id="about">
+    <h2>About Us</h2>
+    <p>Learn more about Novara's mission to connect students with professors.</p>
+  </section>
+
+  <section id="contact">
     <h2>Contact Us</h2>
     <p>Reach out to us at support@novara.com or fill out the form below.</p>
+  </section>
 </section>
 
 {% endblock %}

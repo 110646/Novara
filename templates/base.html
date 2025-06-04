@@ -10,19 +10,21 @@
 <body>
 
   {% if user.is_authenticated %}
+    <!-- Sidebar for authenticated users -->
     <header class="glass-header">
       <a href="{% url 'home' %}" class="nav-logo-auth">
         <img src="{% static 'images/logo.png' %}" alt="Novara Logo" />
       </a>
       <nav class="nav-links-auth">
         <a href="{% url 'dashboard' %}">Dashboard</a>
+        <a href="{% url 'portfolio' %}">Portfolio</a>
         <a href="{% url 'account' %}">Account</a>
         <a href="{% url 'payments' %}">Payments</a>
         <a href="{% url 'account_logout' %}">Log out</a>
       </nav>
     </header>
   {% else %}
-    <!-- Top nav for non-auth users -->
+    <!-- Top nav for non-authenticated users -->
     <header class="top-nav">
       <div class="logo-left">
         <img src="{% static 'images/logo.png' %}" alt="Novara Logo" />
@@ -35,22 +37,12 @@
         </nav>
       </div>
     </header>
-
-    <!-- Hero Section -->
-    <section class="hero-slogan">
-      <h1><span>One Click.</span><br />100s of Professors <span class="done">Done.</span></h1>
-    </section>
-
-    <!-- Move content block below slogan -->
-    <section class="post-slogan">
-      {% block content %}
-      {% endblock %}
-    </section>
   {% endif %}
 
-  <footer>
-    <p>&copy; 2025 Novara</p>
-  </footer>
+  <main>
+    {% block content %}
+    {% endblock %}
+  </main>
 
 </body>
 </html>
