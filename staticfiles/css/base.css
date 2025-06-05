@@ -1,0 +1,153 @@
+/* Background */
+body {
+  background-image: url('../images/back.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  margin: 0;
+  padding: 0;
+  font-family: 'Times New Roman', Times, serif;
+  color: white;
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- Non-Authenticated Top Navigation ---------- */
+.top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30px 60px;
+  position: absolute;
+  width: 100%;
+  top: 50;
+  left: 0;
+  z-index: 100;
+}
+
+.logo-left img {
+  height: 240px;
+  margin-top: -70px;
+}
+
+.nav-wrapper {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.glass-nav {
+  display: flex;
+  gap: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 30px;
+  padding: 12px 30px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.2);
+}
+
+.glass-nav a {
+  color: #fff;
+  font-size: 18px;
+  text-decoration: none;
+  transition: 0.3s ease;
+}
+
+.glass-nav a:hover {
+  text-shadow: 0 0 8px #fff;
+  transform: scale(1.05);
+}
+
+/* ---------- Hero Slogan ---------- */
+.hero-slogan {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  max-width: 90%;
+  z-index: 10;
+}
+
+.hero-slogan h1 {
+  font-size: 3.8rem;
+  font-weight: 500;
+  color: white;
+  line-height: 1.2;
+}
+
+.hero-slogan span.done {
+  color: #f8dc9c;
+}
+
+/* ---------- Content Below Hero Slogan ---------- */
+.post-slogan {
+  margin-top: 60vh;
+  padding: 40px 60px;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.post-slogan h1,
+.post-slogan h2,
+.post-slogan p {
+  color: white;
+}
+
+/* ========== Authenticated User Sidebar Nav ========== */
+.glass-header {
+  position: fixed;
+  top: 60px;
+  right: 60px;
+  width: 260px;
+  padding: 50px 30px;
+  background: rgba(255, 223, 160, 0.086);
+  border: 4px solid rgba(179, 157, 113, 0.3);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  box-shadow: 0 0 40px rgba(255, 235, 190, 0.4);
+  border-radius: 42px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.nav-logo-auth img {
+  height: 310px;
+  margin-top: -120px;
+  margin-bottom: -120px;
+}
+
+.nav-logo-auth::after {
+  content: "";
+  display: block;
+  width: 90%;
+  height: 3px;
+  background-color: rgba(255, 223, 160, 0.5);
+  margin: 25px 0 40px;
+}
+
+.nav-links-auth {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  width: 100%;
+}
+
+.nav-links-auth a {
+  color: #fce7b1;
+  font-size: 22px;
+  letter-spacing: 1.5px;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.nav-links-auth a:hover {
+  color: white;
+  text-shadow: 0 0 10px #ffeaa6;
+  transform: scale(1.05);
+}

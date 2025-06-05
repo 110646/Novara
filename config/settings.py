@@ -11,6 +11,16 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
 from pathlib import Path
+from storages.backends.s3boto3 import S3Boto3Storage
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+AWS_ACCESS_KEY_ID = '058c0a3a388529a3c5425aaf025d7d55'
+AWS_SECRET_ACCESS_KEY = '5a0351f6723df1dfb9142e7c3ce2d28189288381a1af4e2bef6451bbe2fad195'
+AWS_STORAGE_BUCKET_NAME = 'resume-uploads'
+AWS_S3_ENDPOINT_URL = 'https://b6aa53bf1a86bd08e1d961d9df8b7e47.r2.cloudflarestorage.com'
+AWS_S3_REGION_NAME = 'auto'
+AWS_QUERYSTRING_AUTH = False
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -18,6 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-%ek9nr8_z@x_bck=tb+w=220ku6rqe2ne$r@lp2sox@9c%d1gn'
@@ -43,6 +54,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'core', 
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -126,6 +138,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [ BASE_DIR / "static" ]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
