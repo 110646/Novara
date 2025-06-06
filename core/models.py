@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.core.files.storage import default_storage
+from storages.backends.s3boto3 import S3Boto3Storage  # <-- Add this
 
 class Portfolio(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -8,12 +8,18 @@ class Portfolio(models.Model):
     class_year = models.CharField(max_length=50)
     university = models.CharField(max_length=255)
     goals = models.TextField(max_length=1000)
-    resume = models.FileField(upload_to='resumes/', blank=True, null=True)
+
+    resume = models.FileField(
+        upload_to='resumes/',
+        storage=S3Boto3Storage(),  # <-- Force S3/R2 usage here
+        blank=True,
+        null=True
+    )
+
     updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
         try:
-            # Check for existing resume before saving
             this = Portfolio.objects.get(pk=self.pk)
             if this.resume and this.resume != self.resume:
                 this.resume.delete(save=False)
