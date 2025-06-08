@@ -35,6 +35,11 @@ urlpatterns = [
     path('portfolio/', core_views.portfolio, name='portfolio'),
     path('account/', core_views.account, name='account'),
     path('payments/', core_views.payments, name='payments'),
+    path('send-emails/', core_views.send_emails_page, name='send_emails'),
+    path('create-checkout-session/', core_views.create_checkout_session, name='create_checkout_session'),
+    path('emails-sent/', core_views.emails_sent_confirmation, name='emails_sent_confirmation'),
+    path('webhooks/stripe/', core_views.stripe_webhook, name='stripe_webhook'),
+
 ]
 
 if settings.DEBUG:

@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Emails Sent Successfully</h1>
+<p>Your {{ sent_count }} email{{ sent_count|pluralize }} have been sent to the selected professors.</p>
+<p>Please check the dashboard to view your analytics</p>
+<a href="{% url 'dashboard' %}">Return to Dashboard</a>
+
+{% endblock %}

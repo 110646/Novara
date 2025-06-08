@@ -29,3 +29,11 @@ class Portfolio(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Portfolio"
+    
+class EmailCredit(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    count = models.IntegerField()
+    purchased_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.count} credits"
