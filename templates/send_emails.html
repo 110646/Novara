@@ -1,87 +1,35 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
-<style>
-  #emailSlider {
-    -webkit-appearance: none;
-    width: 100%;
-    max-width: 600px;
-    height: 8px;
-    border-radius: 4px;
-    background: #ddd;
-    outline: none;
-    transition: background 0.3s;
-  }
-
-  #emailSlider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #007bff;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-
-  #emailSlider::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #007bff;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-
-  #emailSlider:hover {
-    background: #ccc;
-  }
-
-  .slider-container {
-    width: 100%;
-    max-width: 600px;
-    margin: 30px 0;
-  }
-
-  #portfolioModal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
-    justify-content: center;
-    align-items: center;
-  }
-
-  #portfolioModal .modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-  }
-
-  .btn {
-    padding: 10px 20px;
-    margin-top: 10px;
-  }
-</style>
+<link rel="stylesheet" href="{% static 'css/send_emails.css' %}">
 
 <h1>Send Emails</h1>
 
 <form id="emailForm" method="POST">
-    {% csrf_token %}
+  {% csrf_token %}
 
-    <div class="slider-container">
-        <label for="emailSlider">Number of Emails to Send:</label>
-        <input type="range" id="emailSlider" name="email_count" min="10" max="300" step="1" value="50" oninput="updateSlider()">
-        <p><strong>Selected:</strong> <span id="selectedCount">50</span> emails</p>
-        <p><strong>Total cost:</strong> <span id="totalCost">$10.00</span></p>
-    </div>
+  <div class="slider-container">
+    <label for="emailSlider">Number of Emails to Send:</label>
+    <input
+      type="range"
+      id="emailSlider"
+      name="email_count"
+      min="10"
+      max="300"
+      step="1"
+      value="50"
+      oninput="updateSlider()"
+    />
+    <p><strong>Selected:</strong> <span id="selectedCount">50</span> emails</p>
+    <p><strong>Total cost:</strong> <span id="totalCost">$10.00</span></p>
+  </div>
 
-    <button type="submit" class="btn btn-primary">Pay & Send Emails</button>
+  <button type="submit" class="btn btn-primary">Pay & Send Emails</button>
 </form>
 
-<!-- Modal for portfolio check -->
-<div id="portfolioModal">
+<!-- Modal for incomplete portfolio -->
+<div id="portfolioModal" class="modal">
   <div class="modal-content">
     <h3>Portfolio Incomplete</h3>
     <p>Please complete your portfolio before continuing.</p>
@@ -89,45 +37,68 @@
   </div>
 </div>
 
+<!-- Modal for portfolio confirmation -->
+<div id="confirmModal" class="modal">
+  <div class="modal-content">
+    <h3>Confirm Your Portfolio</h3>
+    <p>Please double-check your portfolio before continuing. This information will be sent to professors.</p>
+    <div style="margin-top: 20px;">
+      <button onclick="closeConfirmModal()" class="btn btn-secondary">Go Back</button>
+      <button onclick="proceedWithCheckout()" class="btn btn-primary">Continue</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://js.stripe.com/v3/"></script>
 <script>
-function updateSlider() {
+  function updateSlider() {
     const slider = document.getElementById("emailSlider");
     const count = parseInt(slider.value);
     const cost = (count * 0.20).toFixed(2);
-
     document.getElementById("selectedCount").innerText = count;
     document.getElementById("totalCost").innerText = `$${cost}`;
-}
+  }
 
-document.getElementById("emailForm").addEventListener("submit", async function(e) {
+  document.getElementById("emailForm").addEventListener("submit", function (e) {
     e.preventDefault();
-    const emailCount = document.getElementById("emailSlider").value;
     const isComplete = "{{ portfolio_complete|yesno:'true,false' }}" === "true";
 
     if (!isComplete) {
-        document.getElementById("portfolioModal").style.display = "flex";
-        return;
+      document.getElementById("portfolioModal").style.display = "flex";
+      return;
     }
 
+    // Show confirmation modal
+    document.getElementById("confirmModal").style.display = "flex";
+  });
+
+  function closeConfirmModal() {
+    document.getElementById("confirmModal").style.display = "none";
+  }
+
+  async function proceedWithCheckout() {
+    closeConfirmModal();
+
+    const emailCount = document.getElementById("emailSlider").value;
+
     const response = await fetch("{% url 'create_checkout_session' %}", {
-        method: "POST",
-        headers: {
-            "X-CSRFToken": "{{ csrf_token }}",
-            "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({ email_count: emailCount })
+      method: "POST",
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({ email_count: emailCount }),
     });
 
     const data = await response.json();
     if (data.id) {
-        const stripe = Stripe("{{ stripe_public_key }}");
-        stripe.redirectToCheckout({ sessionId: data.id });
+      const stripe = Stripe("{{ stripe_public_key }}");
+      stripe.redirectToCheckout({ sessionId: data.id });
     } else {
-        alert("Something went wrong. Please try again.");
+      alert("Something went wrong. Please try again.");
     }
-});
+  }
 
-updateSlider();
+  updateSlider();
 </script>
 {% endblock %}

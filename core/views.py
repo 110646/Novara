@@ -81,10 +81,6 @@ def portfolio(request):
         'editing': editing,
     })
 
-
-# ------------------------------
-# STRIPE CHECKOUT
-# ------------------------------
 @login_required
 @csrf_exempt
 def create_checkout_session(request):
@@ -120,10 +116,6 @@ def create_checkout_session(request):
 
         return JsonResponse({'id': session.id})
 
-
-# ------------------------------
-# STRIPE WEBHOOK
-# ------------------------------
 @csrf_exempt
 def stripe_webhook(request):
     payload = request.body
@@ -149,10 +141,6 @@ def stripe_webhook(request):
 
     return HttpResponse(status=200)
 
-
-# ------------------------------
-# EMAIL CONFIRMATION
-# ------------------------------
 @login_required
 def emails_sent_confirmation(request):
     latest_credit = EmailCredit.objects.filter(user=request.user).order_by('-purchased_at').first()
@@ -160,10 +148,6 @@ def emails_sent_confirmation(request):
         'sent_count': latest_credit.count if latest_credit else 0
     })
 
-
-# ------------------------------
-# EMAIL PAGE
-# ------------------------------
 @login_required
 def send_emails_page(request):
     portfolio = Portfolio.objects.filter(user=request.user).first()
