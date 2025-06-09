@@ -86,13 +86,51 @@ CLASS_YEAR_CHOICES = [
 
 ]
 
+US_UNIVERSITY_CHOICES = [
+    ('', 'Select University'),
+    ('Harvard University', 'Harvard University'),
+    ('Stanford University', 'Stanford University'),
+    ('Massachusetts Institute of Technology', 'Massachusetts Institute of Technology'),
+    ('University of California, Berkeley', 'University of California, Berkeley'),
+    ('California Institute of Technology', 'California Institute of Technology'),
+    ('Princeton University', 'Princeton University'),
+    ('Yale University', 'Yale University'),
+    ('Columbia University', 'Columbia University'),
+    ('University of Chicago', 'University of Chicago'),
+    ('University of Pennsylvania', 'University of Pennsylvania'),
+    ('Johns Hopkins University', 'Johns Hopkins University'),
+    ('Duke University', 'Duke University'),
+    ('Northwestern University', 'Northwestern University'),
+    ('University of Michigan', 'University of Michigan'),
+    ('Cornell University', 'Cornell University'),
+    ('New York University', 'New York University'),
+    ('University of California, Los Angeles', 'University of California, Los Angeles'),
+    ('University of Washington', 'University of Washington'),
+    ('University of Wisconsin-Madison', 'University of Wisconsin-Madison'),
+    ('University of Texas at Austin', 'University of Texas at Austin'),
+    ('University of North Carolina at Chapel Hill', 'University of North Carolina at Chapel Hill'),
+    ('Carnegie Mellon University', 'Carnegie Mellon University'),
+    ('Brown University', 'Brown University'),
+    ('Boston University', 'Boston University'),
+    ('University of California, San Diego', 'University of California, San Diego'),
+    ('University of Illinois at Urbana-Champaign', 'University of Illinois at Urbana-Champaign'),
+    ('University of Florida', 'University of Florida'),
+    ('University of Southern California', 'University of Southern California'),
+    ('Ohio State University', 'Ohio State University'),
+    ('Pennsylvania State University', 'Pennsylvania State University'),
+    # ... add more as needed ...
+]
+
 class PortfolioForm(forms.ModelForm):
+    name = forms.CharField(max_length=255, required=True, label="Name")
     major = forms.ChoiceField(choices=MAJOR_CHOICES, required=True, label="Major")
     class_year = forms.ChoiceField(choices=CLASS_YEAR_CHOICES, required=True, label="Academic Level")
+    university = forms.ChoiceField(choices=US_UNIVERSITY_CHOICES, required=True, label="University")
+    research_interests = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'e.g., Machine Learning, Computer Vision, AI'}), required=True, label="Research Interests")
 
     class Meta:
         model = Portfolio
-        fields = ['major', 'class_year', 'university', 'goals', 'resume']
+        fields = ['name', 'major', 'class_year', 'university', 'research_interests', 'resume']
 
     def clean_resume(self):
         resume = self.cleaned_data.get('resume')

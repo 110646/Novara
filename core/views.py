@@ -51,7 +51,7 @@ def payments(request):
 def portfolio(request):
     portfolio, created = Portfolio.objects.get_or_create(user=request.user)
 
-    is_empty = not (portfolio.major or portfolio.class_year or portfolio.university or portfolio.goals or portfolio.resume)
+    is_empty = not (portfolio.major or portfolio.class_year or portfolio.university or portfolio.research_interests or portfolio.resume)
     if created or is_empty:
         request.session['just_created_portfolio'] = True
 
@@ -153,7 +153,7 @@ def send_emails_page(request):
     portfolio = Portfolio.objects.filter(user=request.user).first()
     portfolio_complete = bool(
         portfolio and portfolio.major and portfolio.class_year and
-        portfolio.university and portfolio.goals and portfolio.resume
+        portfolio.university and portfolio.research_interests and portfolio.resume
     )
     return render(request, 'send_emails.html', {
         'portfolio_complete': portfolio_complete,

@@ -4,60 +4,106 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/portfolio.css' %}">
 
-<h1>Portfolio</h1>
-
-{% if not editing %}
-<a href="?edit=1" class="btn btn-secondary">Edit Portfolio</a>
-{% endif %}
-
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-
-    <label for="id_major">Major:</label>
-    {{ form.major }}
-    <p>Select your major from the dropdown.</p>
-
-    <label for="id_class_year">Academic Level:</label>
-    {{ form.class_year }}
-    <p>Select your current academic level (e.g., High School, Freshman, Senior).</p>
-
-    <label for="id_university">University:</label>
-    {{ form.university }}
-    <p>Enter the name of your university.</p>
-
-    <label for="id_goals">Goals:</label>
-    <p>Describe your goals (e.g., dream jobs, positions, career aspirations).</p>
-    {{ form.goals }}
-
-    <label for="id_resume">Resume (PDF, max 5MB):</label>
-    {{ form.resume }}
-    <p>Upload a PDF resume to display here and for email generation.</p>
-
-    {% if editing %}
-    <button type="submit">Save Portfolio</button>
-    {% if portfolio.resume %}
-    <button type="submit" name="delete_resume" value="1" style="margin-left: 10px; background-color: red; color: white;">
-        Delete Resume
-    </button>
+<div class="portfolio-page">
+  <div class="portfolio-main">
+    <div class="card profile-card">
+      <div class="card-header">
+        <h1>Build Your Research Profile</h1>
+        <p class="subtitle">Create an impressive profile that professors will notice.</p>
+      </div>
+      <div class="card-body">
+        {% if not editing %}
+        <a href="?edit=1" class="btn btn-secondary edit-btn">Edit Portfolio</a>
+        {% endif %}
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="id_name">Name <span class="required">*</span></label>
+            {{ form.name }}
+          </div>
+          <div class="form-group">
+            <label for="id_class_year">Academic Level <span class="required">*</span></label>
+            {{ form.class_year }}
+          </div>
+          <div class="form-group">
+            <label for="id_university">University <span class="required">*</span></label>
+            {{ form.university }}
+          </div>
+          <div class="form-group">
+            <label for="id_major">Major <span class="required">*</span></label>
+            {{ form.major }}
+          </div>
+          <div class="form-group">
+            <label for="id_research_interests">Research Interests <span class="required">*</span></label>
+            {{ form.research_interests }}
+            <div class="form-hint">e.g., Machine Learning, Computer Vision, AI</div>
+          </div>
+          <div class="form-group">
+            <label for="id_resume">Resume (Optional)</label>
+            {{ form.resume }}
+          </div>
+          {% if editing %}
+          <button type="submit" class="btn btn-primary save-btn">Save Profile</button>
+          {% if portfolio.resume %}
+          <button type="submit" name="delete_resume" value="1" class="btn btn-danger delete-btn">Delete Resume</button>
+          {% endif %}
+          {% endif %}
+        </form>
+      </div>
+    </div>
+    {% if portfolio and not editing %}
+    <div class="card info-card">
+      <div class="card-header">
+        <h2>Current Portfolio Information</h2>
+        <div class="last-updated">Last Updated: {{ portfolio.updated_at }}</div>
+      </div>
+      <div class="card-body">
+        <ul class="info-list">
+          <li><strong>Name:</strong> {{ portfolio.name }}</li>
+          <li><strong>Major:</strong> {{ portfolio.major }}</li>
+          <li><strong>Academic Level:</strong> {{ portfolio.class_year }}</li>
+          <li><strong>University:</strong> {{ portfolio.university }}</li>
+          <li><strong>Research Interests:</strong> {{ portfolio.research_interests }}</li>
+        </ul>
+      </div>
+    </div>
     {% endif %}
-    {% endif %}
-</form>
-
-{% if portfolio and not editing %}
-<h2>Last Updated: {{ portfolio.updated_at }}</h2>
-
-<h3>Current Portfolio Information</h3>
-<ul>
-    <li><strong>Major:</strong> {{ portfolio.major }}</li>
-    <li><strong>Academic Level:</strong> {{ portfolio.class_year }}</li>
-    <li><strong>University:</strong> {{ portfolio.university }}</li>
-    <li><strong>Goals:</strong> {{ portfolio.goals }}</li>
-</ul>
-{% endif %}
-
-<h3>Done Building Your Portfolio?</h3>
-<a href="{% url 'send_emails' %}" class="btn btn-primary" style="margin-top: 20px;">
-  Buy and Send Emails
-</a>
-
+    <div class="card action-card">
+      <div class="card-body">
+        <h3>Done Building Your Portfolio?</h3>
+        <a href="{% url 'send_emails' %}" class="btn btn-primary action-btn">Buy and Send Emails</a>
+      </div>
+    </div>
+  </div>
+  <div class="portfolio-sidebar">
+    <div class="card professor-view-card">
+      <div class="card-header">
+        <span class="professor-icon"><i class="fas fa-user-graduate"></i></span>
+        <span class="professor-title">Professor View</span>
+        <div class="professor-subtitle">How your profile appears to professors</div>
+      </div>
+      <div class="card-body">
+        <div class="professor-avatar">
+          <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile Photo" />
+        </div>
+        <div class="professor-name">{{ portfolio.name|default:user.get_full_name|default:user.email }}</div>
+        <div class="professor-university">{{ portfolio.university|default:'University' }}</div>
+        <div class="professor-major"><span>Major</span><br><strong>{{ portfolio.major|default:'Major' }}</strong></div>
+        <div class="professor-interests"><span>Research Interests</span><br><span class="interests-list">{{ portfolio.research_interests|default:'Add interests...' }}</span></div>
+      </div>
+    </div>
+    <div class="card profile-strength-card">
+      <div class="card-header">
+        <span class="strength-icon"><i class="fas fa-bolt"></i></span>
+        <span class="strength-title">Profile Strength</span>
+      </div>
+      <div class="card-body">
+        <div class="strength-bar-bg">
+          <div class="strength-bar-fill" style="width: 30%"></div>
+        </div>
+        <div class="strength-label">Getting Started</div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

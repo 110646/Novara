@@ -2,27 +2,471 @@
 {% load static %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/home.css' %}">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <!-- Hero Section -->
-<section class="hero-slogan">
-  <h1><span>One Click.</span><br />100s of Professors <span class="done">Done.</span></h1>
+<section class="hero">
+    <!-- Background Image with Parallax -->
+    <div class="hero-bg"></div>
+    
+    <!-- Overlay with gradient -->
+    <div class="hero-overlay"></div>
+
+    <!-- Animated background shapes -->
+    <div class="hero-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="hero-content">
+        <h1 class="hero-title">
+            <span class="shimmer-text">One Click.</span><br />100s of Professors <span class="done">Done.</span>
+        </h1>
+        
+        <p class="hero-subtitle">
+            Novara uses AI to automatically find and contact 300+ professors who match your research interests - with an <span class="highlight">87% success rate</span> in landing opportunities.
+        </p>
+        
+        <!-- Primary CTA Button -->
+        <div class="hero-cta">
+            <a href="/signup" class="cta-button">
+                Start Your Research Journey
+                <span class="arrow-icon">
+                    <i class="fas fa-arrow-right"></i>
+                </span>
+            </a>
+        </div>
+
+        <!-- Secondary text -->
+        <p class="hero-secondary">
+            Join <span class="highlight">500+ students</span> who've already landed research positions
+        </p>
+    </div>
+
+    <!-- Floating particles -->
+    <div class="hero-particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
 </section>
 
-<!-- Content Sections -->
-<section class="post-slogan">
-  <h1>Welcome to Novara</h1>
-  <p>This is the Home Page.</p>
+<!-- How It Works Section -->
+<section class="how-it-works-section">
+    <div class="container">
+        <!-- Header -->
+        <div class="section-header">
+            <h2>From Profile to Professor Response in 30 Seconds</h2>
+        </div>
 
-  <section id="about">
-    <h2>About Us</h2>
-    <p>Learn more about Novara's mission to connect students with professors.</p>
-  </section>
+        <!-- 4-Column Grid -->
+        <div class="steps-grid">
+            <!-- Step 1 -->
+            <div class="step-card">
+                <div class="step-number">01</div>
+                <div class="step-icon">
+                    <i class="fas fa-upload"></i>
+                </div>
+                <h3>Upload Your Resume</h3>
+                <p>Simply upload your resume and tell us your research interests. Our AI analyzes your background and skills.</p>
+                <div class="decorative-circles">
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                </div>
+            </div>
 
-  <section id="contact">
-    <h2>Contact Us</h2>
-    <p>Reach out to us at support@novara.com or fill out the form below.</p>
-  </section>
+            <!-- Step 2 -->
+            <div class="step-card">
+                <div class="step-number">02</div>
+                <div class="step-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3>AI Finds Perfect Matches</h3>
+                <p>We search through 120,000+ professors (2/3 of all professors in America) to find those whose research aligns with you.</p>
+                <div class="decorative-circles">
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step-card">
+                <div class="step-number">03</div>
+                <div class="step-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <h3>Personalized Emails Sent</h3>
+                <p>300+ unique, personalized emails are crafted and sent automatically through your Gmail account with one click.</p>
+                <div class="decorative-circles">
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="step-card">
+                <div class="step-number">04</div>
+                <div class="step-icon">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <h3>Land Research Opportunities</h3>
+                <p>Track responses, manage follow-ups, and choose from multiple research offers - 87% of our users succeed.</p>
+                <div class="decorative-circles">
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
+
+<!-- Problem Solution Section -->
+<section class="problem-solution-section">
+    <div class="container">
+        <!-- Header -->
+        <div class="section-header">
+            <h2>The Transformation Story</h2>
+            <p>Watch how we've revolutionized the student research outreach process</p>
+        </div>
+
+        <!-- Split-screen animation -->
+        <div class="split-screen">
+            <div class="grid">
+                <!-- Old Way Side -->
+                <div class="old-way">
+                    <div class="content">
+                        <div class="icon-container">
+                            <i class="icon-x"></i>
+                        </div>
+                        <h3>The Old Way</h3>
+                        
+                        <div class="scenarios">
+                            <div class="scenario" data-index="0">
+                                <div class="icon">
+                                    <i class="icon-x"></i>
+                                </div>
+                                <p>Spending hours researching each professor manually</p>
+                            </div>
+                            <div class="scenario" data-index="1">
+                                <div class="icon">
+                                    <i class="icon-x"></i>
+                                </div>
+                                <p>Writing generic emails that get ignored</p>
+                            </div>
+                            <div class="scenario" data-index="2">
+                                <div class="icon">
+                                    <i class="icon-x"></i>
+                                </div>
+                                <p>5% response rate if you're lucky</p>
+                            </div>
+                            <div class="scenario" data-index="3">
+                                <div class="icon">
+                                    <i class="icon-x"></i>
+                                </div>
+                                <p>Months of rejection and frustration</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- New Way Side -->
+                <div class="new-way">
+                    <div class="content">
+                        <div class="icon-container">
+                            <i class="icon-check"></i>
+                        </div>
+                        <h3>The Novara Way</h3>
+                        
+                        <div class="scenarios">
+                            <div class="scenario" data-index="0">
+                                <div class="icon">
+                                    <i class="icon-check"></i>
+                                </div>
+                                <p>AI instantly finds perfect professor matches</p>
+                            </div>
+                            <div class="scenario" data-index="1">
+                                <div class="icon">
+                                    <i class="icon-check"></i>
+                                </div>
+                                <p>Personalized emails that professors actually read</p>
+                            </div>
+                            <div class="scenario" data-index="2">
+                                <div class="icon">
+                                    <i class="icon-check"></i>
+                                </div>
+                                <p>87% success rate in landing opportunities</p>
+                            </div>
+                            <div class="scenario" data-index="3">
+                                <div class="icon">
+                                    <i class="icon-check"></i>
+                                </div>
+                                <p>Start getting responses in as little as 24 hours</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>What Our Users Say</h2>
+        </div>
+
+        <div class="testimonials-grid">
+            <!-- Testimonial 1 -->
+            <div class="testimonial-card">
+                <div class="stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <blockquote>
+                    "Novara helped me land a research position at my dream university. The personalized emails were incredibly effective!"
+                </blockquote>
+                <div class="author">
+                    <img src="{% static 'images/avatar1.jpg' %}" alt="Sarah Johnson" class="avatar">
+                    <div class="name">Sarah Johnson</div>
+                    <div class="details">Computer Science Student</div>
+                </div>
+                <div class="decorative-circles">
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                </div>
+            </div>
+
+            <!-- Testimonial 2 -->
+            <div class="testimonial-card">
+                <div class="stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <blockquote>
+                    "I received responses from 5 professors within 24 hours. This platform is a game-changer for research opportunities."
+                </blockquote>
+                <div class="author">
+                    <img src="{% static 'images/avatar2.jpg' %}" alt="Michael Chen" class="avatar">
+                    <div class="name">Michael Chen</div>
+                    <div class="details">Physics Student</div>
+                </div>
+                <div class="decorative-circles">
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                </div>
+            </div>
+
+            <!-- Testimonial 3 -->
+            <div class="testimonial-card">
+                <div class="stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <blockquote>
+                    "The AI matching system is incredibly accurate. I found professors whose research perfectly aligned with my interests."
+                </blockquote>
+                <div class="author">
+                    <img src="{% static 'images/avatar3.jpg' %}" alt="Emily Rodriguez" class="avatar">
+                    <div class="name">Emily Rodriguez</div>
+                    <div class="details">Biology Student</div>
+                </div>
+                <div class="decorative-circles">
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Why Choose Novara</h2>
+            <p>Discover the features that make us the best choice for your research journey</p>
+        </div>
+
+        <div class="features-grid">
+            <!-- Feature 1 -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3>AI-Powered Matching</h3>
+                <p>Our advanced AI analyzes your profile and finds professors whose research aligns with your interests.</p>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-envelope-open-text"></i>
+                </div>
+                <h3>Personalized Emails</h3>
+                <p>Each email is uniquely crafted to highlight your relevant experience and research interests.</p>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>High Success Rate</h3>
+                <p>87% of our users receive responses and secure research opportunities within weeks.</p>
+            </div>
+
+            <!-- Feature 4 -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3>Save Time</h3>
+                <p>Automate the entire outreach process and focus on what matters - your research.</p>
+            </div>
+        </div>
+    </div>
+  </section>
+
+<!-- Mid-Page CTA -->
+<section class="mid-page-cta">
+    <div class="container">
+        <h2>Ready to Start Your Research Journey?</h2>
+        <p>Join hundreds of successful students who've found their perfect research opportunities.</p>
+        <a href="/signup" class="cta-button">
+            Get Started Now
+            <span class="button-icon">
+                <i class="fas fa-arrow-right"></i>
+            </span>
+        </a>
+        <div class="decorative-circles">
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+        </div>
+    </div>
+  </section>
+
+<!-- About Section -->
+<section class="about-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>About Novara</h2>
+            <p>Transforming the way students connect with research opportunities</p>
+        </div>
+
+        <div class="about-carousel">
+            <div class="carousel-container">
+                <!-- Slide 1 -->
+                <div class="carousel-slide">
+                    <div class="quote-card">
+                        <p class="quote-text">"Novara has revolutionized how students find research opportunities. Their AI-powered platform makes the process seamless and efficient."</p>
+                        <p class="quote-author">- Dr. Emily Chen, Stanford University</p>
+                    </div>
+                </div>
+                <!-- Slide 2 -->
+                <div class="carousel-slide">
+                    <div class="quote-card">
+                        <p class="quote-text">"The personalized approach and attention to detail in matching students with professors is what sets Novara apart from other platforms."</p>
+                        <p class="quote-author">- Prof. Michael Rodriguez, MIT</p>
+                    </div>
+                </div>
+                <!-- Slide 3 -->
+                <div class="carousel-slide">
+                    <div class="quote-card">
+                        <p class="quote-text">"I've seen firsthand how Novara's platform has helped students find meaningful research opportunities that align with their interests and goals."</p>
+                        <p class="quote-author">- Dr. Sarah Thompson, Harvard University</p>
+                    </div>
+                </div>
+                <!-- Slide 4 -->
+                <div class="carousel-slide">
+                    <div class="quote-card">
+                        <p class="quote-text">"The success rate of students finding research positions through Novara is impressive. It's truly changing the landscape of academic research."</p>
+                        <p class="quote-author">- Prof. James Wilson, UC Berkeley</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carousel Controls -->
+            <div class="carousel-controls">
+                <button class="carousel-button prev" onclick="prevSlide()">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="carousel-button next" onclick="nextSlide()">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <!-- Carousel Indicators -->
+            <div class="carousel-indicators">
+                <span class="indicator active" onclick="goToSlide(0)"></span>
+                <span class="indicator" onclick="goToSlide(1)"></span>
+                <span class="indicator" onclick="goToSlide(2)"></span>
+                <span class="indicator" onclick="goToSlide(3)"></span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Add a spacer div to extend the white background -->
+<div class="about-section-spacer"></div>
+
+<!-- Add JavaScript for carousel functionality -->
+<script>
+let currentSlide = 0;
+const slides = document.querySelectorAll('.carousel-slide');
+const indicators = document.querySelectorAll('.indicator');
+const container = document.querySelector('.carousel-container');
+
+function updateCarousel() {
+    container.style.transform = `translateX(-${currentSlide * 100}%)`;
+    indicators.forEach((indicator, index) => {
+        indicator.classList.toggle('active', index === currentSlide);
+    });
+}
+
+function nextSlide() {
+    currentSlide = (currentSlide + 1) % slides.length;
+    updateCarousel();
+}
+
+function prevSlide() {
+    currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+    updateCarousel();
+}
+
+function goToSlide(index) {
+    currentSlide = index;
+    updateCarousel();
+}
+
+// Auto-advance slides every 5 seconds
+setInterval(nextSlide, 5000);
+</script>
 
 {% endblock %}

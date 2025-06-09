@@ -4,10 +4,11 @@ from storages.backends.s3boto3 import S3Boto3Storage  # <-- Add this
 
 class Portfolio(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255, blank=True, null=True)
     major = models.CharField(max_length=255)
     class_year = models.CharField(max_length=50)
     university = models.CharField(max_length=255)
-    goals = models.TextField(max_length=1000)
+    research_interests = models.TextField(max_length=1000)
 
     resume = models.FileField(
         upload_to='resumes/',
@@ -28,7 +29,7 @@ class Portfolio(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.user.username}'s Portfolio"
+        return f"{self.name or self.user.username}'s Portfolio"
     
 class EmailCredit(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

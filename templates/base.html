@@ -3,38 +3,62 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Novara</title>
   <link rel="stylesheet" href="{% static 'css/base.css' %}" />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
   {% if user.is_authenticated %}
-    <!-- Sidebar for authenticated users -->
-    <header class="glass-header">
-      <a href="{% url 'home' %}" class="nav-logo-auth">
-        <img src="{% static 'images/logo.png' %}" alt="Novara Logo" />
-      </a>
-      <nav class="nav-links-auth">
-        <a href="{% url 'dashboard' %}">Dashboard</a>
-        <a href="{% url 'portfolio' %}">Portfolio</a>
-        <a href="{% url 'account' %}">Account</a>
-        <a href="{% url 'payments' %}">Payments</a>
-        <a href="{% url 'account_logout' %}">Log out</a>
-      </nav>
+    <!-- Header for authenticated users -->
+    <header class="main-header">
+      <div class="container">
+        <div class="header-content">
+          <a href="{% url 'home' %}" class="logo">
+            <img src="{% static 'images/logo.png' %}" alt="Novara Logo" />
+          </a>
+          <nav class="main-nav">
+            <a href="{% url 'dashboard' %}" class="nav-link">
+              <i class="fas fa-chart-line"></i>
+              Dashboard
+            </a>
+            <a href="{% url 'portfolio' %}" class="nav-link">
+              <i class="fas fa-briefcase"></i>
+              Portfolio
+            </a>
+            <a href="{% url 'account' %}" class="nav-link">
+              <i class="fas fa-user"></i>
+              Account
+            </a>
+            <a href="{% url 'payments' %}" class="nav-link">
+              <i class="fas fa-credit-card"></i>
+              Payments
+            </a>
+            <a href="{% url 'account_logout' %}" class="nav-link logout">
+              <i class="fas fa-sign-out-alt"></i>
+              Log out
+            </a>
+          </nav>
+        </div>
+      </div>
     </header>
   {% else %}
-    <!-- Top nav for non-authenticated users -->
-    <header class="top-nav">
-      <div class="logo-left">
-        <img src="{% static 'images/logo.png' %}" alt="Novara Logo" />
-      </div>
-      <div class="nav-wrapper">
-        <nav class="glass-nav">
-          <a href="{% url 'home' %}">Home</a>
-          <a href="{% url 'account_login' %}">Sign In</a>
-          <a href="{% url 'account_signup' %}">Sign Up</a>
-        </nav>
+    <!-- Header for non-authenticated users -->
+    <header class="main-header">
+      <div class="container">
+        <div class="header-content">
+          <a href="{% url 'home' %}" class="logo">
+            <img src="{% static 'images/logo.png' %}" alt="Novara Logo" />
+          </a>
+          <nav class="main-nav">
+            <a href="{% url 'home' %}" class="nav-link">Home</a>
+            <a href="{% url 'account_login' %}" class="nav-link">Sign In</a>
+            <a href="{% url 'account_signup' %}" class="nav-link signup-btn">Sign Up</a>
+          </nav>
+        </div>
       </div>
     </header>
   {% endif %}
@@ -44,5 +68,37 @@
     {% endblock %}
   </main>
 
+  <!-- Footer -->
+  <footer class="main-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <img src="{% static 'images/logo.png' %}" alt="Novara Logo" class="footer-logo">
+          <p>Transforming the way students connect with research opportunities through AI-powered matching.</p>
+        </div>
+        <div class="footer-section">
+          <h3>Quick Links</h3>
+          <ul>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#testimonials">Testimonials</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Connect</h3>
+          <div class="social-links">
+            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 Novara. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>

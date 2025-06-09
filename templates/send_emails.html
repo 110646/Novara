@@ -4,29 +4,41 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/send_emails.css' %}">
 
-<h1>Send Emails</h1>
-
-<form id="emailForm" method="POST">
-  {% csrf_token %}
-
-  <div class="slider-container">
-    <label for="emailSlider">Number of Emails to Send:</label>
-    <input
-      type="range"
-      id="emailSlider"
-      name="email_count"
-      min="10"
-      max="300"
-      step="1"
-      value="50"
-      oninput="updateSlider()"
-    />
-    <p><strong>Selected:</strong> <span id="selectedCount">50</span> emails</p>
-    <p><strong>Total cost:</strong> <span id="totalCost">$10.00</span></p>
+<div class="send-emails-page">
+  <div class="send-card">
+    <div class="send-card-header">
+      <div class="send-icon"><i class="fas fa-envelope"></i></div>
+      <h1>Send Your Emails</h1>
+      <p class="subtitle">Select the number of emails to send</p>
+    </div>
+    <form id="emailForm" method="POST" class="send-form">
+      {% csrf_token %}
+      <div class="slider-label-row">
+        <label for="emailSlider">Number of Emails</label>
+        <span class="slider-value-badge" id="sliderValue">10</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-min">10</span>
+        <input
+          type="range"
+          id="emailSlider"
+          name="email_count"
+          min="10"
+          max="300"
+          step="1"
+          value="10"
+          oninput="updateSlider()"
+        />
+        <span class="slider-max">300</span>
+      </div>
+      <div class="price-box">
+        <div class="price-row">Price: $0.20 per email</div>
+        <div class="total-row">Total: <span class="total-amount" id="totalCost">$2.00</span></div>
+      </div>
+      <button type="submit" class="btn btn-primary send-btn"><i class="fas fa-paper-plane"></i> Send Emails</button>
+    </form>
   </div>
-
-  <button type="submit" class="btn btn-primary">Pay & Send Emails</button>
-</form>
+</div>
 
 <!-- Modal for incomplete portfolio -->
 <div id="portfolioModal" class="modal">
@@ -55,7 +67,7 @@
     const slider = document.getElementById("emailSlider");
     const count = parseInt(slider.value);
     const cost = (count * 0.20).toFixed(2);
-    document.getElementById("selectedCount").innerText = count;
+    document.getElementById("sliderValue").innerText = count;
     document.getElementById("totalCost").innerText = `$${cost}`;
   }
 

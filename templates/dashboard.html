@@ -2,21 +2,213 @@
 {% load static %}
 {% load socialaccount %}
 
-
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-<h1>Dashboard</h1>
-<p>Welcome {{ user.get_full_name|default:user.email }}!</p>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-{% if not google_connected %}
-    <p style="color: red;">You must connect your Google account to use email features.</p>
-    <a href="{% provider_login_url 'google' %}?next={{ request.path }}" class="btn btn-primary">
-    Connect Google</a>
-{% endif %}
+<div class="dashboard-container">
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+        <h1>Welcome, {{ user.get_full_name|default:user.email }}!</h1>
+    </div>
 
-<a href="{% url 'send_emails' %}" class="btn btn-primary" style="margin-top: 20px;">
-  Buy and Send Emails <br>
-</a>
+    <!-- Google Connection Alert -->
+    {% if not google_connected %}
+    <div class="alert-card">
+        <div class="alert-icon">
+            <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <div class="alert-content">
+            <h3>Google Account Required</h3>
+            <p>You must connect your Google account to use email features.</p>
+            <a href="{% provider_login_url 'google' %}?next={{ request.path }}" class="btn btn-primary">
+                <i class="fab fa-google"></i> Connect Google Account
+            </a>
+        </div>
+    </div>
+    {% endif %}
 
-<a href="{% url 'portfolio' %}">Go to Portfolio</a>
+    <!-- Metrics Summary Cards -->
+    <div class="metrics-grid">
+        <!-- Response Rate -->
+        <div class="metric-card">
+            <div class="metric-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="metric-content">
+                <div class="metric-value">43%</div>
+                <div class="metric-label">Response Rate</div>
+                <div class="metric-subtext">18 of 42 emails</div>
+            </div>
+        </div>
+
+        <!-- Total Emails -->
+        <div class="metric-card">
+            <div class="metric-icon">
+                <i class="fas fa-paper-plane"></i>
+            </div>
+            <div class="metric-content">
+                <div class="metric-value">42</div>
+                <div class="metric-label">Total Emails Sent</div>
+                <div class="metric-subtext">Last sent 2 days ago</div>
+            </div>
+        </div>
+
+        <!-- Responses -->
+        <div class="metric-card">
+            <div class="metric-icon">
+                <i class="fas fa-reply-all"></i>
+            </div>
+            <div class="metric-content">
+                <div class="metric-value">18</div>
+                <div class="metric-label">Responses Received</div>
+                <div class="metric-subtext">43% response rate</div>
+            </div>
+        </div>
+
+        <!-- Avg Response Time -->
+        <div class="metric-card">
+            <div class="metric-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="metric-content">
+                <div class="metric-value">3.2</div>
+                <div class="metric-label">Avg. Response Time</div>
+                <div class="metric-subtext">From sent to replied</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <a href="{% url 'send_emails' %}" class="action-button">
+            <i class="fas fa-paper-plane"></i>
+            <span>Buy and Send Emails</span>
+        </a>
+        <a href="{% url 'portfolio' %}" class="action-button">
+            <i class="fas fa-briefcase"></i>
+            <span>View Portfolio</span>
+        </a>
+    </div>
+
+    <!-- Performance by Research Field -->
+    <div class="performance-card">
+        <div class="card-header">
+            <h2>Performance by Research Field</h2>
+        </div>
+        <div class="performance-list">
+            <!-- Computer Science -->
+            <div class="performance-item">
+                <div class="field-info">
+                    <span class="field-name">Computer Science</span>
+                    <span class="field-stats">53% (8/15)</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 53%"></div>
+                </div>
+            </div>
+
+            <!-- Biology -->
+            <div class="performance-item">
+                <div class="field-info">
+                    <span class="field-name">Biology</span>
+                    <span class="field-stats">40% (4/10)</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 40%"></div>
+                </div>
+            </div>
+
+            <!-- Chemistry -->
+            <div class="performance-item">
+                <div class="field-info">
+                    <span class="field-name">Chemistry</span>
+                    <span class="field-stats">38% (3/8)</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 38%"></div>
+                </div>
+            </div>
+
+            <!-- Physics -->
+            <div class="performance-item">
+                <div class="field-info">
+                    <span class="field-name">Physics</span>
+                    <span class="field-stats">20% (1/5)</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 20%"></div>
+                </div>
+            </div>
+
+            <!-- Mathematics -->
+            <div class="performance-item">
+                <div class="field-info">
+                    <span class="field-name">Mathematics</span>
+                    <span class="field-stats">50% (2/4)</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 50%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Emails Sent Table -->
+    <div class="emails-card">
+        <div class="card-header">
+            <h2>Emails Sent</h2>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Professor</th>
+                        <th>University</th>
+                        <th>Date Sent</th>
+                        <th>Status</th>
+                        <th>Response Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Dr. Sarah Johnson</td>
+                        <td>Stanford University</td>
+                        <td>2024-03-15</td>
+                        <td><span class="status-badge replied">Replied</span></td>
+                        <td>2 days</td>
+                    </tr>
+                    <tr>
+                        <td>Prof. Michael Chen</td>
+                        <td>MIT</td>
+                        <td>2024-03-14</td>
+                        <td><span class="status-badge sent">Sent</span></td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>Dr. Emily Rodriguez</td>
+                        <td>UC Berkeley</td>
+                        <td>2024-03-13</td>
+                        <td><span class="status-badge replied">Replied</span></td>
+                        <td>1 day</td>
+                    </tr>
+                    <tr>
+                        <td>Prof. David Kim</td>
+                        <td>Harvard University</td>
+                        <td>2024-03-12</td>
+                        <td><span class="status-badge replied">Replied</span></td>
+                        <td>3 days</td>
+                    </tr>
+                    <tr>
+                        <td>Dr. Lisa Wang</td>
+                        <td>Carnegie Mellon</td>
+                        <td>2024-03-11</td>
+                        <td><span class="status-badge sent">Sent</span></td>
+                        <td>-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}
