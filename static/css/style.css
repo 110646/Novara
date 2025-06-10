@@ -892,4 +892,59 @@ h3 {
     margin: 1rem;
     position: relative;
     border: 1px solid var(--gray-light);
+}
+
+.icon-x {
+    display: inline-block;
+    width: 1.5em;
+    height: 1.5em;
+    background: none;
+    position: relative;
+}
+.icon-x::before, .icon-x::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 60%;
+    height: 12%;
+    background: #fff;
+    border-radius: 2px;
+    transform-origin: center;
+}
+.icon-x::before {
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+.icon-x::after {
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.icon-check {
+    display: inline-block;
+    width: 1.5em;
+    height: 1.5em;
+    background: none;
+    position: relative;
+}
+.icon-check::before {
+    content: '';
+    position: absolute;
+    left: 32%;
+    top: 60%;
+    width: 18%;
+    height: 14%;
+    background: #fff;
+    border-radius: 2px;
+    transform: rotate(-45deg);
+}
+.icon-check::after {
+    content: '';
+    position: absolute;
+    left: 46%;
+    top: 38%;
+    width: 38%;
+    height: 14%;
+    background: #fff;
+    border-radius: 2px;
+    transform: rotate(45deg);
 } 
