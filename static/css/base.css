@@ -51,8 +51,10 @@ body {
 }
 
 .logo img {
-    height: 35px;
+    height: 135px;
     width: auto;
+    margin-top: -50px;
+    margin-bottom: -50px;
 }
 
 .main-nav {
@@ -131,8 +133,9 @@ main {
 }
 
 .footer-logo {
-    height: 40px;
-    margin-bottom: 1rem;
+    height: 135px;
+    margin-bottom: -25px;
+    margin-top: -50px;
 }
 
 .footer-section p {
