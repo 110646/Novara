@@ -1,16 +1,23 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from core.utils import require_google_connection
-from .forms import PortfolioForm
-from .models import Portfolio, EmailCredit
+import httpx
+import os
+from django.core.files.storage import default_storage
+from .models import EmailCredit
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponse
 from django.conf import settings
 from django.utils.timezone import now
 import stripe
+import traceback
+from storages.backends.s3boto3 import S3Boto3Storage
+from core.choices import MAJOR_CHOICES, CLASS_YEAR_CHOICES, US_UNIVERSITY_CHOICES
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
+SUPABASE_URL = "https://qdlguxijkkuujnaeuhqq.supabase.co"
+SUPABASE_API_KEY = settings.SUPABASE_SERVICE_ROLE_KEY
 
 
 # ------------------------------
@@ -49,36 +56,96 @@ def payments(request):
 # ------------------------------
 @login_required
 def portfolio(request):
-    portfolio, created = Portfolio.objects.get_or_create(user=request.user)
-
-    is_empty = not (portfolio.major or portfolio.class_year or portfolio.university or portfolio.research_interests or portfolio.resume)
-    if created or is_empty:
-        request.session['just_created_portfolio'] = True
-
     editing = request.GET.get('edit') == '1' or request.session.pop('just_created_portfolio', False)
+    user = request.user
+    portfolio_data = {}
+
+    headers = {
+        "apikey": SUPABASE_API_KEY,
+        "Authorization": f"Bearer {SUPABASE_API_KEY}"
+    }
+
+    def fetch_portfolio():
+        params = {"user_id": f"eq.{user.id}"}
+        response = httpx.get(f"{SUPABASE_URL}/rest/v1/portfolios", headers=headers, params=params)
+        return response.json()[0] if response.status_code == 200 and response.json() else {}
+
+    try:
+        portfolio_data = fetch_portfolio()
+        if not portfolio_data:
+            request.session['just_created_portfolio'] = True
+            editing = True
+    except Exception as e:
+        print("❌ Error fetching Supabase portfolio:", e)
 
     if request.method == 'POST':
-        if 'delete_resume' in request.POST:
-            if portfolio.resume:
-                portfolio.resume.delete(save=True)
-            return redirect('portfolio')
+        name = request.POST.get('name')
+        major = request.POST.get('major')
+        class_year = request.POST.get('class_year')
+        university = request.POST.get('university')
+        research_interests = request.POST.get('research_interests')
+        resume_file = request.FILES.get('resume')
+        resume_url = portfolio_data.get("resume_url")
 
-        form = PortfolioForm(request.POST, request.FILES, instance=portfolio)
-        if form.is_valid():
-            portfolio = form.save()
-            return redirect('portfolio')
-        else:
-            editing = True
-    else:
-        form = PortfolioForm(instance=portfolio)
-        if not editing:
-            for field in form.fields.values():
-                field.disabled = True
+        if "delete_resume" in request.POST:
+            resume_url = None  # Set to None to clear
+            try:
+                if portfolio_data.get("resume_url"):
+                    from boto3 import client
+                    s3 = client("s3")
+                    key = portfolio_data["resume_url"].split("/")[-2] + "/" + portfolio_data["resume_url"].split("/")[-1]
+                    s3.delete_object(Bucket="your-bucket-name", Key=key)
+            except Exception as e:
+                print("❌ Resume deletion error:", e)
 
+        elif resume_file:
+            try:
+                s3_storage = S3Boto3Storage()
+                path = s3_storage.save(f'resumes/{resume_file.name}', resume_file)
+                resume_url = s3_storage.url(path)
+                print(f"✅ Resume uploaded to R2: {resume_url}")
+            except Exception as e:
+                print("❌ Resume upload error:", e)
+
+        payload = {
+            "user_id": int(user.id),
+            "name": name,
+            "email": user.email,
+            "major": major,
+            "class_year": class_year,
+            "university": university,
+            "research_interests": research_interests,
+            "resume_url": resume_url,
+            "updated_at": now().isoformat()
+        }
+
+        try:
+            if portfolio_data:
+                res = httpx.patch(
+                    f"{SUPABASE_URL}/rest/v1/portfolios?user_id=eq.{user.id}",
+                    headers={**headers, "Content-Type": "application/json"},
+                    json=payload
+                )
+            else:
+                res = httpx.post(
+                    f"{SUPABASE_URL}/rest/v1/portfolios",
+                    headers={**headers, "Content-Type": "application/json"},
+                    json=payload
+                )
+        except Exception:
+            traceback.print_exc()
+
+        portfolio_data = fetch_portfolio()
+        return redirect('portfolio')
+
+    resume_filename = os.path.basename(portfolio_data.get("resume_url", "")) if portfolio_data.get("resume_url") else ""
     return render(request, 'portfolio.html', {
-        'form': form,
-        'portfolio': portfolio,
+        'portfolio': portfolio_data,
         'editing': editing,
+        'resume_filename': resume_filename,
+        'major_choices': MAJOR_CHOICES,
+        'class_year_choices': CLASS_YEAR_CHOICES,
+        'university_choices': US_UNIVERSITY_CHOICES,
     })
 
 @login_required
@@ -86,9 +153,17 @@ def portfolio(request):
 def create_checkout_session(request):
     if request.method == 'POST':
         email_count = int(request.POST.get('email_count', 0))
-        portfolio = Portfolio.objects.filter(user=request.user).first()
 
-        if not portfolio or not portfolio.major or not portfolio.university or not portfolio.resume:
+        headers = {
+            "apikey": SUPABASE_API_KEY,
+            "Authorization": f"Bearer {SUPABASE_API_KEY}"
+        }
+        params = {"user_id": f"eq.{request.user.id}"}
+        response = httpx.get(f"{SUPABASE_URL}/rest/v1/portfolios", headers=headers, params=params)
+
+        portfolio = response.json()[0] if response.status_code == 200 and response.json() else {}
+
+        if not portfolio or not portfolio.get("major") or not portfolio.get("university") or not portfolio.get("resume_url"):
             return JsonResponse({'error': 'Portfolio incomplete'}, status=400)
 
         amount_cents = int(email_count * 0.20 * 100)
@@ -116,6 +191,7 @@ def create_checkout_session(request):
 
         return JsonResponse({'id': session.id})
 
+
 @csrf_exempt
 def stripe_webhook(request):
     payload = request.body
@@ -137,7 +213,7 @@ def stripe_webhook(request):
                 user = User.objects.get(id=user_id)
                 EmailCredit.objects.create(user=user, count=int(email_count))
             except User.DoesNotExist:
-                pass  # In production, log this issue
+                pass  
 
     return HttpResponse(status=200)
 
@@ -150,11 +226,20 @@ def emails_sent_confirmation(request):
 
 @login_required
 def send_emails_page(request):
-    portfolio = Portfolio.objects.filter(user=request.user).first()
+    headers = {
+        "apikey": SUPABASE_API_KEY,
+        "Authorization": f"Bearer {SUPABASE_API_KEY}"
+    }
+    params = {"user_id": f"eq.{request.user.id}"}
+    response = httpx.get(f"{SUPABASE_URL}/rest/v1/portfolios", headers=headers, params=params)
+
+    portfolio = response.json()[0] if response.status_code == 200 and response.json() else {}
+
     portfolio_complete = bool(
-        portfolio and portfolio.major and portfolio.class_year and
-        portfolio.university and portfolio.research_interests and portfolio.resume
+        portfolio and portfolio.get("major") and portfolio.get("class_year") and
+        portfolio.get("university") and portfolio.get("research_interests") and portfolio.get("resume_url")
     )
+
     return render(request, 'send_emails.html', {
         'portfolio_complete': portfolio_complete,
         'stripe_public_key': settings.STRIPE_PUBLIC_KEY

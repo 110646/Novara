@@ -15,42 +15,77 @@
         {% if not editing %}
         <a href="?edit=1" class="btn btn-secondary edit-btn">Edit Portfolio</a>
         {% endif %}
+
         <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
+
           <div class="form-group">
             <label for="id_name">Name <span class="required">*</span></label>
-            {{ form.name }}
+            <input type="text" name="name" id="id_name" value="{{ portfolio.name|default_if_none:'' }}" {% if not editing %}disabled{% endif %} required />
           </div>
+
           <div class="form-group">
             <label for="id_class_year">Academic Level <span class="required">*</span></label>
-            {{ form.class_year }}
+            <select name="class_year" id="id_class_year" {% if not editing %}disabled{% endif %} required>
+              <option value="">Select Academic Level</option>
+              {% for val, label in class_year_choices %}
+              <option value="{{ val }}" {% if portfolio.class_year == val %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
           </div>
+
           <div class="form-group">
             <label for="id_university">University <span class="required">*</span></label>
-            {{ form.university }}
+            <select name="university" id="id_university" {% if not editing %}disabled{% endif %} required>
+              <option value="">Select University</option>
+              {% for val, label in university_choices %}
+              <option value="{{ val }}" {% if portfolio.university == val %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
           </div>
+
           <div class="form-group">
             <label for="id_major">Major <span class="required">*</span></label>
-            {{ form.major }}
+            <select name="major" id="id_major" {% if not editing %}disabled{% endif %} required>
+              <option value="">Select Major</option>
+              {% for val, label in major_choices %}
+              <option value="{{ val }}" {% if portfolio.major == val %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
           </div>
+
           <div class="form-group">
             <label for="id_research_interests">Research Interests <span class="required">*</span></label>
-            {{ form.research_interests }}
+            <input type="text" name="research_interests" id="id_research_interests"
+                   value="{{ portfolio.research_interests|default_if_none:'' }}"
+                   placeholder="e.g., Machine Learning, Computer Vision, AI"
+                   {% if not editing %}disabled{% endif %} required />
             <div class="form-hint">e.g., Machine Learning, Computer Vision, AI</div>
           </div>
+
           <div class="form-group">
-            <label for="id_resume">Resume (Optional)</label>
-            {{ form.resume }}
+            <label for="id_resume">Resume (PDF)</label>
+            {% if portfolio.resume_url %}
+              <div class="resume-display">
+                <span class="form-hint">Uploaded Resume:</span>
+                <a href="{{ portfolio.resume_url }}" target="_blank">{{ resume_filename }}</a>
+                {% if editing %}
+                <button type="submit" name="delete_resume" value="1" class="btn btn-danger btn-sm ml-2">Delete</button>
+                {% endif %}
+              </div>
+            {% else %}
+              <p class="form-hint">No resume uploaded yet.</p>
+            {% endif %}
+            <input type="file" name="resume" id="id_resume" {% if not editing %}disabled{% endif %} />
           </div>
+
           {% if editing %}
           <button type="submit" class="btn btn-primary save-btn">Save Profile</button>
-          {% if portfolio.resume %}
-          <button type="submit" name="delete_resume" value="1" class="btn btn-danger delete-btn">Delete Resume</button>
-          {% endif %}
           {% endif %}
         </form>
       </div>
     </div>
+
     {% if portfolio and not editing %}
     <div class="card info-card">
       <div class="card-header">
@@ -68,6 +103,7 @@
       </div>
     </div>
     {% endif %}
+
     <div class="card action-card">
       <div class="card-body">
         <h3>Done Building Your Portfolio?</h3>
@@ -75,6 +111,7 @@
       </div>
     </div>
   </div>
+
   <div class="portfolio-sidebar">
     <div class="card professor-view-card">
       <div class="card-header">
@@ -92,6 +129,7 @@
         <div class="professor-interests"><span>Research Interests</span><br><span class="interests-list">{{ portfolio.research_interests|default:'Add interests...' }}</span></div>
       </div>
     </div>
+
     <div class="card profile-strength-card">
       <div class="card-header">
         <span class="strength-icon"><i class="fas fa-bolt"></i></span>

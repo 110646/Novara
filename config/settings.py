@@ -152,6 +152,8 @@ LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'    
 LOGOUT_REDIRECT_URL = '/'
 
+SUPABASE_SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkbGd1eGlqa2t1dWpuYWV1aHFxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NzcxNTE4OSwiZXhwIjoyMDYzMjkxMTg5fQ.K3K9jUQa88k0lawEzOGtu7aYwJZbuD9_wARpeIasXiI"
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 

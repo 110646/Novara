@@ -1,22 +1,27 @@
-from django.db.models.signals import post_delete, pre_save
 from django.dispatch import receiver
-from .models import Portfolio
+from allauth.account.signals import user_logged_in
+import httpx
+from django.conf import settings
 
-@receiver(post_delete, sender=Portfolio)
-def delete_resume_file(sender, instance, **kwargs):
-    if instance.resume:
-        instance.resume.delete(save=False)
+@receiver(user_logged_in)
+def populate_supabase_profile(sender, request, user, **kwargs):
+    SUPABASE_URL = "https://qdlguxijkkuujnaeuhqq.supabase.co"
+    SUPABASE_API_KEY = settings.SUPABASE_SERVICE_ROLE_KEY
 
-@receiver(pre_save, sender=Portfolio)
-def delete_old_resume_on_change(sender, instance, **kwargs):
-    if not instance.pk:
-        return  # New portfolio, nothing to compare
+    headers = {
+        "apikey": SUPABASE_API_KEY,
+        "Authorization": f"Bearer {SUPABASE_API_KEY}",
+        "Content-Type": "application/json"
+    }
 
-    try:
-        old_instance = Portfolio.objects.get(pk=instance.pk)
-    except Portfolio.DoesNotExist:
-        return
+    # Check if entry already exists
+    params = {"user_id": f"eq.{user.id}"}
+    res = httpx.get(f"{SUPABASE_URL}/rest/v1/portfolios", headers=headers, params=params)
 
-    # If a new file has been uploaded and it's different from the old one
-    if old_instance.resume and old_instance.resume != instance.resume:
-        old_instance.resume.delete(save=False)
+    if res.status_code == 200 and not res.json():
+        payload = {
+            "user_id": user.id,
+            "email": user.email,
+            "name": user.get_full_name() or "",
+        }
+        httpx.post(f"{SUPABASE_URL}/rest/v1/portfolios", headers=headers, json=payload)
