@@ -5,5 +5,56 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/payments.css' %}">
 <h1>Payments</h1>
-<p>Review your payment information.</p>
+
+<h2>Payment History</h2>
+<table class="payment-history">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>ID</th>
+      <th>Amount</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Example static data, replace with dynamic context when backend is ready -->
+    <tr>
+      <td>04/20/2024</td>
+      <td>123457</td>
+      <td>$25.00</td>
+      <td><span class="status-completed">Completed</span></td>
+    </tr>
+    <tr>
+      <td>04/15/2024</td>
+      <td>123456</td>
+      <td>$55.00</td>
+      <td><span class="status-completed">Completed</span></td>
+    </tr>
+    <tr>
+      <td>04/10/2024</td>
+      <td>123455</td>
+      <td>$100.00</td>
+      <td><span class="status-completed">Completed</span></td>
+    </tr>
+    <tr>
+      <td>04/01/2024</td>
+      <td>123454</td>
+      <td>$30.00</td>
+      <td><span class="status-completed">Completed</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Set up Payment Method</h2>
+<div class="credit-card">
+  <div class="chip"></div>
+  <div class="card-number">**** **** **** 9012</div>
+  <div class="card-name">JOHN DOE</div>
+  <div class="card-expiry">00/00</div>
+</div>
+
+<form method="post" action="#">
+  {% csrf_token %}
+  <button type="submit" class="update-btn">Add / Update Payment Method</button>
+</form>
 {% endblock %}

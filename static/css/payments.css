@@ -1,0 +1,75 @@
+.payment-history {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 32px;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.payment-history th, .payment-history td {
+  padding: 16px 20px;
+  text-align: left;
+}
+.payment-history th {
+  background: #fafbfc;
+  font-weight: 600;
+  font-size: 1.1em;
+}
+.payment-history tr:not(:last-child) {
+  border-bottom: 1px solid #f0f0f0;
+}
+.status-completed {
+  background: #34d399;
+  color: #fff;
+  padding: 6px 18px;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 1em;
+  display: inline-block;
+}
+.credit-card {
+  background: #222;
+  color: #fff;
+  border-radius: 20px;
+  width: 400px;
+  padding: 30px 32px 24px 32px;
+  margin: 20px 0 24px 0;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+}
+.chip {
+  width: 50px;
+  height: 35px;
+  background: gold;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+.card-number {
+  font-size: 1.5em;
+  letter-spacing: 4px;
+  margin-bottom: 20px;
+}
+.card-name {
+  font-size: 1.1em;
+  margin-bottom: 5px;
+  letter-spacing: 2px;
+}
+.card-expiry {
+  font-size: 1.1em;
+  margin-bottom: 5px;
+}
+.update-btn {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 28px;
+  font-size: 1.1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.update-btn:hover {
+  background: #1e40af;
+}
