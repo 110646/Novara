@@ -20,7 +20,7 @@ MAJOR_CHOICES = [
     ('Chemistry', 'Chemistry'), ('Child Development', 'Child Development'), ('Child Care', 'Child Care'),
     ('Civil Engineering', 'Civil Engineering'), ('Cognitive Psychology', 'Cognitive Psychology'), ('Comparative Literature', 'Comparative Literature'),
     ('Computer and Information Science', 'Computer and Information Science'), ('Computer Engineering', 'Computer Engineering'),
-    ('Computer Graphics', 'Computer Graphics'), ('Computer Systems Analysis', 'Computer Systems Analysis'),
+    ('Computer Graphics', 'Computer Graphics'), ('Computer Science', 'Computer Science'), ('Computer Systems Analysis', 'Computer Systems Analysis'),
     ('Construction Management', 'Construction Management'), ('Creative Writing', 'Creative Writing'), ('Criminal Justice', 'Criminal Justice'),
     ('Criminology', 'Criminology'), ('Culinary Arts', 'Culinary Arts'), ('Dental Hygiene', 'Dental Hygiene'),
     ('Developmental Psychology', 'Developmental Psychology'), ('Diagnostic Medical Sonography', 'Diagnostic Medical Sonography'),
