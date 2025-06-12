@@ -127,6 +127,7 @@
   }
   .edit-btn {
     margin-bottom: 1.2rem;
+    text-decoration: none;
   }
   .save-btn {
     margin-top: 0.5rem;

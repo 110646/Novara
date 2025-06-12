@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from core.utils import require_google_connection
 import httpx
 import os
+import urllib.parse
 from django.core.files.storage import default_storage
 from .models import EmailCredit
 from django.contrib.auth.models import User
@@ -138,7 +139,10 @@ def portfolio(request):
         portfolio_data = fetch_portfolio()
         return redirect('portfolio')
 
-    resume_filename = os.path.basename(portfolio_data.get("resume_url", "")) if portfolio_data.get("resume_url") else ""
+    resume_filename = ""
+    if portfolio_data.get("resume_url"):
+        raw_name = os.path.basename(portfolio_data["resume_url"])
+        resume_filename = urllib.parse.unquote(raw_name)
     return render(request, 'portfolio.html', {
         'portfolio': portfolio_data,
         'editing': editing,
