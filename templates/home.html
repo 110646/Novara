@@ -185,32 +185,32 @@
                 <div class="new-way">
                     <div class="content">
                         <div class="icon-container">
-                            <i class="icon-check"></i>
+                            <span class="icon-check-img"><img src="{% static 'images/check.png' %}" alt="Check" /></span>
                         </div>
                         <h3>The Novara Way</h3>
                         
                         <div class="scenarios">
                             <div class="scenario" data-index="0">
                                 <div class="icon">
-                                    <i class="icon-check"></i>
+                                    <span class="icon-check-img"><img src="{% static 'images/check.png' %}" alt="Check" /></span>
                                 </div>
                                 <p>AI instantly finds perfect professor matches</p>
                             </div>
                             <div class="scenario" data-index="1">
                                 <div class="icon">
-                                    <i class="icon-check"></i>
+                                    <span class="icon-check-img"><img src="{% static 'images/check.png' %}" alt="Check" /></span>
                                 </div>
                                 <p>Personalized emails that professors actually read</p>
                             </div>
                             <div class="scenario" data-index="2">
                                 <div class="icon">
-                                    <i class="icon-check"></i>
+                                    <span class="icon-check-img"><img src="{% static 'images/check.png' %}" alt="Check" /></span>
                                 </div>
                                 <p>87% success rate in landing opportunities</p>
                             </div>
                             <div class="scenario" data-index="3">
                                 <div class="icon">
-                                    <i class="icon-check"></i>
+                                    <span class="icon-check-img"><img src="{% static 'images/check.png' %}" alt="Check" /></span>
                                 </div>
                                 <p>Start getting responses in as little as 24 hours</p>
                             </div>
@@ -377,7 +377,7 @@
     <div class="container">
         <div class="section-header">
             <h2>About Novara</h2>
-            <p>Novara is a powerful platform designed to connect users with a wide range of research and internship opportunities—quickly, efficiently, and at scale. Instead of spending hours crafting and sending individual emails, Novara automates the process by generating personalized outreach based on each user’s profile and preferences. With just a few clicks, users can send hundreds of professionally tailored emails to potential mentors, labs, or institutions, saving valuable time while maximizing their chances of success. Our mission is to break down barriers to opportunity by leveraging smart automation, allowing users to focus more on growth and less on logistics.</p>
+            <p>Novara is a powerful platform designed to connect users with a wide range of research and internship opportunities—quickly, efficiently, and at scale. Instead of spending hours crafting and sending individual emails, Novara automates the process by generating personalized outreach based on each user's profile and preferences. With just a few clicks, users can send hundreds of professionally tailored emails to potential mentors, labs, or institutions, saving valuable time while maximizing their chances of success. Our mission is to break down barriers to opportunity by leveraging smart automation, allowing users to focus more on growth and less on logistics.</p>
         </div>
 
         <div class="about-carousel">
@@ -385,29 +385,36 @@
                 <!-- Slide 1 -->
                 <div class="carousel-slide">
                     <div class="quote-card">
-                        <p class="quote-text">"Novara has revolutionized how students find research opportunities. Their AI-powered platform makes the process seamless and efficient."</p>
-                        <p class="quote-author">- Dr. Emily Chen, Stanford University</p>
+                        <p class="quote-text">"After manually sending over 200 emails, I never once got a response from a professor, but while testing out Novara early-on, I matched with universities such as Harvad and Brown"</p>
+                        <p class="quote-author">- Aryan Kumar, CEO</p>
                     </div>
                 </div>
                 <!-- Slide 2 -->
                 <div class="carousel-slide">
                     <div class="quote-card">
-                        <p class="quote-text">"The personalized approach and attention to detail in matching students with professors is what sets Novara apart from other platforms."</p>
-                        <p class="quote-author">- Prof. Michael Rodriguez, MIT</p>
+                        <p class="quote-text">"Having been ignored myself, I used my computer-science skills to build a platform that hands the mic—and a real chance to people who rarely get one. I thought, why not use automation and smart matching to actually make outreach work? Now, we've helped thousands of students connect with professors, and the success rate speaks for itself."</p>
+                        <p class="quote-author">- Yogesh Karthikeyan, CTO</p>
                     </div>
                 </div>
                 <!-- Slide 3 -->
                 <div class="carousel-slide">
                     <div class="quote-card">
-                        <p class="quote-text">"I've seen firsthand how Novara's platform has helped students find meaningful research opportunities that align with their interests and goals."</p>
-                        <p class="quote-author">- Dr. Sarah Thompson, Harvard University</p>
+                        <p class="quote-text">"As a computer science major, I spent months cold-emailing professors and rarely got a response. It was frustrating—doing everything right but still feeling invisible. That experience pushed me to help build Novara: a platform designed to streamline outreach and give students like me a fair shot at research opportunities."</p>
+                        <p class="quote-author">- Vishakh Mishra, VP of Technology</p>
                     </div>
                 </div>
                 <!-- Slide 4 -->
                 <div class="carousel-slide">
                     <div class="quote-card">
-                        <p class="quote-text">"The success rate of students finding research positions through Novara is impressive. It's truly changing the landscape of academic research."</p>
-                        <p class="quote-author">- Prof. James Wilson, UC Berkeley</p>
+                        <p class="quote-text">"Talent is everywhere, but opportunity is not. Novara was founded to bridge that gap by connecting promising students to the research opportunities that they deserve. It's about opening doors for the next generation of innovators."</p>
+                        <p class="quote-author">- Aadi Nag, Co-Founder</p>
+                    </div>
+                </div>
+                <!-- Slide 5 -->
+                <div class="carousel-slide">
+                    <div class="quote-card">
+                        <p class="quote-text">"Novara was born from a simple idea: that finding the right research opportunity shouldn't depend on luck or connections — it should depend on passion and access. We're here to level that playing field."</p>
+                        <p class="quote-author">- Rohan Arangi, Co-Founder</p>
                     </div>
                 </div>
             </div>
@@ -428,6 +435,7 @@
                 <span class="indicator" onclick="goToSlide(1)"></span>
                 <span class="indicator" onclick="goToSlide(2)"></span>
                 <span class="indicator" onclick="goToSlide(3)"></span>
+                <span class="indicator" onclick="goToSlide(4)"></span>
             </div>
         </div>
     </div>
