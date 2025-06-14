@@ -13,7 +13,7 @@
       </div>
       <div class="card-body">
         {% if not editing %}
-        <a href="?edit=1" class="btn btn-secondary edit-btn">Edit Portfolio</a>
+        <a href="?edit=1" class="btn btn-secondary edit-btn" style="text-decoration: none;">Edit Portfolio</a>
         {% endif %}
 
         <form method="post" enctype="multipart/form-data">
@@ -133,15 +133,56 @@
     <div class="card profile-strength-card">
       <div class="card-header">
         <span class="strength-icon"><i class="fas fa-bolt"></i></span>
-        <span class="strength-title">Profile Strength</span>
+        <span class="strength-title">Profile Completion</span>
       </div>
       <div class="card-body">
         <div class="strength-bar-bg">
-          <div class="strength-bar-fill" style="width: 30%"></div>
+          <div id="strengthBarFill" class="strength-bar-fill" style="width: 0%;"></div>
         </div>
-        <div class="strength-label">Getting Started</div>
+        <div id="strengthLabel" class="strength-label">Getting Started</div>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+  function calculateStrength() {
+    let filled = 0;
+    const total = 6;
+
+    if (document.getElementById("id_name").value.trim()) filled++;
+    if (document.getElementById("id_class_year").value.trim()) filled++;
+    if (document.getElementById("id_university").value.trim()) filled++;
+    if (document.getElementById("id_major").value.trim()) filled++;
+    if (document.getElementById("id_research_interests").value.trim()) filled++;
+
+    const resumeInput = document.getElementById("id_resume");
+    const resumeUploaded = document.querySelector(".resume-display a");
+    if (resumeInput.files.length > 0 || resumeUploaded) filled++;
+
+    const percent = Math.round((filled / total) * 100);
+    const bar = document.getElementById("strengthBarFill");
+    bar.style.width = percent + "%";
+    bar.classList.toggle("complete", percent === 100);
+
+
+    let label = "Getting Started";
+    if (percent >= 100) label = "Done!";
+    else if (percent >= 70) label = "Almost There";
+    else if (percent >= 40) label = "In Progress";
+    document.getElementById("strengthLabel").innerText = label;
+  }
+
+
+  calculateStrength();
+
+  ["id_name", "id_class_year", "id_university", "id_major", "id_research_interests", "id_resume"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("input", calculateStrength);
+      el.addEventListener("change", calculateStrength); 
+    }
+  });
+</script>
+
 {% endblock %}

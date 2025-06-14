@@ -143,6 +143,21 @@ def portfolio(request):
     if portfolio_data.get("resume_url"):
         raw_name = os.path.basename(portfolio_data["resume_url"])
         resume_filename = urllib.parse.unquote(raw_name)
+
+    def calculate_completion(portfolio):
+        total = 6
+        completed = sum([
+        1 if portfolio.get("name") else 0,
+        1 if portfolio.get("major") else 0,
+        1 if portfolio.get("class_year") else 0,
+        1 if portfolio.get("university") else 0,
+        1 if portfolio.get("research_interests") else 0,
+        1 if portfolio.get("resume_url") else 0,
+    ])
+        return int((completed / total) * 100)
+
+    profile_completion = calculate_completion(portfolio_data)
+
     return render(request, 'portfolio.html', {
         'portfolio': portfolio_data,
         'editing': editing,
@@ -150,6 +165,7 @@ def portfolio(request):
         'major_choices': MAJOR_CHOICES,
         'class_year_choices': CLASS_YEAR_CHOICES,
         'university_choices': US_UNIVERSITY_CHOICES,
+        'profile_completion': profile_completion,
     })
 
 @login_required
