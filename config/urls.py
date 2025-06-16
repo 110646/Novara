@@ -1,19 +1,3 @@
-"""
-URL configuration for config project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path, include
 from core import views as core_views
@@ -21,21 +5,31 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import render
 from django.views.generic.base import RedirectView
-from core.views import custom_logout
-from django.contrib.auth.views import LogoutView
-
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
+    # blocks unwanted allauth routes
     path('accounts/signup/', RedirectView.as_view(url='/', permanent=False)),
+    path('accounts/login/', RedirectView.as_view(url='/', permanent=False)),
+    path('accounts/logout/', RedirectView.as_view(url='/', permanent=False)),
+    path('accounts/password/reset/', RedirectView.as_view(pattern_name='home', permanent=False)),
+    path('accounts/password/reset/done/', RedirectView.as_view(pattern_name='home', permanent=False)),
+    path('accounts/password/change/', RedirectView.as_view(pattern_name='home', permanent=False)),
+    path('accounts/inactive/', RedirectView.as_view(pattern_name='home', permanent=False)),
+    path('accounts/confirm-email/', RedirectView.as_view(pattern_name='home', permanent=False)),
+    path('accounts/email/', RedirectView.as_view(pattern_name='home', permanent=False)),
+    path('accounts/confirm-email/<str:key>/', RedirectView.as_view(pattern_name='home', permanent=False)),
+    path('accounts/social/connections/', RedirectView.as_view(pattern_name='home', permanent=False)),
+    
     path('accounts/', include('allauth.urls')),
-    path("accounts/logout/", custom_logout, name="account_logout"),
+
+    # custom logout
+    path('logout/', core_views.custom_logout, name='logout'),
 
     # Public
     path('', core_views.home, name='home'),
     path('login/', lambda request: render(request, 'login.html'), name='account_login'),
-
 
     # Protected
     path('dashboard/', core_views.dashboard, name='dashboard'),
@@ -46,7 +40,6 @@ urlpatterns = [
     path('create-checkout-session/', core_views.create_checkout_session, name='create_checkout_session'),
     path('emails-sent/', core_views.emails_sent_confirmation, name='emails_sent_confirmation'),
     path('webhooks/stripe/', core_views.stripe_webhook, name='stripe_webhook'),
-
 ]
 
 if settings.DEBUG:
