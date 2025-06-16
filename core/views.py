@@ -13,6 +13,8 @@ from django.conf import settings
 from django.utils.timezone import now
 import stripe
 import traceback
+from django.contrib.auth import logout
+from django.contrib import messages
 from storages.backends.s3boto3 import S3Boto3Storage
 from core.choices import MAJOR_CHOICES, CLASS_YEAR_CHOICES, US_UNIVERSITY_CHOICES
 
@@ -29,6 +31,10 @@ def home(request):
         return redirect('dashboard')
     return render(request, 'home.html')
 
+def custom_logout(request):
+    logout(request)
+    messages.success(request, "Logged out successfully.")
+    return redirect('home')
 
 # ------------------------------
 # DASHBOARD + PAGES

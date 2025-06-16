@@ -1,0 +1,20 @@
+{% load socialaccount %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign In - ConnectNovara</title>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Sign in to ConnectNovara</h1>
+            <a href="{% provider_login_url 'google' method='oauth2' process='login' %}">
+                <button class="google-btn">Sign in with Google</button>
+            </a>
+
+    </div>
+</body>
+</html>

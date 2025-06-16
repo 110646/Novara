@@ -148,7 +148,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SITE_ID = 1
-LOGIN_URL = '/accounts/login/'        
+LOGIN_URL = '/login/'        
 LOGIN_REDIRECT_URL = '/dashboard/'    
 LOGOUT_REDIRECT_URL = '/'
 
@@ -163,6 +163,10 @@ SOCIALACCOUNT_PROVIDERS = {
         },
     }
 }
+
+ACCOUNT_SIGNUP_ALLOWED = False
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
 
 SUPABASE_SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkbGd1eGlqa2t1dWpuYWV1aHFxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NzcxNTE4OSwiZXhwIjoyMDYzMjkxMTg5fQ.K3K9jUQa88k0lawEzOGtu7aYwJZbuD9_wARpeIasXiI"
 

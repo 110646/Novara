@@ -19,16 +19,23 @@ from django.urls import path, include
 from core import views as core_views
 from django.conf import settings
 from django.conf.urls.static import static
+from django.shortcuts import render
+from django.views.generic.base import RedirectView
+from core.views import custom_logout
+from django.contrib.auth.views import LogoutView
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-     
+    path('accounts/signup/', RedirectView.as_view(url='/', permanent=False)),
     path('accounts/', include('allauth.urls')),
+    path("accounts/logout/", custom_logout, name="account_logout"),
 
     # Public
     path('', core_views.home, name='home'),
+    path('login/', lambda request: render(request, 'login.html'), name='account_login'),
+
 
     # Protected
     path('dashboard/', core_views.dashboard, name='dashboard'),
