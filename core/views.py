@@ -117,7 +117,6 @@ def portfolio(request):
         payload = {
             "user_id": int(user.id),
             "name": name,
-            "email": user.email,
             "major": major,
             "class_year": class_year,
             "university": university,
@@ -125,6 +124,9 @@ def portfolio(request):
             "resume_url": resume_url,
             "updated_at": now().isoformat()
         }
+
+        if user.email:
+            payload["email"] = user.email
 
         try:
             if portfolio_data:
