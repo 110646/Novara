@@ -1,0 +1,18 @@
+[Unit]
+Description=gunicorn daemon for Novara
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/novara/Novara
+ExecStart=/home/ubuntu/novara/venv/bin/gunicorn \
+          --access-logfile - \
+          --workers 3 \
+          --bind unix:/home/ubuntu/novara/Novara/gunicorn.sock \
+          config.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
+
+
