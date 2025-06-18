@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "send-emails",
+  "main": "src/index.js",
+  "compatibility_date": "2025-06-18",
+  "observability": {
+    "enabled": true
+  },
+  "vars": {
+    "SENDGRID_API_KEY": "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"
+  }
+}

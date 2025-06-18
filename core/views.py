@@ -1,8 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from core.utils import require_google_connection
+from core.utils import require_google_connection, send_emails_after_payment
 import httpx
 import os
+import openai
+from openai import OpenAI
+from django.views.decorators.http import require_POST
 import urllib.parse
 from django.core.files.storage import default_storage
 from .models import EmailCredit
@@ -13,6 +16,8 @@ from django.conf import settings
 from django.utils.timezone import now
 import stripe
 import traceback
+import json
+from openai.types.chat import ChatCompletionMessageParam
 from django.contrib.auth import logout
 from django.contrib import messages
 from storages.backends.s3boto3 import S3Boto3Storage
@@ -21,7 +26,7 @@ from core.choices import MAJOR_CHOICES, CLASS_YEAR_CHOICES, US_UNIVERSITY_CHOICE
 stripe.api_key = settings.STRIPE_SECRET_KEY
 SUPABASE_URL = "https://qdlguxijkkuujnaeuhqq.supabase.co"
 SUPABASE_API_KEY = settings.SUPABASE_SERVICE_ROLE_KEY
-
+openai.api_key = settings.OPENAI_API_KEY
 
 # ------------------------------
 # PUBLIC
@@ -56,7 +61,6 @@ def payments(request):
         'credits': credits,
         'total_credits': total
     })
-
 
 # ------------------------------
 # PORTFOLIO
@@ -95,13 +99,13 @@ def portfolio(request):
         resume_url = portfolio_data.get("resume_url")
 
         if "delete_resume" in request.POST:
-            resume_url = None  # Set to None to clear
+            resume_url = None
             try:
                 if portfolio_data.get("resume_url"):
                     from boto3 import client
                     s3 = client("s3")
                     key = portfolio_data["resume_url"].split("/")[-2] + "/" + portfolio_data["resume_url"].split("/")[-1]
-                    s3.delete_object(Bucket="your-bucket-name", Key=key)
+                    s3.delete_object(Bucket="resume-uploads", Key=key)
             except Exception as e:
                 print("❌ Resume deletion error:", e)
 
@@ -155,13 +159,13 @@ def portfolio(request):
     def calculate_completion(portfolio):
         total = 6
         completed = sum([
-        1 if portfolio.get("name") else 0,
-        1 if portfolio.get("major") else 0,
-        1 if portfolio.get("class_year") else 0,
-        1 if portfolio.get("university") else 0,
-        1 if portfolio.get("research_interests") else 0,
-        1 if portfolio.get("resume_url") else 0,
-    ])
+            1 if portfolio.get("name") else 0,
+            1 if portfolio.get("major") else 0,
+            1 if portfolio.get("class_year") else 0,
+            1 if portfolio.get("university") else 0,
+            1 if portfolio.get("research_interests") else 0,
+            1 if portfolio.get("resume_url") else 0,
+        ])
         return int((completed / total) * 100)
 
     profile_completion = calculate_completion(portfolio_data)
@@ -176,12 +180,17 @@ def portfolio(request):
         'profile_completion': profile_completion,
     })
 
-@login_required
+# ------------------------------
+# STRIPE + EMAIL FLOW
+# ------------------------------
 @csrf_exempt
+@login_required
+@require_POST
 def create_checkout_session(request):
-    if request.method == 'POST':
+    try:
         email_count = int(request.POST.get('email_count', 0))
 
+        # 1. Validate portfolio completeness
         headers = {
             "apikey": SUPABASE_API_KEY,
             "Authorization": f"Bearer {SUPABASE_API_KEY}"
@@ -191,9 +200,16 @@ def create_checkout_session(request):
 
         portfolio = response.json()[0] if response.status_code == 200 and response.json() else {}
 
-        if not portfolio or not portfolio.get("major") or not portfolio.get("university") or not portfolio.get("resume_url"):
+        if not portfolio or not all([
+            portfolio.get("major"),
+            portfolio.get("university"),
+            portfolio.get("resume_url"),
+            portfolio.get("class_year"),
+            portfolio.get("research_interests"),
+        ]):
             return JsonResponse({'error': 'Portfolio incomplete'}, status=400)
 
+        # 2. Calculate price and create session
         amount_cents = int(email_count * 0.20 * 100)
 
         session = stripe.checkout.Session.create(
@@ -219,6 +235,73 @@ def create_checkout_session(request):
 
         return JsonResponse({'id': session.id})
 
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+@csrf_exempt
+@require_POST
+def generate_email_template(request):
+    try:
+        name = request.POST.get("name")
+        email = request.POST.get("email")
+        major = request.POST.get("major")
+        university = request.POST.get("university")
+        research_interests = request.POST.get("research_interests")
+        class_year = request.POST.get("class_year")
+        resume_file = request.FILES.get("resume")
+
+        if not resume_file:
+            return JsonResponse({"error": "Resume file missing"}, status=400)
+
+        prompt = f"""
+You are an academic writing assistant. Write a professional cold outreach email on behalf of a student named {name}, who is majoring in {major} at {university} and expects to graduate in {class_year}. The email is being sent to a professor.
+
+The student's resume is attached. Their stated research interests are: {research_interests}.
+
+Your job is to generate a polished, respectful, and enthusiastic email that:
+
+- Clearly expresses interest in joining the professor’s research group
+- Highlights relevant accomplishments and skills from the resume
+- Ties their research interests and long-term goals to the professor's and student's major
+- Ends with a polite, actionable closing (e.g., asking about opportunities)
+
+Format requirements:
+- Use **only** these placeholders: {{ professor_name }}, {{ university }}
+- Do **not** invent any fields like [specific area of research] or [insert XYZ]
+- Do **not** use markdown, bold, or special formatting — plain text only
+- Keep the email **3 to 5 concise paragraphs**
+- End the email with:
+{name}
+{email}
+(include phone number only if found in the resume)
+
+Do not include any preamble or commentary. Only return the finalized email body.
+""".strip()
+
+        client = OpenAI(api_key=settings.OPENAI_API_KEY)
+
+        # ✅ Properly format the file as a tuple
+        uploaded_file = client.files.create(
+            file=("resume.pdf", resume_file.read(), "application/pdf"),
+            purpose="assistants"
+        )
+
+        # ✅ Now call the chat completion with the file context
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "You are an academic writing assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            file_ids=[uploaded_file.id]
+        )
+
+        template = response.choices[0].message.content.strip()
+        return JsonResponse({"template": template})
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
 
 @csrf_exempt
 def stripe_webhook(request):
@@ -240,8 +323,9 @@ def stripe_webhook(request):
             try:
                 user = User.objects.get(id=user_id)
                 EmailCredit.objects.create(user=user, count=int(email_count))
+                send_emails_after_payment(user.id)
             except User.DoesNotExist:
-                pass  
+                return HttpResponse(status=404)
 
     return HttpResponse(status=200)
 

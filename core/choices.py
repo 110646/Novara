@@ -2,6 +2,7 @@
 MAJOR_CHOICES = [
     ('', 'Select Major'),  # Placeholder
     ('Accounting', 'Accounting'), ('Aerospace Engineering', 'Aerospace Engineering'),
+    ('test', 'test'),
     ('Agricultural Business and Management', 'Agricultural Business and Management'),
     ('Agricultural Economics', 'Agricultural Economics'), ('Agricultural Education', 'Agricultural Education'),
     ('Agricultural Journalism', 'Agricultural Journalism'), ('Agricultural Mechanization', 'Agricultural Mechanization'),

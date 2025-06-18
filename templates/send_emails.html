@@ -15,25 +15,25 @@
       {% csrf_token %}
       <div class="slider-label-row">
         <label for="emailSlider">Number of Emails</label>
-        <span class="slider-value-badge" id="sliderValue">10</span>
+        <span class="slider-value-badge" id="sliderValue">3</span>
       </div>
       <div class="slider-row">
-        <span class="slider-min">10</span>
+        <span class="slider-min">3</span>
         <input
           type="range"
           id="emailSlider"
           name="email_count"
-          min="10"
+          min="3"
           max="300"
           step="1"
-          value="10"
+          value="3"
           oninput="updateSlider()"
         />
         <span class="slider-max">300</span>
       </div>
       <div class="price-box">
         <div class="price-row">Price: $0.20 per email</div>
-        <div class="total-row">Total: <span class="total-amount" id="totalCost">$2.00</span></div>
+        <div class="total-row">Total: <span class="total-amount" id="totalCost">$0.60</span></div>
       </div>
       <button type="submit" class="btn btn-primary send-btn"><i class="fas fa-paper-plane"></i> Send Emails</button>
     </form>

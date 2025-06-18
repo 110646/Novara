@@ -12,15 +12,18 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 from storages.backends.s3boto3 import S3Boto3Storage
+from dotenv import load_dotenv
+
+load_dotenv()
 
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
-AWS_ACCESS_KEY_ID = '058c0a3a388529a3c5425aaf025d7d55'
-AWS_SECRET_ACCESS_KEY = '5a0351f6723df1dfb9142e7c3ce2d28189288381a1af4e2bef6451bbe2fad195'
-AWS_STORAGE_BUCKET_NAME = 'resume-uploads'
-AWS_S3_ENDPOINT_URL = 'https://b6aa53bf1a86bd08e1d961d9df8b7e47.r2.cloudflarestorage.com'
-AWS_S3_REGION_NAME = 'auto'
-AWS_QUERYSTRING_AUTH = False
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
+AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL")
+AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME")
+AWS_QUERYSTRING_AUTH = os.getenv("False")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -167,12 +170,17 @@ ACCOUNT_SIGNUP_ALLOWED = False
 SOCIALACCOUNT_LOGIN_ON_GET = True
 ACCOUNT_ADAPTER = 'core.adapters.NoLoginMessageAdapter'
 
-SUPABASE_SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkbGd1eGlqa2t1dWpuYWV1aHFxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NzcxNTE4OSwiZXhwIjoyMDYzMjkxMTg5fQ.K3K9jUQa88k0lawEzOGtu7aYwJZbuD9_wARpeIasXiI"
+SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-STRIPE_WEBHOOK_SECRET = 'whsec_7565cd7bed6a6066699772dc3873761693614c3ee6bd0921095709f6105913d8'
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
 
-STRIPE_PUBLIC_KEY = 'pk_test_51RXVuXC5cw7sV82FNEXpyp1MqrKHQaY0JscjxeUd1ULd5bgRXs0YeY3TYjcsD3jAUgHjYfaJht5uLfVKUbivRGos00Pv4QB1uA'
-STRIPE_SECRET_KEY = 'sk_test_51RXVuXC5cw7sV82FB6dnUbLPkxJ2NE9y9z5FnFmp2qVCjI1qr3D6xChEsZU5SXamT1XyHjZYlzVp4QfbQHUZZGUj00VpjX570k'
+STRIPE_PUBLIC_KEY = os.getenv("STRIPE_PUBLIC_KEY")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+
+SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+CLOUDFLARE_WORKER_URL = os.getenv("CLOUDFLARE_WORKER_URL")
