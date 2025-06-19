@@ -22,6 +22,7 @@ from django.contrib.auth import logout
 from django.contrib import messages
 from storages.backends.s3boto3 import S3Boto3Storage
 from core.choices import MAJOR_CHOICES, CLASS_YEAR_CHOICES, US_UNIVERSITY_CHOICES
+from django.core.mail import send_mail
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 SUPABASE_URL = "https://qdlguxijkkuujnaeuhqq.supabase.co"
@@ -356,3 +357,31 @@ def send_emails_page(request):
         'portfolio_complete': portfolio_complete,
         'stripe_public_key': settings.STRIPE_PUBLIC_KEY
     })
+
+def contact(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        message = request.POST.get('message')
+        
+        # Send email
+        subject = name
+        email_message = message
+        to_email = 'helpnovaraco@gmail.com'
+        from_email = email
+        
+        try:
+            send_mail(
+                subject,
+                email_message,
+                from_email,
+                [to_email],
+                fail_silently=False,
+            )
+            messages.success(request, 'Thank you for your message! We will get back to you soon.')
+        except Exception as e:
+            messages.error(request, 'Sorry, there was an error sending your message. Please try again later.')
+        
+        return redirect('contact')
+    
+    return render(request, 'contact.html')

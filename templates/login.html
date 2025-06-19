@@ -1,5 +1,6 @@
 {% load socialaccount %}
 {% load static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
 <link rel="stylesheet" href="{% static 'css/login.css' %}">
 
 <!DOCTYPE html>
@@ -9,12 +10,23 @@
     <title>Sign In - ConnectNovara</title>
 </head>
 <body>
-    <div class="login-container">
-        <h1>Sign in to Novara</h1>
-            <a href="{% provider_login_url 'google' method='oauth2' process='login' %}">
-                <button class="google-btn">Sign in with Google</button>
+    <div class="login-bg">
+        <div class="login-card">
+            <img src="{% static 'images/logo.png' %}" alt="Novara Logo" class="login-logo-img">
+            <div class="login-main-message">
+                Sign in with Google to send and receive research emails seamlessly.
+            </div>
+            <div class="login-sub-message">
+                No other login options—just Google.
+            </div>
+            <a href="{% provider_login_url 'google' method='oauth2' process='login' %}" class="google-signin-btn">
+                <span class="google-icon">
+                    <img src="{% static 'images/google.png' %}" alt="Google Logo">
+                </span>
+                Sign in with Google
             </a>
-
+            <a href="{% url 'home' %}" class="back-btn-large">Back</a>
+        </div>
     </div>
 </body>
 </html>

@@ -5,6 +5,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import render
 from django.views.generic.base import RedirectView
+from core.views import (
+    home, dashboard, portfolio, account, payments, contact
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

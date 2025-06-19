@@ -74,6 +74,7 @@
   </style>
 {% endif %}
 
+<body id="home">
 
 <!-- Hero Section -->
 <section class="hero">
@@ -293,7 +294,7 @@
 </section>
 
 <!-- Testimonials Section -->
-<section class="testimonials-section">
+<section class="testimonials-section" id="testimonials-section" style="margin-bottom: 0; padding-bottom: 0;">
     <div class="container">
         <div class="section-header">
             <h2>What Our Users Say</h2>
@@ -376,7 +377,7 @@
 </section>
 
 <!-- Features Section -->
-<section class="features-section">
+<section class="features-section" id="features-section">
     <div class="container">
         <div class="section-header">
             <h2>Why Choose Novara</h2>
@@ -443,9 +444,9 @@
   </section>
 
 <!-- About Section -->
-<section class="about-section">
+<section class="about-section" id="about-section" style="margin-bottom: -64px; padding-bottom: -10px;">
     <div class="container">
-        <div class="section-header">
+        <div class="section-header" style="margin-bottom: 10px;">
             <h2>About Novara</h2>
             <p>Novara is a powerful platform designed to connect users with a wide range of research and internship opportunities—quickly, efficiently, and at scale. Instead of spending hours crafting and sending individual emails, Novara automates the process by generating personalized outreach based on each user's profile and preferences. With just a few clicks, users can send hundreds of professionally tailored emails to potential mentors, labs, or institutions, saving valuable time while maximizing their chances of success. Our mission is to break down barriers to opportunity by leveraging smart automation, allowing users to focus more on growth and less on logistics.</p>
         </div>
@@ -511,9 +512,6 @@
     </div>
 </section>
 
-<!-- Add a spacer div to extend the white background -->
-<div class="about-section-spacer"></div>
-
 <!-- Add JavaScript for carousel functionality -->
 <script>
 let currentSlide = 0;
@@ -548,3 +546,4 @@ setInterval(nextSlide, 5000);
 </script>
 
 {% endblock %}
+</body>
