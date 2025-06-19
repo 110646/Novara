@@ -1,16 +1,12 @@
-const SENDGRID_API_KEY = SENDGRID_API_KEY;
-
 export default {
-  async fetch(request) {
+  async fetch(request, env) {
     try {
       const { template, student, professors } = await request.json();
 
-      // Optional log for debug in Cloudflare logs
       console.log(`📨 Sending ${professors.length} emails`);
 
       for (const prof of professors) {
         const personalized = template
-          // Support both {{ }} and {} syntax
           .replace(/{{\s*professor_name\s*}}|{professor_name}/g, prof.last_name)
           .replace(/{{\s*university\s*}}|{university}/g, prof.university)
           .replace(/{{\s*major\s*}}|{major}/g, student.major)
@@ -19,7 +15,7 @@ export default {
         await fetch("https://api.sendgrid.com/v3/mail/send", {
           method: "POST",
           headers: {
-            "Authorization": `Bearer ${SENDGRID_API_KEY}`,
+            "Authorization": `Bearer ${env.SENDGRID_API_KEY}`,
             "Content-Type": "application/json"
           },
           body: JSON.stringify({

@@ -1,5 +1,4 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "send-emails",
   "main": "src/index.js",
   "compatibility_date": "2025-06-18",
