@@ -23,6 +23,10 @@ from django.contrib import messages
 from storages.backends.s3boto3 import S3Boto3Storage
 from core.choices import MAJOR_CHOICES, CLASS_YEAR_CHOICES, US_UNIVERSITY_CHOICES
 from django.core.mail import send_mail
+import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 SUPABASE_URL = "https://qdlguxijkkuujnaeuhqq.supabase.co"
@@ -243,6 +247,8 @@ def create_checkout_session(request):
 @require_POST
 def generate_email_template(request):
     try:
+        logger.info("🚀 Starting email template generation")
+
         name = request.POST.get("name")
         email = request.POST.get("email")
         major = request.POST.get("major")
@@ -251,7 +257,9 @@ def generate_email_template(request):
         class_year = request.POST.get("class_year")
         resume_file = request.FILES.get("resume")
 
+        logger.debug(f"📥 Form data received: name={name}, email={email}, major={major}, university={university}, class_year={class_year}, interests={research_interests}")
         if not resume_file:
+            logger.warning("⚠️ Resume file is missing from POST request")
             return JsonResponse({"error": "Resume file missing"}, status=400)
 
         prompt = f"""
@@ -259,50 +267,86 @@ You are an academic writing assistant. Write a professional cold outreach email 
 
 The student's resume is attached. Their stated research interests are: {research_interests}.
 
-Your job is to generate a polished, respectful, and enthusiastic email that:
+Your job is to generate a clear, professional, and enthusiastic email that:
 
-- Clearly expresses interest in joining the professor’s research group
-- Highlights relevant accomplishments and skills from the resume
-- Ties their research interests and long-term goals to the professor's and student's major
-- Ends with a polite, actionable closing (e.g., asking about opportunities)
+- Begins with: "Dear Professor {{ professor_name }}"
+- Expresses interest in joining the professor’s research group
+- Highlights specific, relevant experiences or projects mentioned in the resume
+- Uses plain, simple, and professional language (avoid overly complex academic phrases)
+- Ends with a polite closing that invites further communication (e.g., asking about open opportunities)
 
 Format requirements:
-- Use **only** these placeholders: {{ professor_name }}, {{ university }}
-- Do **not** invent any fields like [specific area of research] or [insert XYZ]
-- Do **not** use markdown, bold, or special formatting — plain text only
-- Keep the email **3 to 5 concise paragraphs**
-- End the email with:
-{name}
-{email}
-(include phone number only if found in the resume)
+- Use ONLY these placeholders: {{ professor_name }}, {{ university }}
+- DO NOT invent any placeholders like [insert XYZ]
+- DO NOT include markdown, bold, or special formatting — plain text only
+- Keep the email 3 to 5 concise paragraphs
+- Always end the email with this exact signature block (unless information is missing):
 
-Do not include any preamble or commentary. Only return the finalized email body.
+{name}  
+{email}  
+(add phone number if found in the resume)
+
+Only return the finalized email body. Do not include any explanation or commentary.
+Do not include a subject line.
 """.strip()
 
         client = OpenAI(api_key=settings.OPENAI_API_KEY)
+        logger.info("📡 Connected to OpenAI")
 
-        # ✅ Properly format the file as a tuple
-        uploaded_file = client.files.create(
+        # Step 1: Upload resume
+        logger.info("📤 Uploading resume to OpenAI")
+        file_upload = client.files.create(
             file=("resume.pdf", resume_file.read(), "application/pdf"),
             purpose="assistants"
         )
+        logger.debug(f"✅ Resume uploaded: file_id={file_upload.id}")
 
-        # ✅ Now call the chat completion with the file context
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": "You are an academic writing assistant."},
-                {"role": "user", "content": prompt}
-            ],
-            file_ids=[uploaded_file.id]
+        # Step 2: Create thread
+        thread = client.beta.threads.create()
+        logger.debug(f"🧵 Thread created: thread_id={thread.id}")
+
+        # Step 3: Add prompt to thread
+        client.beta.threads.messages.create(
+            thread_id=thread.id,
+            role="user",
+            content=[{"type": "text", "text": prompt}]
         )
+        logger.info("📝 Prompt added to thread")
 
-        template = response.choices[0].message.content.strip()
-        return JsonResponse({"template": template})
+        # Step 4: Run assistant
+        logger.info("⚙️ Starting assistant run with attached resume")
+        run = client.beta.threads.runs.create(
+            thread_id=thread.id,
+            assistant_id=settings.OPENAI_ASSISTANT_ID,
+            
+        )
+        logger.debug(f"▶️ Run started: run_id={run.id}")
+
+        # Step 5: Poll until complete
+        while True:
+            run_status = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
+            logger.debug(f"⏳ Polling status: {run_status.status}")
+            if run_status.status == "completed":
+                logger.info("✅ Assistant run completed")
+                break
+            elif run_status.status in ["failed", "cancelled", "expired"]:
+                logger.error(f"❌ Run failed with status: {run_status.status}")
+                return JsonResponse({"error": f"Run failed with status: {run_status.status}"}, status=500)
+            time.sleep(2)
+
+        # Step 6: Retrieve final message
+        messages = client.beta.threads.messages.list(thread_id=thread.id)
+        logger.debug(f"📨 {len(messages.data)} messages retrieved from thread")
+
+        latest_message = messages.data[0]
+        email_template = latest_message.content[0].text.value.strip()
+        logger.info("📬 Final email template generated")
+
+        return JsonResponse({"template": email_template})
 
     except Exception as e:
+        logger.exception("❌ OpenAI template generation failed")
         return JsonResponse({"error": str(e)}, status=500)
-
 
 @csrf_exempt
 def stripe_webhook(request):
