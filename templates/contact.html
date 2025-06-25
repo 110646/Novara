@@ -5,6 +5,8 @@
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
 <section class="contact-section">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
     <div class="container">
         <div class="section-header">
             <h2>Contact Us</h2>
@@ -24,7 +26,7 @@
                 </div>
                 <div class="form-group">
                     <label for="message">Message</label>
-                    <textarea id="message" name="message" required placeholder="Your message" rows="6"></textarea>
+                    <textarea id="message" name="message" required placeholder="Your message" rows="6" maxlength="1000"></textarea>
                 </div>
                 <button type="submit" class="submit-btn">
                     Send Message
@@ -37,31 +39,47 @@
 
 <style>
 .contact-section {
-    padding: 80px 0;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 40px 0;
+    position: relative;
+    overflow: hidden;
     margin-top: -10px;
     margin-bottom: -65px;
 }
 
 .contact-form-container {
-    max-width: 600px;
-    margin: 40px auto;
+    max-width: 480px;
+    margin: 20px auto;
     background: white;
-    padding: 40px;
+    padding: 30px;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 1;
+}
+
+.contact-section .hero-bg {
+    background-image: url("{% static 'images/contact.jpg' %}");
+}
+
+.contact-section .section-header h2 {
+    color: white;
+}
+
+.contact-section .section-header p {
+    color: white;
+    opacity: 0.9;
 }
 
 .contact-form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 15px;
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 5px;
 }
 
 .form-group label {
@@ -76,6 +94,7 @@
     border-radius: 8px;
     font-size: 16px;
     transition: border-color 0.3s ease;
+    resize: none;
 }
 
 .form-group input:focus,

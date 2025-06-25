@@ -32,8 +32,8 @@ body {
     background: #fff;
     border-radius: 24px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.13);
-    padding: 64px 48px 44px 48px;
-    max-width: 480px;
+    padding: 40px;
+    max-width: 440px;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -42,25 +42,25 @@ body {
     z-index: 2;
 }
 .login-logo-img {
-    height: 300px;
+    height: 255px;
     width: auto;
-    margin-bottom: -100px;
-    margin-top: -125px;
+    margin-bottom: -80px;
+    margin-top: -90px;
     display: block;
 }
 .login-main-message {
-    font-size: 2.1rem;
+    font-size: 1.9rem;
     font-weight: 700;
     color: #222;
     text-align: center;
-    margin-bottom: 22px;
-    line-height: 1.18;
+    margin-bottom: 18px;
+    line-height: 1.2;
 }
 .login-sub-message {
-    font-size: 1.18rem;
+    font-size: 1.05rem;
     color: #444;
-    margin-bottom: 36px;
-    text-align: left;
+    margin-bottom: 30px;
+    text-align: center;
 }
 .google-signin-btn {
     display: flex;
@@ -71,10 +71,10 @@ body {
     color: #222;
     border: 2px solid #d1d5db;
     border-radius: 10px;
-    font-size: 1.22rem;
+    font-size: 1.1rem;
     font-weight: 600;
-    padding: 18px 0;
-    margin-bottom: 32px;
+    padding: 16px 0;
+    margin-bottom: 16px;
     cursor: pointer;
     text-decoration: none;
     transition: border 0.18s, box-shadow 0.18s;
@@ -90,8 +90,8 @@ body {
     margin-right: 16px;
 }
 .google-icon img {
-    height: 32px;
-    width: 32px;
+    height: 28px;
+    width: 28px;
     display: block;
 }
 .back-btn-large {
@@ -102,8 +102,8 @@ body {
     font-weight: 600;
     border: none;
     border-radius: 10px;
-    padding: 18px 0;
-    font-size: 1.22rem;
+    padding: 16px 0;
+    font-size: 1.1rem;
     text-align: center;
     cursor: pointer;
     text-decoration: none;

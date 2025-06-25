@@ -193,7 +193,7 @@
       <div id="sideNav" class="side-nav">
         <button class="close-btn" id="closeNavBtn">&times;</button>
         <ul class="side-nav-links">
-          <li><a href="/contact/">Contact Us</a></li>
+          <li><a href="{% url 'contact' %}">Contact Us</a></li>
           <li><a href="{% url 'home' %}#features-section">Features</a></li>
           <li><a href="{% url 'home' %}#testimonials-section">Testimonials</a></li>
         </ul>
@@ -218,7 +218,7 @@
           <h3>Quick Links</h3>
           <ul>
             <li><a href="{% url 'home' %}">Home</a></li>
-            <li><a href="/contact/">Contact Us</a></li>
+            <li><a href="{% url 'contact' %}">Contact Us</a></li>
             <li><a href="{% url 'home' %}#about-section">About Us</a></li>
             <li><a href="{% url 'home' %}#features-section">Features</a></li>
             <li><a href="{% url 'home' %}#testimonials-section">Testimonials</a></li>
@@ -329,6 +329,31 @@
     // Close nav on link click
     document.querySelectorAll('.side-nav-links a').forEach(link => {
       link.onclick = () => sideNav.classList.remove('open');
+    });
+  </script>
+  <script>
+    // Smooth scroll with offset for About Us and Features links
+    document.addEventListener('DOMContentLoaded', function() {
+      function scrollToSectionWithOffset(e, sectionId, yOffset) {
+        const section = document.getElementById(sectionId);
+        if (section) {
+          e.preventDefault();
+          const y = section.getBoundingClientRect().top + window.pageYOffset - yOffset;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+      }
+      // About Us links
+      document.querySelectorAll('a[href$="#about-section"]').forEach(link => {
+        link.addEventListener('click', function(e) {
+          scrollToSectionWithOffset(e, 'about-section', 60); // 60px offset for About Us
+        });
+      });
+      // Features links
+      document.querySelectorAll('a[href$="#features-section"]').forEach(link => {
+        link.addEventListener('click', function(e) {
+          scrollToSectionWithOffset(e, 'features-section', 0); // 0px offset for Features
+        });
+      });
     });
   </script>
 </body>

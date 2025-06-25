@@ -165,6 +165,31 @@ body {
     animation: slideInUp 1s ease forwards;
 }
 
+#typing-text {
+    color: white;
+    position: relative;
+}
+
+.typing-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    background-color: white;
+    margin-left: 5px;
+    animation: blink 0.7s infinite;
+    position: relative;
+    bottom: -2px;
+}
+
+@keyframes blink {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+}
+
 .hero-subtitle {
     font-size: 1.25rem;
     margin-bottom: 2rem;

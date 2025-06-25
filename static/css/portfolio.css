@@ -1,3 +1,14 @@
+body, .portfolio-page {
+    background: #fff !important;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+.portfolio-main, .portfolio-sidebar {
+    background: transparent;
+}
+
   /* Portfolio Page Layout */
   .portfolio-page {
     display: flex;

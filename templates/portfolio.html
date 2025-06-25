@@ -120,8 +120,12 @@
         <div class="professor-subtitle">How your profile appears to professors</div>
       </div>
       <div class="card-body">
-        <div class="professor-avatar">
-          <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile Photo" />
+        <div class="professor-avatar" style="cursor:pointer;" onclick="document.getElementById('profile-image-input').click();">
+          <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default_user.png' %}{% endif %}" alt="Profile Photo" id="profile-image-preview" />
+          <form id="profile-image-form" method="post" enctype="multipart/form-data" style="display:none;">
+            {% csrf_token %}
+            <input type="file" id="profile-image-input" name="profile_image" accept="image/*" onchange="document.getElementById('profile-image-form').submit();" />
+          </form>
         </div>
         <div class="professor-name">{{ portfolio.name|default:user.get_full_name|default:user.email }}</div>
         <div class="professor-university">{{ portfolio.university|default:'University' }}</div>

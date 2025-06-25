@@ -94,11 +94,11 @@
     <!-- Content -->
     <div class="hero-content">
         <h1 class="hero-title">
-            <span class="shimmer-text">One Click.</span><br />100s of Professors <span class="done">Done.</span>
+            <span class="shimmer-text">One Click</span><br /><span id="typing-text"></span>
         </h1>
         
         <p class="hero-subtitle">
-            Novara uses AI to automatically find and contact 300+ professors who match your research interests - with an <span class="highlight">87% success rate</span> in landing opportunities.
+            We're not <span class="highlight">selling</span>  a product or algorithm — we're selling you <span class="highlight">your time back</span>; time <span class="highlight">lost</span>  to cold emailing and browsing, better spent on <span class="highlight">meaningful academic work.</span>  
         </p>
         
         <!-- Primary CTA Button -->
@@ -456,7 +456,7 @@
                 <!-- Slide 1 -->
                 <div class="carousel-slide">
                     <div class="quote-card">
-                        <p class="quote-text">"Research opportunities are handed out like family heirlooms—passed down through connections, not earned through talent. We built Researchify to burn down that broken system and let merit win for once."</p>
+                        <p class="quote-text">"Research opportunities are handed out like family heirlooms—passed down through connections, not earned through talent. We built Novara to burn down that broken system and let merit win for once."</p>
                         <p class="quote-author">- Aryan Kumar, CEO</p>
                     </div>
                 </div>
@@ -543,6 +543,50 @@ function goToSlide(index) {
 
 // Auto-advance slides every 5 seconds
 setInterval(nextSlide, 5000);
+
+document.addEventListener("DOMContentLoaded", function() {
+    const typingTextElement = document.getElementById('typing-text');
+    if (typingTextElement) {
+        const phrases = [
+            "100s of Professors Done.",
+            "Weeks of Work Done.",
+            "Hours Back in Your Day.",
+            "Ahead of Every Classmate.",
+            "Months of Searching Avoided."
+        ];
+        let phraseIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+
+        function type() {
+            const currentPhrase = phrases[phraseIndex];
+            let typeSpeed = isDeleting ? 60 : 120;
+
+            if (isDeleting) {
+                charIndex--;
+            } else {
+                charIndex++;
+            }
+
+            // Use innerHTML to render the cursor
+            typingTextElement.innerHTML = currentPhrase.substring(0, charIndex) + '<span class="typing-cursor"></span>';
+            
+            if (!isDeleting && charIndex === currentPhrase.length) {
+                // Pause at end of phrase
+                isDeleting = true;
+                setTimeout(type, 2000);
+            } else if (isDeleting && charIndex === 0) {
+                // Finished deleting
+                isDeleting = false;
+                phraseIndex = (phraseIndex + 1) % phrases.length;
+                setTimeout(type, 500); // Pause before typing next phrase
+            } else {
+                setTimeout(type, typeSpeed);
+            }
+        }
+        type();
+    }
+});
 </script>
 
 {% endblock %}

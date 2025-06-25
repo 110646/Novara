@@ -33,6 +33,7 @@ urlpatterns = [
     # Public
     path('', core_views.home, name='home'),
     path('login/', lambda request: render(request, 'login.html'), name='account_login'),
+    path('contact/', core_views.contact, name='contact'),
 
     # Protected
     path('dashboard/', core_views.dashboard, name='dashboard'),

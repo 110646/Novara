@@ -376,3 +376,8 @@ tr:last-child td {
         padding-right: 0;
     }
 }
+
+body, .dashboard-container {
+    background: #fff !important;
+    min-height: 100vh;
+}

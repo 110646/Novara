@@ -8,7 +8,7 @@ from openai import OpenAI
 from django.views.decorators.http import require_POST
 import urllib.parse
 from django.core.files.storage import default_storage
-from .models import EmailCredit
+from .models import EmailCredit, Profile
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponse
@@ -90,6 +90,14 @@ def portfolio(request):
     except Exception as e:
         print("❌ Error fetching Supabase portfolio:", e)
 
+    # Handle profile image upload
+    if request.method == 'POST' and 'profile_image' in request.FILES:
+        profile_image = request.FILES['profile_image']
+        profile, _ = Profile.objects.get_or_create(user=user)
+        profile.image = profile_image
+        profile.save()
+        return redirect('portfolio')
+
     if request.method == 'POST':
         name = request.POST.get('name')
         major = request.POST.get('major')
@@ -160,13 +168,13 @@ def portfolio(request):
     def calculate_completion(portfolio):
         total = 6
         completed = sum([
-            1 if portfolio.get("name") else 0,
-            1 if portfolio.get("major") else 0,
-            1 if portfolio.get("class_year") else 0,
-            1 if portfolio.get("university") else 0,
-            1 if portfolio.get("research_interests") else 0,
-            1 if portfolio.get("resume_url") else 0,
-        ])
+        1 if portfolio.get("name") else 0,
+        1 if portfolio.get("major") else 0,
+        1 if portfolio.get("class_year") else 0,
+        1 if portfolio.get("university") else 0,
+        1 if portfolio.get("research_interests") else 0,
+        1 if portfolio.get("resume_url") else 0,
+    ])
         return int((completed / total) * 100)
 
     profile_completion = calculate_completion(portfolio_data)
@@ -261,7 +269,7 @@ The student's resume is attached. Their stated research interests are: {research
 
 Your job is to generate a polished, respectful, and enthusiastic email that:
 
-- Clearly expresses interest in joining the professor’s research group
+- Clearly expresses interest in joining the professor's research group
 - Highlights relevant accomplishments and skills from the resume
 - Ties their research interests and long-term goals to the professor's and student's major
 - Ends with a polite, actionable closing (e.g., asking about opportunities)
@@ -365,22 +373,29 @@ def contact(request):
         message = request.POST.get('message')
         
         # Send email
-        subject = name
-        email_message = message
+        subject = f"Contact Form: {name}"
+        email_message = f"""
+From: {name} ({email})
+
+Message:
+{message}
+        """
         to_email = 'helpnovaraco@gmail.com'
-        from_email = email
         
         try:
+            # Send the email
             send_mail(
                 subject,
                 email_message,
-                from_email,
+                'noreply@novara.com',  # From email
                 [to_email],
                 fail_silently=False,
             )
+            print(f"✅ Email sent successfully to {to_email}")
             messages.success(request, 'Thank you for your message! We will get back to you soon.')
         except Exception as e:
-            messages.error(request, 'Sorry, there was an error sending your message. Please try again later.')
+            print(f"❌ Email sending error: {str(e)}")
+            messages.error(request, f'Sorry, there was an error sending your message: {str(e)}')
         
         return redirect('contact')
     
