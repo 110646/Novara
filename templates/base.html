@@ -234,8 +234,15 @@
           </div>
         </div>
       </div>
-      <div class="footer-bottom">
+      <div class="footer-bottom" style="display: flex; justify-content: space-between; align-items: center;">
         <p>&copy; 2025 Novara. All rights reserved.</p>
+        <div class="theme-toggle-wrapper">
+          <label class="theme-switch">
+            <input type="checkbox" id="theme-toggle">
+            <span class="slider"></span>
+          </label>
+          <span id="theme-label" style="margin-left: 10px; font-size: 1rem; color: var(--text-secondary);">Light Mode</span>
+        </div>
       </div>
     </div>
   </footer>
@@ -319,6 +326,52 @@
         display: inline-block;
       }
     }
+    .theme-toggle-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .theme-switch {
+      position: relative;
+      display: inline-block;
+      width: 48px;
+      height: 26px;
+    }
+    .theme-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 26px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    input:checked + .slider {
+      background-color: #222;
+    }
+    input:checked + .slider:before {
+      transform: translateX(22px);
+      background-color: #FFD700;
+    }
   </style>
   <script>
     const hamburgerBtn = document.getElementById('hamburgerBtn');
@@ -354,6 +407,34 @@
           scrollToSectionWithOffset(e, 'features-section', 0); // 0px offset for Features
         });
       });
+    });
+  </script>
+  <script>
+    // Theme toggle logic
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeLabel = document.getElementById('theme-label');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    function setTheme(dark) {
+      if (dark) {
+        document.body.classList.add('dark-mode');
+        themeLabel.textContent = 'Dark Mode';
+      } else {
+        document.body.classList.remove('dark-mode');
+        themeLabel.textContent = 'Light Mode';
+      }
+    }
+    // On load, check localStorage or system preference
+    (function() {
+      let dark = localStorage.getItem('theme') === 'dark';
+      if (localStorage.getItem('theme') === null) {
+        dark = prefersDark;
+      }
+      setTheme(dark);
+      themeToggle.checked = dark;
+    })();
+    themeToggle.addEventListener('change', function() {
+      setTheme(this.checked);
+      localStorage.setItem('theme', this.checked ? 'dark' : 'light');
     });
   </script>
 </body>

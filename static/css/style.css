@@ -30,6 +30,82 @@ body {
     background-color: var(--background-light);
 }
 
+/* === Dark Mode Overrides === */
+body.dark-mode {
+  --primary-color: #FFD700;
+  --primary-hover: #FFC800;
+  --text-primary: #f5f5f5;
+  --text-secondary: #bbbbbb;
+  --background-light: #18181b;
+  --background-white: #23232a;
+  --border-color: #33343a;
+  --success-color: #22c55e;
+  --warning-color: #facc15;
+  --error-color: #ef4444;
+}
+body.dark-mode {
+  background-color: var(--background-light) !important;
+  color: var(--text-primary) !important;
+}
+body.dark-mode .main-footer,
+body.dark-mode .footer-section,
+body.dark-mode .footer-content,
+body.dark-mode .footer-bottom {
+  background-color: var(--background-white) !important;
+  color: var(--text-primary) !important;
+}
+body.dark-mode .footer-section h3,
+body.dark-mode .footer-section ul li a,
+body.dark-mode .footer-bottom p {
+  color: var(--text-secondary) !important;
+}
+body.dark-mode .footer-section ul li a:hover {
+  color: var(--primary-color) !important;
+}
+body.dark-mode .theme-switch .slider {
+  background-color: #444;
+}
+body.dark-mode .theme-switch input:checked + .slider {
+  background-color: #FFD700;
+}
+body.dark-mode .theme-switch .slider:before {
+  background-color: #23232a;
+}
+body.dark-mode .theme-switch input:checked + .slider:before {
+  background-color: #23232a;
+}
+body.dark-mode .container,
+body.dark-mode .contact-form-container,
+body.dark-mode .about-section,
+body.dark-mode .features-section,
+body.dark-mode .testimonials-section,
+body.dark-mode .mid-page-cta,
+body.dark-mode .team-intro,
+body.dark-mode .testimonial-card,
+body.dark-mode .feature-card,
+body.dark-mode .quote-card {
+  background-color: var(--background-white) !important;
+  color: var(--text-primary) !important;
+}
+body.dark-mode .section-header h2,
+body.dark-mode .section-header p {
+  color: var(--text-primary) !important;
+}
+body.dark-mode .form-group label,
+body.dark-mode .form-group input,
+body.dark-mode .form-group textarea {
+  color: var(--text-primary) !important;
+  background-color: #23232a !important;
+  border-color: #33343a !important;
+}
+body.dark-mode .submit-btn {
+  background: #FFD700 !important;
+  color: #23232a !important;
+}
+body.dark-mode .submit-btn:hover {
+  background: #FFC800 !important;
+}
+
 /* Hero Section */
 .hero {
     position: relative;

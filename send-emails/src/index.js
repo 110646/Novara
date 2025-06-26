@@ -1,5 +1,6 @@
 export default {
   async fetch(request, env) {
+    console.log("🔐 Using SendGrid API key:", env.SENDGRID_API_KEY ? "✅ Loaded" : "❌ Not Found");
     try {
       const { template, student, professors } = await request.json();
 
@@ -7,12 +8,16 @@ export default {
 
       for (const prof of professors) {
         const personalized = template
-          .replace(/{{\s*professor_name\s*}}|{professor_name}/g, prof.last_name)
-          .replace(/{{\s*university\s*}}|{university}/g, prof.university)
-          .replace(/{{\s*major\s*}}|{major}/g, student.major)
-          .replace(/{{\s*student_name\s*}}|{student_name}/g, student.name);
+          .replace(/{{\s*professor_name\s*}}|{\s*professor_name\s*}/g, prof.last_name)
+          .replace(/{{\s*university\s*}}|{\s*university\s*}/g, prof.university)
+          .replace(/{{\s*major\s*}}|{\s*major\s*}/g, student.major)
+          .replace(/{{\s*student_name\s*}}|{\s*student_name\s*}/g, student.name);
 
-        await fetch("https://api.sendgrid.com/v3/mail/send", {
+        console.log(`📤 Sending to: ${prof.email}`);
+        console.log(`📬 Subject: Research Opportunity – Inquiry from ${student.name}`);
+        console.log(`📝 Email body:\n${personalized}`);
+
+        const sendgridRes = await fetch("https://api.sendgrid.com/v3/mail/send", {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${env.SENDGRID_API_KEY}`,
@@ -37,10 +42,18 @@ export default {
             }]
           })
         });
+
+        console.log(`✅ SendGrid response: ${sendgridRes.status}`);
+
+        if (sendgridRes.status >= 400) {
+          const errorBody = await sendgridRes.text();
+          console.log(`❌ SendGrid error response:\n${errorBody}`);
+        }
       }
 
       return new Response("Emails sent");
     } catch (err) {
+      console.log("❌ Worker error:", err);
       return new Response(`Error: ${err.message}`);
     }
   }

@@ -12,6 +12,19 @@ SUPABASE_URL = "https://qdlguxijkkuujnaeuhqq.supabase.co"
 SUPABASE_API_KEY = settings.SUPABASE_SERVICE_ROLE_KEY
 OPENAI_TEMPLATE_ENDPOINT = "http://localhost:8000/generate-email-template/"
 
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)  # or INFO if you want less detail
+
+handler = logging.StreamHandler()
+formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')
+handler.setFormatter(formatter)
+
+if not logger.handlers:  # Prevent duplicate handlers on reload
+    logger.addHandler(handler)
+
+
 
 def require_google_connection(view_func):
     @wraps(view_func)
@@ -24,6 +37,7 @@ def require_google_connection(view_func):
 
 def send_emails_after_payment(user_id):
     try:
+        logger.info("🔁 Starting email dispatch flow for user ID: %s", user_id)
         user = User.objects.get(id=user_id)
 
         headers = {
@@ -31,22 +45,25 @@ def send_emails_after_payment(user_id):
             "Authorization": f"Bearer {SUPABASE_API_KEY}"
         }
 
-        # Step 1: Get portfolio
+        logger.debug("📡 Fetching portfolio from Supabase")
         params = {"user_id": f"eq.{user.id}"}
         response = httpx.get(f"{SUPABASE_URL}/rest/v1/portfolios", headers=headers, params=params)
         portfolio = response.json()[0] if response.status_code == 200 and response.json() else {}
 
         if not portfolio:
-            print("❌ No portfolio found.")
+            logger.error("❌ No portfolio found for user.")
             return
 
-        # Step 1.5: Download resume from R2
+        logger.debug("📄 Portfolio loaded: %s", portfolio)
+
+        logger.info("📥 Downloading resume from R2")
         resume_bytes = download_resume_from_r2(portfolio.get("resume_url"))
         if not resume_bytes:
-            print("❌ Failed to retrieve resume for OpenAI.")
+            logger.error("❌ Failed to retrieve resume for OpenAI.")
             return
+        logger.info("✅ Resume downloaded successfully")
 
-        # Step 2: Send to OpenAI
+        logger.info("📤 Sending resume and info to OpenAI for template generation")
         files = {
             "resume": ("resume.pdf", resume_bytes, "application/pdf")
         }
@@ -61,19 +78,21 @@ def send_emails_after_payment(user_id):
 
         openai_res = httpx.post(OPENAI_TEMPLATE_ENDPOINT, data=data, files=files, timeout=60.0)
         if openai_res.status_code != 200:
-            print("❌ OpenAI template generation failed:", openai_res.text)
+            logger.error("❌ OpenAI template generation failed: %s", openai_res.text)
             return
 
         template = openai_res.json().get("template")
         if not template:
-            print("❌ Template missing in OpenAI response.")
+            logger.error("❌ No template returned from OpenAI")
             return
 
-        # Step 3: Get latest email credit count
+        logger.info("✅ Received template from OpenAI")
+
         email_credit = EmailCredit.objects.filter(user=user).order_by('-purchased_at').first()
         count = email_credit.count if email_credit else 0
+        logger.info("📬 User has %d email credits", count)
 
-        # Step 4: Fetch professors
+        logger.debug("📡 Fetching professors from Supabase")
         prof_params = {
             "major": f"eq.{portfolio.get('major')}",
             "select": "*"
@@ -82,13 +101,14 @@ def send_emails_after_payment(user_id):
         all_profs = prof_res.json()
 
         if not all_profs:
-            print("❌ No professors found for major.")
+            logger.error("❌ No professors found for major: %s", portfolio.get("major"))
             return
 
+        logger.info("📚 Found %d professors, selecting %d randomly", len(all_profs), count)
         random.shuffle(all_profs)
         selected_profs = all_profs[:count]
 
-        # Step 5: Call Cloudflare Worker
+        logger.info("📡 Sending to Cloudflare Worker")
         worker_payload = {
             "template": template,
             "student": data,
@@ -96,10 +116,11 @@ def send_emails_after_payment(user_id):
         }
 
         worker_res = httpx.post(settings.CLOUDFLARE_WORKER_URL, json=worker_payload)
-        print("✅ Cloudflare response:", worker_res.status_code, worker_res.text)
+        logger.info("✅ Cloudflare response: %s %s", worker_res.status_code, worker_res.text)
 
-    except Exception:
-        traceback.print_exc()
+    except Exception as e:
+        logger.exception("❌ Unhandled exception in send_emails_after_payment")
+
 
 
 from urllib.parse import urlparse, unquote
