@@ -14,10 +14,10 @@
         <div class="login-card">
             <img src="{% static 'images/logo.png' %}" alt="Novara Logo" class="login-logo-img">
             <div class="login-main-message">
-                Sign in with Google to email researchers seamlessly.
+                Sign in with Google
             </div>
             <div class="login-sub-message">
-                Our product requires a Google login.      
+                Our product requires a Google login to email researchers seamlessly   
             </div>
             <a href="{% provider_login_url 'google' method='oauth2' process='login' %}" class="google-signin-btn">
                 <span class="google-icon">
