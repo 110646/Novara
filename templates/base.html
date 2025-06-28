@@ -181,8 +181,6 @@
             <img src="{% static 'images/logo.png' %}" alt="Novara Logo" />
           </a>
           <nav class="main-nav">
-            <a href="{% url 'home' %}" class="nav-link">Home</a>
-            <a href="{% url 'home' %}#about-section" class="nav-link">About Us</a>
             <a href="{% url 'account_login' %}" class="nav-link signup-btn">Sign In</a>
             <button class="hamburger" id="hamburgerBtn" aria-label="Open navigation">
               <span></span><span></span><span></span>
@@ -192,11 +190,22 @@
       </div>
       <div id="sideNav" class="side-nav">
         <button class="close-btn" id="closeNavBtn">&times;</button>
-        <ul class="side-nav-links">
+        <ul class="side-nav-links main-links">
+          <li><a href="{% url 'home' %}">Home</a></li>
+          <li><a href="{% url 'home' %}#about-section">About Us</a></li>
           <li><a href="{% url 'contact' %}">Contact Us</a></li>
           <li><a href="{% url 'home' %}#features-section">Features</a></li>
           <li><a href="{% url 'home' %}#testimonials-section">Testimonials</a></li>
         </ul>
+        <ul class="side-nav-links social-links">
+          <li><a href="#"><i class="fab fa-twitter"></i> Twitter</a></li>
+          <li><a href="https://www.linkedin.com/company/novararesearch" target="_blank" rel="noopener"><i class="fab fa-linkedin"></i> LinkedIn</a></li>
+          <li><a href="https://www.tiktok.com/@novara_ai" target="_blank" rel="noopener"><i class="fab fa-tiktok"></i> TikTok</a></li>
+          <li><a href="https://www.instagram.com/novara.ai_/" target="_blank" rel="noopener"><i class="fab fa-instagram"></i> Instagram</a></li>
+        </ul>
+        <div class="side-nav-email">
+          <a href="mailto:helpnovaraco@gmail.com">helpnovaraco@gmail.com</a>
+        </div>
       </div>
     </header>
   {% endif %}
@@ -228,9 +237,9 @@
           <h3>Connect</h3>
           <div class="social-links">
             <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-            <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
-            <a href="#" class="social-link"><i class="fab fa-github"></i></a>
-            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.linkedin.com/company/novararesearch" class="social-link" target="_blank" rel="noopener"><i class="fab fa-linkedin"></i></a>
+            <a href="https://www.tiktok.com/@novara_ai" class="social-link" target="_blank" rel="noopener"><i class="fab fa-tiktok"></i></a>
+            <a href="https://www.instagram.com/novara.ai_/" class="social-link" target="_blank" rel="noopener"><i class="fab fa-instagram"></i></a>
           </div>
         </div>
       </div>
@@ -309,20 +318,51 @@
       display: flex;
       flex-direction: column;
       align-items: flex-end;
+    }
+    .side-nav-links.main-links {
       margin-top: 60px;
+      gap: 18px;
     }
-    .side-nav-links li {
-      margin-bottom: 28px;
-    }
-    .side-nav-links a {
-      color: #fff;
-      text-decoration: none;
+    .side-nav-links.main-links a {
       font-size: 2rem;
-      font-weight: 600;
+      font-weight: 700;
+      color: #fff;
+      text-align: right;
       transition: color 0.2s;
-      letter-spacing: 1px;
     }
-    .side-nav-links a:hover {
+    .side-nav-links.main-links a:hover {
+      color: #FFD700;
+    }
+    .side-nav-links.social-links {
+      margin-top: 40px;
+      gap: 10px;
+    }
+    .side-nav-links.social-links a {
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: #e0e0e0;
+      text-align: right;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.2s;
+    }
+    .side-nav-links.social-links a:hover {
+      color: #FFD700;
+    }
+    .side-nav-email {
+      margin-top: 18px;
+      padding-right: 48px;
+      text-align: right;
+    }
+    .side-nav-email a {
+      color: #e0e0e0;
+      font-size: 1.1rem;
+      text-decoration: none !important;
+      font-weight: 400;
+      transition: color 0.2s;
+    }
+    .side-nav-email a:hover {
       color: #FFD700;
     }
     @media (max-width: 700px) {
@@ -335,7 +375,7 @@
       .side-nav-links {
         padding-right: 24px;
       }
-      .side-nav-links a {
+      .side-nav-links.main-links a {
         font-size: 1.3rem;
       }
     }
@@ -384,6 +424,13 @@
     input:checked + .slider:before {
       transform: translateX(22px);
       background-color: #FFD700;
+    }
+    .side-nav-links a,
+    .side-nav-links a:visited,
+    .side-nav-links a:active {
+      text-decoration: none !important;
+      outline: none;
+      box-shadow: none;
     }
   </style>
   <script>
