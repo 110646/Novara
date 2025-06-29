@@ -226,6 +226,31 @@ def portfolio(request):
 # STRIPE + EMAIL FLOW
 # ------------------------------
 @csrf_exempt
+def stripe_webhook(request):
+    payload = request.body
+    sig_header = request.META.get('HTTP_STRIPE_SIGNATURE', '')
+    webhook_secret = settings.STRIPE_WEBHOOK_SECRET
+
+    try:
+        event = stripe.Webhook.construct_event(payload, sig_header, webhook_secret)
+    except (ValueError, stripe.error.SignatureVerificationError):
+        return HttpResponse(status=400)
+
+    if event['type'] == 'checkout.session.completed':
+        session = event['data']['object']
+        user_id = session.get('metadata', {}).get('user_id')
+        email_count = session.get('metadata', {}).get('email_count')
+
+        if user_id and email_count:
+            try:
+                user = User.objects.get(id=user_id)
+                EmailCredit.objects.create(user=user, count=int(email_count))
+                send_emails_after_payment(user.id)
+            except User.DoesNotExist:
+                return HttpResponse(status=404)
+
+    return HttpResponse(status=200)
+@csrf_exempt
 @login_required
 @require_POST
 def create_checkout_session(request):
