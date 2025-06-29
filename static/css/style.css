@@ -179,7 +179,7 @@ body.dark-mode .submit-btn:hover {
 .shape-2 {
     width: 200px;
     height: 200px;
-    background: var(--success-color);
+    background: var(--primary-color);
     bottom: -100px;
     left: -100px;
     animation-delay: 2s;
