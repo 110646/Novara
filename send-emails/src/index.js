@@ -26,7 +26,11 @@ export default {
           body: JSON.stringify({
             personalizations: [{
               to: [{ email: prof.email }],
-              subject: `Research Opportunity – Inquiry from ${student.name}`
+              subject: `Research Opportunity – Inquiry from ${student.name}`,
+              custom_args: {
+                user_id: student.id,
+                student_email: student.email
+              }
             }],
             from: {
               email: "research@connectnovara.com",

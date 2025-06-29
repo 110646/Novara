@@ -30,51 +30,51 @@
 
     <!-- Metrics Summary Cards -->
     <div class="metrics-grid">
-        <!-- Response Rate -->
+        <!-- Open Rate -->
         <div class="metric-card">
             <div class="metric-icon">
                 <i class="fas fa-chart-line"></i>
             </div>
             <div class="metric-content">
-                <div class="metric-value">43%</div>
-                <div class="metric-label">Response Rate</div>
-                <div class="metric-subtext">18 of 42 emails</div>
+                <div class="metric-value">{{ open_rate }}%</div>
+                <div class="metric-label">Open Rate</div>
+                <div class="metric-subtext">{{ total_opened }} of {{ total_sent }} emails</div>
             </div>
         </div>
 
-        <!-- Total Emails -->
+    <!-- Total Emails Sent -->
         <div class="metric-card">
             <div class="metric-icon">
                 <i class="fas fa-paper-plane"></i>
             </div>
             <div class="metric-content">
-                <div class="metric-value">42</div>
+                <div class="metric-value">{{ total_sent }}</div>
                 <div class="metric-label">Total Emails Sent</div>
-                <div class="metric-subtext">Last sent 2 days ago</div>
+                <div class="metric-subtext">Tracked via SendGrid</div>
             </div>
         </div>
 
-        <!-- Responses -->
+    <!-- Emails Opened -->
         <div class="metric-card">
             <div class="metric-icon">
-                <i class="fas fa-reply-all"></i>
+                <i class="fas fa-envelope-open-text"></i>
             </div>
             <div class="metric-content">
-                <div class="metric-value">18</div>
-                <div class="metric-label">Responses Received</div>
-                <div class="metric-subtext">43% response rate</div>
+                <div class="metric-value">{{ total_opened }}</div>
+                <div class="metric-label">Emails Opened</div>
+                <div class="metric-subtext">{{ open_rate }}% open rate</div>
             </div>
         </div>
 
-        <!-- Avg Response Time -->
+    <!-- Placeholder Stat (Emails Bought / Spent / etc.) -->
         <div class="metric-card">
             <div class="metric-icon">
-                <i class="fas fa-clock"></i>
+                <i class="fas fa-wallet"></i>
             </div>
             <div class="metric-content">
-                <div class="metric-value">3.2</div>
-                <div class="metric-label">Avg. Response Time</div>
-                <div class="metric-subtext">From sent to replied</div>
+                <div class="metric-value">{{ placeholder_stat }}</div>
+                <div class="metric-label">Emails Bought</div>
+                <div class="metric-subtext">Updated via Stripe</div>
             </div>
         </div>
     </div>

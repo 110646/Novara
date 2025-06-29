@@ -26,3 +26,15 @@ class Profile(models.Model):
         email = self.user.email.lower().encode('utf-8')
         gravatar_hash = hashlib.md5(email).hexdigest()
         return f"https://www.gravatar.com/avatar/{gravatar_hash}?d=identicon"
+
+class SentEmailEvent(models.Model):
+    email = models.EmailField()
+    event_type = models.CharField(max_length=50)
+    timestamp = models.DateTimeField()
+    smtp_id = models.CharField(max_length=255, blank=True)
+    user_agent = models.TextField(blank=True)
+    response = models.TextField(blank=True)
+    custom_args = models.JSONField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.email} - {self.event_type} at {self.timestamp}"

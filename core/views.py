@@ -25,6 +25,7 @@ from core.choices import MAJOR_CHOICES, CLASS_YEAR_CHOICES, US_UNIVERSITY_CHOICE
 from django.core.mail import send_mail
 import time
 import logging
+from core.models import SentEmailEvent, EmailCredit
 
 logger = logging.getLogger(__name__)
 
@@ -51,8 +52,36 @@ def custom_logout(request):
 # ------------------------------
 @login_required
 def dashboard(request):
-    google_connected = request.user.socialaccount_set.filter(provider='google').exists()
-    return render(request, 'dashboard.html', {'google_connected': google_connected})
+    user = request.user
+    google_connected = user.socialaccount_set.filter(provider='google').exists()
+
+    # Get all email events tied to this user
+    events = SentEmailEvent.objects.filter(custom_args__user_id=user.id)
+
+    # Delivered emails
+    delivered_events = events.filter(event_type="delivered")
+    total_sent = delivered_events.count()
+
+    # Opened emails
+    opened_events = events.filter(event_type="open")
+    total_opened = opened_events.count()
+
+    # Open rate percentage
+    open_rate = int((total_opened / total_sent) * 100) if total_sent > 0 else 0
+
+    # Placeholder stat: total email credits purchased
+    credits = EmailCredit.objects.filter(user=user)
+    total_credits = sum(c.count for c in credits)
+
+    context = {
+        "google_connected": google_connected,
+        "total_sent": total_sent,
+        "total_opened": total_opened,
+        "open_rate": open_rate,
+        "placeholder_stat": total_credits  # Update this to money or other metric later
+    }
+
+    return render(request, "dashboard.html", context)
 
 @login_required
 def account(request):
@@ -296,7 +325,6 @@ Format requirements:
 
 {name}  
 {email}  
-(add phone number if found in the resume)
 
 Only return the finalized email body. Do not include any explanation or commentary.
 Do not include a subject line.
@@ -305,7 +333,7 @@ Do not include a subject line.
         client = OpenAI(api_key=settings.OPENAI_API_KEY)
         logger.info("📡 Connected to OpenAI")
 
-        # Step 1: Upload resume
+        # ✅ File upload is still current
         logger.info("📤 Uploading resume to OpenAI")
         file_upload = client.files.create(
             file=("resume.pdf", resume_file.read(), "application/pdf"),
@@ -313,31 +341,39 @@ Do not include a subject line.
         )
         logger.debug(f"✅ Resume uploaded: file_id={file_upload.id}")
 
-        # Step 2: Create thread
-        thread = client.beta.threads.create()
-        logger.debug(f"🧵 Thread created: thread_id={thread.id}")
+        # ✅ Create thread (new style)
+        thread_response = client.beta.threads.with_raw_response.create().get_response()
+        thread_id = thread_response.id
+        logger.debug(f"🧵 Thread created: thread_id={thread_id}")
 
-        # Step 3: Add prompt to thread
-        client.beta.threads.messages.create(
-            thread_id=thread.id,
+        # ✅ Add message (new style)
+        client.beta.threads.messages.with_raw_response.create(
+            thread_id=thread_id,
             role="user",
-            content=[{"type": "text", "text": prompt}]
-        )
-        logger.info("📝 Prompt added to thread")
+            content=[{"type": "text", "text": prompt}],
+            attachments=[{
+                "file_id": file_upload.id,
+                "tools": [{"type": "file_search"}]
+            }]
+        ).get_response()
+        logger.info("📝 Prompt and resume attached to thread")
 
-        # Step 4: Run assistant
-        logger.info("⚙️ Starting assistant run with attached resume")
-        run = client.beta.threads.runs.create(
-            thread_id=thread.id,
+        # ✅ Run assistant (new style)
+        run_response = client.beta.threads.runs.with_raw_response.create(
+            thread_id=thread_id,
             assistant_id=settings.OPENAI_ASSISTANT_ID,
-            
-        )
-        logger.debug(f"▶️ Run started: run_id={run.id}")
+        ).get_response()
+        run_id = run_response.id
+        logger.debug(f"▶️ Run started: run_id={run_id}")
 
-        # Step 5: Poll until complete
+        # Poll until complete (still supported)
         while True:
-            run_status = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
-            logger.debug(f"⏳ Polling status: {run_status.status}")
+            run_status = client.beta.threads.runs.with_raw_response.retrieve(
+                thread_id=thread_id,
+                run_id=run_id
+            ).get_response()
+
+            logger.debug(f"⏳ Run status: {run_status.status}")
             if run_status.status == "completed":
                 logger.info("✅ Assistant run completed")
                 break
@@ -346,11 +382,11 @@ Do not include a subject line.
                 return JsonResponse({"error": f"Run failed with status: {run_status.status}"}, status=500)
             time.sleep(2)
 
-        # Step 6: Retrieve final message
-        messages = client.beta.threads.messages.list(thread_id=thread.id)
-        logger.debug(f"📨 {len(messages.data)} messages retrieved from thread")
+        # ✅ Use pagination to get messages
+        messages = list(client.beta.threads.messages.paginate(thread_id=thread_id))
+        logger.debug(f"📨 Retrieved {len(messages)} message(s) from thread")
 
-        latest_message = messages.data[0]
+        latest_message = messages[0]
         email_template = latest_message.content[0].text.value.strip()
         logger.info("📬 Final email template generated")
 
@@ -359,32 +395,6 @@ Do not include a subject line.
     except Exception as e:
         logger.exception("❌ OpenAI template generation failed")
         return JsonResponse({"error": str(e)}, status=500)
-
-@csrf_exempt
-def stripe_webhook(request):
-    payload = request.body
-    sig_header = request.META.get('HTTP_STRIPE_SIGNATURE', '')
-    webhook_secret = settings.STRIPE_WEBHOOK_SECRET
-
-    try:
-        event = stripe.Webhook.construct_event(payload, sig_header, webhook_secret)
-    except (ValueError, stripe.error.SignatureVerificationError):
-        return HttpResponse(status=400)
-
-    if event['type'] == 'checkout.session.completed':
-        session = event['data']['object']
-        user_id = session.get('metadata', {}).get('user_id')
-        email_count = session.get('metadata', {}).get('email_count')
-
-        if user_id and email_count:
-            try:
-                user = User.objects.get(id=user_id)
-                EmailCredit.objects.create(user=user, count=int(email_count))
-                send_emails_after_payment(user.id)
-            except User.DoesNotExist:
-                return HttpResponse(status=404)
-
-    return HttpResponse(status=200)
 
 @login_required
 def emails_sent_confirmation(request):
@@ -448,3 +458,20 @@ Message:
         return redirect('contact')
     
     return render(request, 'contact.html')
+@csrf_exempt
+def sendgrid_events_webhook(request):
+    try:
+        events = json.loads(request.body)
+        for event in events:
+            SentEmailEvent.objects.create(
+                email=event.get("email"),
+                event_type=event.get("event"),
+                timestamp=event.get("timestamp"),
+                smtp_id=event.get("smtp-id", ""),
+                user_agent=event.get("useragent", ""),
+                response=event.get("response", ""),
+                custom_args=event.get("custom_args", {})
+            )
+        return JsonResponse({"status": "ok"})
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)

@@ -39,7 +39,13 @@ SECRET_KEY = 'django-insecure-%ek9nr8_z@x_bck=tb+w=220ku6rqe2ne$r@lp2sox@9c%d1gn
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '54.157.10.102', 'connectnovara.com', 'www.connectnovara.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '54.157.10.102', 'connectnovara.com', 'www.connectnovara.com', '2d36-2601-cd-c600-5dd0-699a-e413-e647-874c.ngrok-free.app']
+
+# Trust X-Forwarded-Proto from ngrok so request.is_secure() works
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Optionally force HTTPS redirects in development
+SECURE_SSL_REDIRECT = True
 
 # Application definition
 
