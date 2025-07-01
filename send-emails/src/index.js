@@ -17,39 +17,43 @@ export default {
         console.log(`📬 Subject: Research Opportunity – Inquiry from ${student.name}`);
         console.log(`📝 Email body:\n${personalized}`);
 
+        const body = {
+          personalizations: [{
+            to: [{ email: prof.email }],
+            subject: `Research Opportunity – Inquiry from ${student.name}`,
+            custom_args: {
+              user_id: student.id,
+              student_email: student.email
+            }
+          }],
+          from: {
+            email: "research@connectnovara.com",
+            name: student.name
+          },
+          reply_to: {
+            email: student.email,
+            name: student.name
+          },
+          content: [{
+            type: "text/plain",
+            value: personalized
+          }],
+          tracking_settings: {
+            open_tracking: {
+              enable: true
+            }
+          }
+        };
+
+        console.log("📦 SendGrid Payload:", JSON.stringify(body, null, 2));
+
         const sendgridRes = await fetch("https://api.sendgrid.com/v3/mail/send", {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${env.SENDGRID_API_KEY}`,
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({
-            personalizations: [{
-              to: [{ email: prof.email }],
-              subject: `Research Opportunity – Inquiry from ${student.name}`,
-              custom_args: {
-                user_id: student.id,
-                student_email: student.email
-              }
-            }],
-            from: {
-              email: "research@connectnovara.com",
-              name: student.name
-            },
-            reply_to: {
-              email: student.email,
-              name: student.name
-            },
-            content: [{
-              type: "text/plain",
-              value: personalized
-            }],
-            tracking_settings: {
-              open_tracking: {
-                enable: true
-              }
-            }
-          })
+          body: JSON.stringify(body)
         });
 
         console.log(`✅ SendGrid response: ${sendgridRes.status}`);

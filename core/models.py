@@ -36,5 +36,7 @@ class SentEmailEvent(models.Model):
     response = models.TextField(blank=True)
     custom_args = models.JSONField(null=True, blank=True)
 
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+
     def __str__(self):
         return f"{self.email} - {self.event_type} at {self.timestamp}"

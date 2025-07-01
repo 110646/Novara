@@ -58,7 +58,7 @@ def dashboard(request):
     google_connected = user.socialaccount_set.filter(provider='google').exists()
 
     # Get all email events tied to this user
-    events = SentEmailEvent.objects.filter(custom_args__user_id=user.id)
+    events = SentEmailEvent.objects.filter(user=user)
 
     # Delivered emails
     delivered_events = events.filter(event_type="delivered")
@@ -489,26 +489,44 @@ Message:
 @csrf_exempt
 def sendgrid_events_webhook(request):
     try:
+        logger.info("📩 SendGrid webhook HIT!")
         events = json.loads(request.body)
         logger.info("📬 Raw SendGrid events received:")
-        logger.info(json.dumps(events, indent=2))  # 👈 Log full payload
 
         for event in events:
+            logger.info("📬 Received SendGrid Event:\n%s", json.dumps(event, indent=2))  # 👈 log each event fully
+
             timestamp = event.get("timestamp")
             timestamp_dt = timezone.make_aware(datetime.fromtimestamp(timestamp), dt_timezone.utc) if timestamp else None
 
 
+            custom_args = event.get("custom_args", {})
+            user_id = custom_args.get("user_id")
+
+            if not user_id:
+                logger.warning("⚠️ Event missing user_id in custom_args: %s", custom_args)
+                continue
+
+            try:
+                user = User.objects.get(id=user_id)
+            except User.DoesNotExist:
+                logger.warning("⚠️ No matching user found for ID: %s", user_id)
+                continue
+
             SentEmailEvent.objects.create(
+                user=user,
                 email=event.get("email"),
                 event_type=event.get("event"),
                 timestamp=timestamp_dt,
                 smtp_id=event.get("smtp-id", ""),
                 user_agent=event.get("useragent", ""),
                 response=event.get("response", ""),
-                custom_args=event.get("custom_args", {})  # this is what we care about
+                custom_args=custom_args
             )
+            logger.info("✅ Stored event for user_id: %s", user_id)
 
         return JsonResponse({"status": "ok"})
     except Exception as e:
         logger.exception("❌ Failed to process SendGrid event")
         return JsonResponse({"error": str(e)}, status=500)
+

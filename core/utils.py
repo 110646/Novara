@@ -10,7 +10,7 @@ import boto3
 
 SUPABASE_URL = "https://qdlguxijkkuujnaeuhqq.supabase.co"
 SUPABASE_API_KEY = settings.SUPABASE_SERVICE_ROLE_KEY
-OPENAI_TEMPLATE_ENDPOINT = "https://63c2-2600-1700-1061-25e0-8969-63c5-19f5-2790.ngrok-free.app/generate-email-template/"
+OPENAI_TEMPLATE_ENDPOINT = "https://3a6f-2601-cd-c600-5dd0-5849-cdfc-a025-4894.ngrok-free.app/generate-email-template/"
 
 import logging
 
@@ -68,6 +68,7 @@ def send_emails_after_payment(user_id):
             "resume": ("resume.pdf", resume_bytes, "application/pdf")
         }
         data = {
+            "id": user.id,
             "name": portfolio.get("name"),
             "email": portfolio.get("email"),
             "major": portfolio.get("major"),
