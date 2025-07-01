@@ -6,7 +6,7 @@ from django.conf.urls.static import static
 from django.shortcuts import render
 from django.views.generic.base import RedirectView
 from core.views import (
-    home, dashboard, portfolio, account, payments, contact, sendgrid_events_webhook
+    home, dashboard, portfolio, account, contact, sendgrid_events_webhook
 )
 
 urlpatterns = [
@@ -39,7 +39,6 @@ urlpatterns = [
     path('dashboard/', core_views.dashboard, name='dashboard'),
     path('portfolio/', core_views.portfolio, name='portfolio'),
     path('account/', core_views.account, name='account'),
-    path('payments/', core_views.payments, name='payments'),
     path('send-emails/', core_views.send_emails_page, name='send_emails'),
     path('create-checkout-session/', core_views.create_checkout_session, name='create_checkout_session'),
     path('emails-sent/', core_views.emails_sent_confirmation, name='emails_sent_confirmation'),
