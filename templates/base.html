@@ -17,7 +17,7 @@
     <header class="main-header">
       <div class="container">
         <div class="header-content">
-          <a href="{% url 'home' %}" class="logo">
+          <a href="{% url 'home' %}" class="logo" id="headerHomeLink">
             <img src="{% static 'images/logo.png' %}" alt="Novara Logo" />
           </a>
           <nav class="main-nav">
@@ -177,7 +177,7 @@
     <header class="main-header">
       <div class="container">
         <div class="header-content">
-          <a href="{% url 'home' %}" class="logo">
+          <a href="{% url 'home' %}" class="logo" id="headerHomeLink">
             <img src="{% static 'images/logo.png' %}" alt="Novara Logo" />
           </a>
           <nav class="main-nav">
@@ -191,7 +191,7 @@
       <div id="sideNav" class="side-nav">
         <button class="close-btn" id="closeNavBtn">&times;</button>
         <ul class="side-nav-links main-links">
-          <li><a href="{% url 'home' %}">Home</a></li>
+          <li><a href="{% url 'home' %}" id="hamburgerHomeLink">Home</a></li>
           <li><a href="{% url 'home' %}#about-section">About Us</a></li>
           <li><a href="{% url 'contact' %}">Contact Us</a></li>
           <li><a href="{% url 'home' %}#features-section">Features</a></li>
@@ -201,7 +201,7 @@
           <li><a href="https://www.linkedin.com/company/novararesearch" target="_blank" rel="noopener"><i class="fab fa-linkedin"></i> LinkedIn</a></li>
           <li><a href="https://www.tiktok.com/@novara_ai" target="_blank" rel="noopener"><i class="fab fa-tiktok"></i> TikTok</a></li>
           <li><a href="https://www.instagram.com/novara.ai_/" target="_blank" rel="noopener"><i class="fab fa-instagram"></i> Instagram</a></li>
-          <li><a href="mailto:helpnovaraco@gmail.com">helpnovaraco@gmail.com</a></li>
+          <li><a href="mailto:helpnovaraco@gmail.com" id="footerEmailLink">helpnovaraco@gmail.com</a></li>
         </ul>
       </div>
     </header>
@@ -223,7 +223,7 @@
         <div class="footer-section">
           <h3>Quick Links</h3>
           <ul>
-            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'home' %}" id="footerHomeLink">Home</a></li>
             <li><a href="{% url 'contact' %}">Contact Us</a></li>
             <li><a href="{% url 'home' %}#about-section">About Us</a></li>
             <li><a href="{% url 'home' %}#features-section">Features</a></li>
@@ -241,16 +241,51 @@
       </div>
       <div class="footer-bottom" style="display: flex; justify-content: space-between; align-items: center;">
         <p>&copy; 2025 Novara. All rights reserved.</p>
-        <div class="theme-toggle-wrapper">
-          <label class="theme-switch">
-            <input type="checkbox" id="theme-toggle">
-            <span class="slider"></span>
-          </label>
-          <span id="theme-label" style="margin-left: 10px; font-size: 1rem; color: var(--text-secondary);">Light Mode</span>
-        </div>
       </div>
     </div>
   </footer>
+
+  <div id="emailCopiedNotification" style="display:none;position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:#222;color:#FFD700;padding:10px 22px;border-radius:22px;font-weight:700;font-size:1.1rem;z-index:99999;box-shadow:0 2px 8px 0 rgba(0,0,0,0.13);">Email copied!</div>
+  <script>
+    function copyEmailToClipboard(email) {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(email).then(function() {
+          showEmailCopiedNotification();
+        });
+      } else {
+        // fallback for older browsers
+        var tempInput = document.createElement('input');
+        tempInput.value = email;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+        showEmailCopiedNotification();
+      }
+    }
+    function showEmailCopiedNotification() {
+      var notif = document.getElementById('emailCopiedNotification');
+      notif.style.display = 'block';
+      setTimeout(function() {
+        notif.style.display = 'none';
+      }, 1800);
+    }
+    // Attach to both footer and side-nav email links
+    document.addEventListener('DOMContentLoaded', function() {
+      var emailLinks = [
+        document.getElementById('footerEmailLink'),
+        document.getElementById('footerEmailLink2')
+      ];
+      emailLinks.forEach(function(link) {
+        if (link) {
+          link.addEventListener('click', function(e) {
+            copyEmailToClipboard('helpnovaraco@gmail.com');
+            // Let mailto still work
+          });
+        }
+      });
+    });
+  </script>
 
   <style>
     .hamburger {
@@ -316,14 +351,14 @@
       align-items: flex-start;
       position: relative;
       top: -50px;
-      right: 250px;
+      right: 150px;
     }
     .side-nav-links.main-links {
       margin-top: 60px;
       gap: 18px;
     }
     .side-nav-links.main-links a {
-      font-size: 2rem;
+      font-size: 1.6rem;
       font-weight: 700;
       color: #fff;
       text-align: left;
@@ -335,10 +370,12 @@
     .side-nav-links.social-links {
       margin-top: 40px;
       gap: 10px;
+      right: 150px;
+      position: relative;
     }
     .side-nav-links.social-links a {
-      font-size: 1.1rem;
-      font-weight: 400;
+      font-size: 0.9rem;
+      font-weight: 600;
       color: #e0e0e0;
       text-align: left;
       display: flex;
@@ -362,61 +399,8 @@
         top: 0;
       }
       .side-nav-links.main-links a {
-        font-size: 1.3rem;
+        font-size: 1.1rem;
       }
-    }
-    .theme-toggle-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .theme-switch {
-      position: relative;
-      display: inline-block;
-      width: 48px;
-      height: 26px;
-    }
-    .theme-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      transition: .4s;
-      border-radius: 26px;
-    }
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 20px;
-      width: 20px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    }
-    input:checked + .slider {
-      background-color: #222;
-    }
-    input:checked + .slider:before {
-      transform: translateX(22px);
-      background-color: #FFD700;
-    }
-    .side-nav-links a,
-    .side-nav-links a:visited,
-    .side-nav-links a:active {
-      text-decoration: none !important;
-      outline: none;
-      box-shadow: none;
     }
   </style>
   <script>
@@ -425,9 +409,14 @@
     const closeNavBtn = document.getElementById('closeNavBtn');
     hamburgerBtn.onclick = () => sideNav.classList.add('open');
     closeNavBtn.onclick = () => sideNav.classList.remove('open');
-    // Close nav on link click
+    // Close nav on link click, but exclude email links
     document.querySelectorAll('.side-nav-links a').forEach(link => {
-      link.onclick = () => sideNav.classList.remove('open');
+      link.onclick = () => {
+        // Don't close nav if it's an email link
+        if (!link.href.includes('mailto:')) {
+          sideNav.classList.remove('open');
+        }
+      };
     });
   </script>
   <script>
@@ -456,31 +445,29 @@
     });
   </script>
   <script>
-    // Theme toggle logic
-    const themeToggle = document.getElementById('theme-toggle');
-    const themeLabel = document.getElementById('theme-label');
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    function setTheme(dark) {
-      if (dark) {
-        document.body.classList.add('dark-mode');
-        themeLabel.textContent = 'Dark Mode';
-      } else {
-        document.body.classList.remove('dark-mode');
-        themeLabel.textContent = 'Light Mode';
-      }
-    }
-    // On load, check localStorage or system preference
-    (function() {
-      let dark = localStorage.getItem('theme') === 'dark';
-      if (localStorage.getItem('theme') === null) {
-        dark = prefersDark;
-      }
-      setTheme(dark);
-      themeToggle.checked = dark;
-    })();
-    themeToggle.addEventListener('change', function() {
-      setTheme(this.checked);
-      localStorage.setItem('theme', this.checked ? 'dark' : 'light');
+    // Home link behavior: scroll to top if on home page, reload if on other pages
+    document.addEventListener('DOMContentLoaded', function() {
+      const homeLinks = [
+        document.getElementById('headerHomeLink'),
+        document.getElementById('footerHomeLink'),
+        document.getElementById('hamburgerHomeLink')
+      ];
+      
+      homeLinks.forEach(function(link) {
+        if (link) {
+          link.addEventListener('click', function(e) {
+            const currentPath = window.location.pathname;
+            const isOnHomePage = currentPath === '/' || currentPath === '/home/';
+            
+            if (isOnHomePage) {
+              // If on home page, scroll to top
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            // If on other pages, let the normal link behavior happen (reload to home)
+          });
+        }
+      });
     });
   </script>
 </body>
