@@ -43,7 +43,12 @@ export default {
             content: [{
               type: "text/plain",
               value: personalized
-            }]
+            }],
+            tracking_settings: {
+              open_tracking: {
+                enable: true
+              }
+            }
           })
         });
 
