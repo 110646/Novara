@@ -334,7 +334,7 @@ The student's resume is attached. Their stated research interests are: {research
 Your job is to generate a clear, professional, and enthusiastic email that:
 
 - Begins with: "Dear Professor {{ professor_name }}"
-- Expresses interest in joining the professor’s research group
+- Expresses interest in joining the professor's research group
 - Highlights specific, relevant experiences or projects mentioned in the resume
 - Uses plain, simple, and professional language (avoid overly complex academic phrases)
 - Ends with a polite closing that invites further communication (e.g., asking about open opportunities)
