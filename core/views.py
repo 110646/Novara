@@ -25,6 +25,8 @@ from core.choices import MAJOR_CHOICES, CLASS_YEAR_CHOICES, US_UNIVERSITY_CHOICE
 from django.core.mail import send_mail
 import time
 import logging
+from datetime import datetime, timezone as dt_timezone
+from django.utils import timezone
 from core.models import SentEmailEvent, EmailCredit
 
 logger = logging.getLogger(__name__)
@@ -347,6 +349,7 @@ Format requirements:
 - DO NOT include markdown, bold, or special formatting — plain text only
 - Keep the email 3 to 5 concise paragraphs
 - Always end the email with this exact signature block (unless information is missing):
+- Make sure to indent each paragraph properly
 
 {name}  
 {email}  
@@ -358,7 +361,7 @@ Do not include a subject line.
         client = OpenAI(api_key=settings.OPENAI_API_KEY)
         logger.info("📡 Connected to OpenAI")
 
-        # ✅ File upload is still current
+        # Step 1: Upload resume
         logger.info("📤 Uploading resume to OpenAI")
         file_upload = client.files.create(
             file=("resume.pdf", resume_file.read(), "application/pdf"),
@@ -366,38 +369,35 @@ Do not include a subject line.
         )
         logger.debug(f"✅ Resume uploaded: file_id={file_upload.id}")
 
-        # ✅ Create thread (new style)
-        thread_response = client.beta.threads.with_raw_response.create().get_response()
-        thread_id = thread_response.id
-        logger.debug(f"🧵 Thread created: thread_id={thread_id}")
+        # Step 2: Create thread
+        thread = client.beta.threads.create()
+        logger.debug(f"🧵 Thread created: thread_id={thread.id}")
 
-        # ✅ Add message (new style)
-        client.beta.threads.messages.with_raw_response.create(
-            thread_id=thread_id,
+        # Step 3: Add message
+        client.beta.threads.messages.create(
+            thread_id=thread.id,
             role="user",
             content=[{"type": "text", "text": prompt}],
             attachments=[{
                 "file_id": file_upload.id,
                 "tools": [{"type": "file_search"}]
             }]
-        ).get_response()
+        )
         logger.info("📝 Prompt and resume attached to thread")
 
-        # ✅ Run assistant (new style)
-        run_response = client.beta.threads.runs.with_raw_response.create(
-            thread_id=thread_id,
+        # Step 4: Run assistant
+        run = client.beta.threads.runs.create(
+            thread_id=thread.id,
             assistant_id=settings.OPENAI_ASSISTANT_ID,
-        ).get_response()
-        run_id = run_response.id
-        logger.debug(f"▶️ Run started: run_id={run_id}")
+        )
+        logger.debug(f"▶️ Run started: run_id={run.id}")
 
-        # Poll until complete (still supported)
+        # Step 5: Poll for result
         while True:
-            run_status = client.beta.threads.runs.with_raw_response.retrieve(
-                thread_id=thread_id,
-                run_id=run_id
-            ).get_response()
-
+            run_status = client.beta.threads.runs.retrieve(
+                thread_id=thread.id,
+                run_id=run.id
+            )
             logger.debug(f"⏳ Run status: {run_status.status}")
             if run_status.status == "completed":
                 logger.info("✅ Assistant run completed")
@@ -407,11 +407,11 @@ Do not include a subject line.
                 return JsonResponse({"error": f"Run failed with status: {run_status.status}"}, status=500)
             time.sleep(2)
 
-        # ✅ Use pagination to get messages
-        messages = list(client.beta.threads.messages.paginate(thread_id=thread_id))
-        logger.debug(f"📨 Retrieved {len(messages)} message(s) from thread")
+        # Step 6: Retrieve message
+        messages = client.beta.threads.messages.list(thread_id=thread.id)
+        logger.debug(f"📨 Retrieved {len(messages.data)} message(s)")
 
-        latest_message = messages[0]
+        latest_message = messages.data[0]
         email_template = latest_message.content[0].text.value.strip()
         logger.info("📬 Final email template generated")
 
@@ -420,6 +420,7 @@ Do not include a subject line.
     except Exception as e:
         logger.exception("❌ OpenAI template generation failed")
         return JsonResponse({"error": str(e)}, status=500)
+
 
 @login_required
 def emails_sent_confirmation(request):
@@ -483,20 +484,31 @@ Message:
         return redirect('contact')
     
     return render(request, 'contact.html')
+
+@require_POST
 @csrf_exempt
 def sendgrid_events_webhook(request):
     try:
         events = json.loads(request.body)
+        logger.info("📬 Raw SendGrid events received:")
+        logger.info(json.dumps(events, indent=2))  # 👈 Log full payload
+
         for event in events:
+            timestamp = event.get("timestamp")
+            timestamp_dt = timezone.make_aware(datetime.fromtimestamp(timestamp), dt_timezone.utc) if timestamp else None
+
+
             SentEmailEvent.objects.create(
                 email=event.get("email"),
                 event_type=event.get("event"),
-                timestamp=event.get("timestamp"),
+                timestamp=timestamp_dt,
                 smtp_id=event.get("smtp-id", ""),
                 user_agent=event.get("useragent", ""),
                 response=event.get("response", ""),
-                custom_args=event.get("custom_args", {})
+                custom_args=event.get("custom_args", {})  # this is what we care about
             )
+
         return JsonResponse({"status": "ok"})
     except Exception as e:
+        logger.exception("❌ Failed to process SendGrid event")
         return JsonResponse({"error": str(e)}, status=500)
