@@ -491,17 +491,18 @@ def sendgrid_events_webhook(request):
     try:
         logger.info("📩 SendGrid webhook HIT!")
         events = json.loads(request.body)
-        logger.info("📬 Raw SendGrid events received:")
 
         for event in events:
-            logger.info("📬 Received SendGrid Event:\n%s", json.dumps(event, indent=2))  # 👈 log each event fully
+            logger.info("📬 Received SendGrid Event:\n%s", json.dumps(event, indent=2))
 
             timestamp = event.get("timestamp")
             timestamp_dt = timezone.make_aware(datetime.fromtimestamp(timestamp), dt_timezone.utc) if timestamp else None
 
-
             custom_args = event.get("custom_args", {})
             user_id = custom_args.get("user_id")
+
+            # Log extraction result
+            logger.info("✅ Event mapped to user_id: %s from custom_args: %s", user_id, custom_args)
 
             if not user_id:
                 logger.warning("⚠️ Event missing user_id in custom_args: %s", custom_args)
@@ -518,15 +519,15 @@ def sendgrid_events_webhook(request):
                 email=event.get("email"),
                 event_type=event.get("event"),
                 timestamp=timestamp_dt,
-                smtp_id=event.get("smtp-id", ""),
+                smtp_id=event.get("smtp-id", ""),  # still captured for debug
                 user_agent=event.get("useragent", ""),
                 response=event.get("response", ""),
                 custom_args=custom_args
             )
+
             logger.info("✅ Stored event for user_id: %s", user_id)
 
         return JsonResponse({"status": "ok"})
     except Exception as e:
         logger.exception("❌ Failed to process SendGrid event")
         return JsonResponse({"error": str(e)}, status=500)
-

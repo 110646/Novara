@@ -1,9 +1,9 @@
 export default {
   async fetch(request, env) {
     console.log("🔐 Using SendGrid API key:", env.SENDGRID_API_KEY ? "✅ Loaded" : "❌ Not Found");
+
     try {
       const { template, student, professors } = await request.json();
-
       console.log(`📨 Sending ${professors.length} emails`);
 
       for (const prof of professors) {
@@ -13,17 +13,13 @@ export default {
           .replace(/{{\s*major\s*}}|{\s*major\s*}/g, student.major)
           .replace(/{{\s*student_name\s*}}|{\s*student_name\s*}/g, student.name);
 
-        console.log(`📤 Sending to: ${prof.email}`);
-        console.log(`📬 Subject: Research Opportunity – Inquiry from ${student.name}`);
-        console.log(`📝 Email body:\n${personalized}`);
-
         const body = {
           personalizations: [{
             to: [{ email: prof.email }],
             subject: `Research Opportunity – Inquiry from ${student.name}`,
             custom_args: {
-              user_id: student.id,
-              student_email: student.email
+              user_id: String(student.id),
+              professor_id: prof.id
             }
           }],
           from: {
@@ -42,6 +38,9 @@ export default {
             open_tracking: {
               enable: true
             }
+          },
+          mail_settings: {
+            event_payload_version: 2  // ✅ required for SendGrid to include custom_args in webhooks
           }
         };
 
@@ -59,8 +58,8 @@ export default {
         console.log(`✅ SendGrid response: ${sendgridRes.status}`);
 
         if (sendgridRes.status >= 400) {
-          const errorBody = await sendgridRes.text();
-          console.log(`❌ SendGrid error response:\n${errorBody}`);
+          const errorText = await sendgridRes.text();
+          console.log(`❌ SendGrid error:\n${errorText}`);
         }
       }
 
