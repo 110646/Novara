@@ -10,7 +10,7 @@ import boto3
 
 SUPABASE_URL = "https://qdlguxijkkuujnaeuhqq.supabase.co"
 SUPABASE_API_KEY = settings.SUPABASE_SERVICE_ROLE_KEY
-OPENAI_TEMPLATE_ENDPOINT = "https://305b-2601-cd-c600-5dd0-69ee-fd80-3f9-60be.ngrok-free.app/generate-email-template/"
+OPENAI_TEMPLATE_ENDPOINT = "http://127.0.0.1:8000/generate-email-template/"
 
 import logging
 
