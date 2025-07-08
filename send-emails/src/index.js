@@ -14,10 +14,11 @@ export default {
           .replace(/{{\s*student_name\s*}}|{\s*student_name\s*}/g, student.name);
 
         const payload = {
-          From: "research@connectnovara.com",
+          From: `${student.name} <research@connectnovara.com>`,
           To: prof.email,
           Subject: `Research Opportunity – Inquiry from ${student.name}`,
           TextBody: personalized,
+          HtmlBody: personalized.replace(/\n/g, "<br>"),
           ReplyTo: student.email,
           TrackOpens: true,
           Metadata: {

@@ -13,6 +13,7 @@ from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponse
 from django.conf import settings
+from django.views.decorators.cache import never_cache
 from django.utils.timezone import now
 import stripe
 import traceback
@@ -57,21 +58,15 @@ def dashboard(request):
     user = request.user
     google_connected = user.socialaccount_set.filter(provider='google').exists()
 
-    # Get all email events tied to this user
     events = SentEmailEvent.objects.filter(user=user)
-
-    # Delivered emails
-    delivered_events = events.filter(event_type="delivered")
+    delivered_events = events.filter(event_type="Delivery")
     total_sent = delivered_events.count()
 
-    # Opened emails
-    opened_events = events.filter(event_type="open")
+    opened_events = events.filter(event_type="Open")
     total_opened = opened_events.count()
 
-    # Open rate percentage
     open_rate = int((total_opened / total_sent) * 100) if total_sent > 0 else 0
 
-    # Placeholder stat: total email credits purchased
     credits = EmailCredit.objects.filter(user=user)
     total_credits = sum(c.count for c in credits)
 
@@ -80,10 +75,26 @@ def dashboard(request):
         "total_sent": total_sent,
         "total_opened": total_opened,
         "open_rate": open_rate,
-        "placeholder_stat": total_credits  # Update this to money or other metric later
+        "placeholder_stat": total_credits
     }
 
     return render(request, "dashboard.html", context)
+
+@never_cache
+@login_required
+def dashboard_stats(request):
+    user = request.user
+    events = SentEmailEvent.objects.filter(user=user)
+
+    total_sent = events.filter(event_type="Delivery").count()
+    total_opened = events.filter(event_type="Open").count()
+    open_rate = int((total_opened / total_sent) * 100) if total_sent > 0 else 0
+
+    return JsonResponse({
+        "total_sent": total_sent,
+        "total_opened": total_opened,
+        "open_rate": open_rate
+    })
 
 @login_required
 def account(request):
@@ -333,23 +344,24 @@ The student's resume is attached. Their stated research interests are: {research
 
 Your job is to generate a clear, professional, and enthusiastic email that:
 
-- Begins with: "Dear Professor {{ professor_name }}"
-- Expresses interest in joining the professor's research group
-- Highlights specific, relevant experiences or projects mentioned in the resume
-- Uses plain, simple, and professional language (avoid overly complex academic phrases)
-- Ends with a polite closing that invites further communication (e.g., asking about open opportunities)
-- Clearly expresses interest in joining the professor's research group
-- Highlights relevant accomplishments and skills from the resume
-- Ties their research interests and long-term goals to the professor's and student's major
-- Ends with a polite, actionable closing (e.g., asking about opportunities)
+Begins with: "Dear Professor {{ professor_name }}"
+Expresses interest in joining the professor's research group
+Highlights specific, relevant experiences or projects mentioned in the resume
+Uses plain, simple, and professional language (avoid overly complex academic phrases)
+Ends with a polite closing that invites further communication (e.g., asking about open opportunities)
+Clearly expresses interest in joining the professor's research group
+Highlights relevant accomplishments and skills from the resume
+Ties their research interests and long-term goals to the professor's and student's major
+Ends with a polite, actionable closing (e.g., asking about opportunities)
 
 Format requirements:
-- Use ONLY these placeholders: {{ professor_name }}, {{ university }}
-- DO NOT invent any placeholders like [insert XYZ]
-- DO NOT include markdown, bold, or special formatting — plain text only
-- Keep the email 3 to 5 concise paragraphs
-- Always end the email with this exact signature block (unless information is missing):
-- Make sure to indent each paragraph properly
+Use ONLY these placeholders: {{ professor_name }}, {{ university }}
+DO NOT invent or include any placeholders like [insert XYZ], [mention project], [describe skill], or similar. If information is missing, skip it entirely.
+Any output with square brackets like [ ... ] should be considered invalid.
+DO NOT include markdown, bold, or special formatting — plain text only
+Keep the email 3 to 5 concise paragraphs
+Make sure to indent each paragraph properly
+Always end the email with this exact signature block (unless information is missing):
 
 {name}  
 {email}  
@@ -487,47 +499,49 @@ Message:
 
 @require_POST
 @csrf_exempt
-def sendgrid_events_webhook(request):
+def postmark_events_webhook(request):
     try:
-        logger.info("📩 SendGrid webhook HIT!")
-        events = json.loads(request.body)
+        logger.info("📩 Postmark webhook HIT!")
 
-        for event in events:
-            logger.info("📬 Received SendGrid Event:\n%s", json.dumps(event, indent=2))
+        event = json.loads(request.body)
+        logger.info("📬 Received Postmark Event:\n%s", json.dumps(event, indent=2))
 
-            timestamp = event.get("timestamp")
-            timestamp_dt = timezone.make_aware(datetime.fromtimestamp(timestamp), dt_timezone.utc) if timestamp else None
+        metadata = event.get("Metadata", {})
+        user_id = metadata.get("user_id")
+        professor_id = metadata.get("professor_id")
+        logger.info("✅ Extracted metadata: user_id=%s, professor_id=%s", user_id, professor_id)
 
-            custom_args = event.get("custom_args", {})
-            user_id = custom_args.get("user_id")
+        if not user_id:
+            logger.warning("⚠️ Event missing user_id in metadata: %s", metadata)
+            return JsonResponse({"error": "Missing user_id"}, status=400)
 
-            # Log extraction result
-            logger.info("✅ Event mapped to user_id: %s from custom_args: %s", user_id, custom_args)
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            logger.warning("⚠️ No matching user found for ID: %s", user_id)
+            return JsonResponse({"error": "User not found"}, status=404)
 
-            if not user_id:
-                logger.warning("⚠️ Event missing user_id in custom_args: %s", custom_args)
-                continue
+        raw_ts = event.get("DeliveredAt") or event.get("ReceivedAt") or event.get("BouncedAt")
+        try:
+            timestamp_dt = datetime.strptime(raw_ts, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt_timezone.utc) if raw_ts else timezone.now()
+        except Exception as e:
+            logger.warning("⚠️ Failed to parse timestamp: %s", raw_ts)
+            timestamp_dt = timezone.now()
 
-            try:
-                user = User.objects.get(id=user_id)
-            except User.DoesNotExist:
-                logger.warning("⚠️ No matching user found for ID: %s", user_id)
-                continue
+        SentEmailEvent.objects.create(
+            user=user,
+            email=event.get("Recipient"),
+            event_type=event.get("RecordType"),
+            timestamp=timestamp_dt,
+            smtp_id=event.get("MessageID", ""),
+            user_agent="",  # Not provided by Postmark
+            response=event.get("Details", ""),
+            custom_args=metadata
+        )
 
-            SentEmailEvent.objects.create(
-                user=user,
-                email=event.get("email"),
-                event_type=event.get("event"),
-                timestamp=timestamp_dt,
-                smtp_id=event.get("smtp-id", ""),  # still captured for debug
-                user_agent=event.get("useragent", ""),
-                response=event.get("response", ""),
-                custom_args=custom_args
-            )
-
-            logger.info("✅ Stored event for user_id: %s", user_id)
-
+        logger.info("✅ Stored Postmark event for user_id: %s", user_id)
         return JsonResponse({"status": "ok"})
+
     except Exception as e:
-        logger.exception("❌ Failed to process SendGrid event")
+        logger.exception("❌ Failed to process Postmark event")
         return JsonResponse({"error": str(e)}, status=500)
