@@ -6,7 +6,7 @@ from django.conf.urls.static import static
 from django.shortcuts import render
 from django.views.generic.base import RedirectView
 from core.views import (
-    home, dashboard, portfolio, account, contact, postmark_events_webhook,dashboard_stats
+    home, dashboard, portfolio, account, contact, postmark_events_webhook,dashboard_stats, log_sent_email, sent_emails_list
 )
 
 urlpatterns = [
@@ -46,6 +46,9 @@ urlpatterns = [
     path('stripe/webhook/', core_views.stripe_webhook, name='stripe_webhook'),
     path("generate-email-template/", core_views.generate_email_template, name="generate_email_template"),
     path("postmark/events/", core_views.postmark_events_webhook, name="postmark_events_webhook"),
+    path('log-sent-email/', core_views.log_sent_email, name='log_sent_email'),
+    path('sent-emails/', core_views.sent_emails_list, name='sent_emails_list'),
+    path('email-send-status/', core_views.email_send_status, name='email_send_status'),
 
 ]
 

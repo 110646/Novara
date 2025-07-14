@@ -40,3 +40,16 @@ class SentEmailEvent(models.Model):
 
     def __str__(self):
         return f"{self.email} - {self.event_type} at {self.timestamp}"
+
+class SentEmailRecord(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    professor_email = models.EmailField()
+    university = models.CharField(max_length=255)
+    date_sent = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=50, default='Delivered')  # or 'Opened'
+    email_body = models.TextField()
+
+    smtp_id = models.CharField(max_length=255, blank=True, null=True)  # for linking with Postmark events
+
+    def __str__(self):
+        return f"{self.professor_email} - {self.status} at {self.date_sent}"

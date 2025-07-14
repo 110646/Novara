@@ -8,7 +8,7 @@ from openai import OpenAI
 from django.views.decorators.http import require_POST
 import urllib.parse
 from django.core.files.storage import default_storage
-from .models import EmailCredit, Profile
+from .models import EmailCredit, Profile, SentEmailRecord
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponse
@@ -28,7 +28,8 @@ import time
 import logging
 from datetime import datetime, timezone as dt_timezone
 from django.utils import timezone
-from core.models import SentEmailEvent, EmailCredit
+from core.models import SentEmailEvent, EmailCredit, SentEmailRecord
+from core.progress_tracker import user_progress
 
 logger = logging.getLogger(__name__)
 
@@ -57,19 +58,14 @@ def custom_logout(request):
 def dashboard(request):
     user = request.user
     google_connected = user.socialaccount_set.filter(provider='google').exists()
-
     events = SentEmailEvent.objects.filter(user=user)
     delivered_events = events.filter(event_type="Delivery")
     total_sent = delivered_events.count()
-
     opened_events = events.filter(event_type="Open")
     total_opened = opened_events.count()
-
     open_rate = int((total_opened / total_sent) * 100) if total_sent > 0 else 0
-
     credits = EmailCredit.objects.filter(user=user)
     total_credits = sum(c.count for c in credits)
-
     context = {
         "google_connected": google_connected,
         "total_sent": total_sent,
@@ -77,7 +73,6 @@ def dashboard(request):
         "open_rate": open_rate,
         "placeholder_stat": total_credits
     }
-
     return render(request, "dashboard.html", context)
 
 @never_cache
@@ -85,16 +80,49 @@ def dashboard(request):
 def dashboard_stats(request):
     user = request.user
     events = SentEmailEvent.objects.filter(user=user)
-
     total_sent = events.filter(event_type="Delivery").count()
     total_opened = events.filter(event_type="Open").count()
     open_rate = int((total_opened / total_sent) * 100) if total_sent > 0 else 0
-
     return JsonResponse({
         "total_sent": total_sent,
         "total_opened": total_opened,
         "open_rate": open_rate
     })
+
+@login_required
+def sent_emails_list(request):
+    emails = SentEmailRecord.objects.filter(user=request.user).order_by('-date_sent')
+    data = [{
+        "professor_email": email.professor_email,
+        "university": email.university,
+        "date_sent": email.date_sent.strftime("%Y-%m-%d %H:%M"),
+        "status": email.status,
+        "email_body": email.email_body
+    } for email in emails]
+    return JsonResponse(data, safe=False)
+
+@csrf_exempt
+def log_sent_email(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        user_id = data.get('user_id')
+        professor_email = data.get('professor_email')
+        university = data.get('university')
+        email_body = data.get('email_body')
+        smtp_id = data.get('smtp_id')
+        try:
+            user = User.objects.get(id=user_id)
+            SentEmailRecord.objects.create(
+                user=user,
+                professor_email=professor_email,
+                university=university,
+                email_body=email_body,
+                smtp_id=smtp_id
+            )
+            return JsonResponse({'status': 'success'})
+        except User.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
 @login_required
 def account(request):
@@ -108,6 +136,16 @@ def payments(request):
         'credits': credits,
         'total_credits': total
     })
+
+@login_required
+def email_send_status(request):
+    user_id = request.user.id
+    status = user_progress.get(user_id, {
+        "progress": 10,
+        "message": "Initializing…",
+        "complete": False
+    })
+    return JsonResponse(status)
 
 # ------------------------------
 # PORTFOLIO
@@ -258,11 +296,21 @@ def stripe_webhook(request):
             try:
                 user = User.objects.get(id=user_id)
                 EmailCredit.objects.create(user=user, count=int(email_count))
-                send_emails_after_payment(user.id)
+
+                # ✅ INIT user_progress here before sending emails
+                user_progress[user.id] = {
+                    "progress": 10,
+                    "message": "Initializing...",
+                    "complete": False
+                }
+
+                send_emails_after_payment(user.id, user_progress)
+
             except User.DoesNotExist:
                 return HttpResponse(status=404)
 
     return HttpResponse(status=200)
+
 @csrf_exempt
 @login_required
 @require_POST
@@ -521,6 +569,7 @@ def postmark_events_webhook(request):
             logger.warning("⚠️ No matching user found for ID: %s", user_id)
             return JsonResponse({"error": "User not found"}, status=404)
 
+        # Timestamp parsing
         raw_ts = event.get("DeliveredAt") or event.get("ReceivedAt") or event.get("BouncedAt")
         try:
             timestamp_dt = datetime.strptime(raw_ts, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt_timezone.utc) if raw_ts else timezone.now()
@@ -528,6 +577,7 @@ def postmark_events_webhook(request):
             logger.warning("⚠️ Failed to parse timestamp: %s", raw_ts)
             timestamp_dt = timezone.now()
 
+        # Store the event in SentEmailEvent
         SentEmailEvent.objects.create(
             user=user,
             email=event.get("Recipient"),
@@ -538,8 +588,19 @@ def postmark_events_webhook(request):
             response=event.get("Details", ""),
             custom_args=metadata
         )
-
         logger.info("✅ Stored Postmark event for user_id: %s", user_id)
+
+        # 🔥 Update SentEmailRecord if it's an Open event
+        if event.get("RecordType") == "Open":
+            try:
+                record = SentEmailRecord.objects.get(user=user, smtp_id=event.get("MessageID", ""))
+                if record.status != "Opened":
+                    record.status = "Opened"
+                    record.save()
+                    logger.info("✅ Updated SentEmailRecord status to Opened for smtp_id: %s", event.get("MessageID"))
+            except SentEmailRecord.DoesNotExist:
+                logger.warning("⚠️ No SentEmailRecord found for smtp_id: %s", event.get("MessageID"))
+
         return JsonResponse({"status": "ok"})
 
     except Exception as e:

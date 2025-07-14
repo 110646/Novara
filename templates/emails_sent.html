@@ -1,8 +1,68 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block content %}
-<h1>Emails Sent Successfully</h1>
-<p>Your {{ sent_count }} email{{ sent_count|pluralize }} have been sent to the selected professors.</p>
-<p>Please check the dashboard to view your analytics</p>
-<a href="{% url 'dashboard' %}">Return to Dashboard</a>
+<link rel="stylesheet" href="{% static 'css/loading_status.css' %}">
+
+<div class="dashboard-container">
+    <h1>Preparing Your Emails…</h1>
+    <p id="status-message" class="status-message">Initializing process. Please wait.</p>
+
+    <div class="progress-wrapper">
+        <div class="progress-bar-background">
+            <div id="progress-bar" class="progress-bar-fill"></div>
+        </div>
+        <p id="tip-message" class="tip-message"></p>
+    </div>
+
+    <a href="{% url 'dashboard' %}" id="dashboard-link" class="btn btn-primary">Go to Dashboard</a>
+</div>
+
+<script>
+const statusMessage = document.getElementById('status-message');
+const progressBar = document.getElementById('progress-bar');
+const tipMessage = document.getElementById('tip-message');
+const dashboardLink = document.getElementById('dashboard-link');
+
+const tips = [
+    "Tip: Double-check your portfolio for accuracy!",
+    "Tip: Personalized emails increase response rates.",
+    "Tip: Consider following up after a few days.",
+    "Tip: Research each professor before reaching out!",
+    "Tip: Keep your email concise and focused."
+];
+
+let tipIndex = 0;
+setInterval(() => {
+    tipMessage.textContent = tips[tipIndex];
+    tipIndex = (tipIndex + 1) % tips.length;
+}, 3000);
+
+function fetchStatus() {
+    fetch("{% url 'email_send_status' %}")
+        .then(response => response.json())
+        .then(data => {
+            progressBar.style.width = data.progress + "%";
+            statusMessage.textContent = data.message;
+
+            if (data.complete) {
+                statusMessage.textContent = "🎉 Emails sent successfully!";
+                progressBar.style.background = "#28a745";  // Green on complete
+                dashboardLink.style.display = "inline-block";
+                setTimeout(() => {
+                    window.location.href = "{% url 'dashboard' %}";
+                }, 3000);
+            } else {
+                setTimeout(fetchStatus, 2000);
+            }
+        })
+        .catch(err => {
+            console.error("Failed to fetch status", err);
+            setTimeout(fetchStatus, 5000);
+        });
+}
+
+fetchStatus();
+</script>
 
 {% endblock %}

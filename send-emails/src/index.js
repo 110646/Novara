@@ -44,9 +44,30 @@ export default {
           const error = await res.text();
           console.error("❌ Postmark error:", error);
         }
+
+        // ✅ Log the sent email to your Django backend
+        const logRes = await fetch("https://8f6a48d46a7d.ngrok-free.app/log-sent-email/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            user_id: student.id,
+            professor_email: prof.email,
+            university: prof.university,
+            email_body: personalized,
+            smtp_id: null  // You can update this if Postmark returns a message ID
+          })
+        });
+
+        console.log(`📤 Django log response: ${logRes.status}`);
+        if (logRes.status >= 400) {
+          const logError = await logRes.text();
+          console.error("❌ Django log error:", logError);
+        }
       }
 
-      return new Response("Emails sent");
+      return new Response("Emails sent and logged successfully");
     } catch (err) {
       console.error("❌ Worker error:", err);
       return new Response(`Error: ${err.message}`);

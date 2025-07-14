@@ -1,0 +1,44 @@
+/* Progress Page Styles */
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 2rem 1.5rem;
+    background: #f7f8fa;
+}
+
+.status-message {
+    font-size: 1.2rem;
+    color: #333;
+}
+
+.progress-wrapper {
+    width: 80%;
+    max-width: 500px;
+    margin: 2rem auto;
+}
+
+.progress-bar-background {
+    background: #eee;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.progress-bar-fill {
+    height: 20px;
+    width: 0%;
+    background: var(--primary-color);
+    transition: width 0.5s ease, background 0.5s ease;
+}
+
+.tip-message {
+    margin-top: 1rem;
+    color: #555;
+    font-size: 1rem;
+    font-style: italic;
+}
+
+#dashboard-link {
+    display: none;
+    margin-top: 2rem;
+}

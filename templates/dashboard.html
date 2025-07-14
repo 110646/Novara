@@ -7,12 +7,10 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <div class="dashboard-container">
-    <!-- Welcome Section -->
     <div class="welcome-section">
         <h1>Welcome, {{ user.get_full_name|default:user.email }}!</h1>
     </div>
 
-    <!-- Google Connection Alert -->
     {% if not google_connected %}
     <div class="alert-card">
         <div class="alert-icon">
@@ -28,7 +26,6 @@
     </div>
     {% endif %}
 
-    <!-- Metrics Summary Cards -->
     <div class="metrics-grid">
         <!-- Open Rate -->
         <div class="metric-card">
@@ -81,7 +78,6 @@
 
     </div>
 
-    <!-- Quick Actions -->
     <div class="quick-actions">
         <a href="{% url 'send_emails' %}" class="action-button">
             <i class="fas fa-paper-plane"></i>
@@ -93,125 +89,35 @@
         </a>
     </div>
 
-    <!-- Performance by Research Field -->
-    <div class="performance-card">
-        <div class="card-header">
-            <h2>Performance by Research Field</h2>
-        </div>
-        <div class="performance-list">
-            <!-- Computer Science -->
-            <div class="performance-item">
-                <div class="field-info">
-                    <span class="field-name">Computer Science</span>
-                    <span class="field-stats">53% (8/15)</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 53%"></div>
-                </div>
-            </div>
-
-            <!-- Biology -->
-            <div class="performance-item">
-                <div class="field-info">
-                    <span class="field-name">Biology</span>
-                    <span class="field-stats">40% (4/10)</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 40%"></div>
-                </div>
-            </div>
-
-            <!-- Chemistry -->
-            <div class="performance-item">
-                <div class="field-info">
-                    <span class="field-name">Chemistry</span>
-                    <span class="field-stats">38% (3/8)</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 38%"></div>
-                </div>
-            </div>
-
-            <!-- Physics -->
-            <div class="performance-item">
-                <div class="field-info">
-                    <span class="field-name">Physics</span>
-                    <span class="field-stats">20% (1/5)</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 20%"></div>
-                </div>
-            </div>
-
-            <!-- Mathematics -->
-            <div class="performance-item">
-                <div class="field-info">
-                    <span class="field-name">Mathematics</span>
-                    <span class="field-stats">50% (2/4)</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 50%"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Emails Sent Table -->
-    <div class="emails-card">
+    <!-- Emails Sent Section -->
+    <div class="emails-card" style="padding: 20px; border-radius: 12px;">
         <div class="card-header">
             <h2>Emails Sent</h2>
+            {{ total_sent }}<p>emails sent</p>
         </div>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Professor</th>
-                        <th>University</th>
-                        <th>Date Sent</th>
-                        <th>Status</th>
-                        <th>Response Time</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Dr. Sarah Johnson</td>
-                        <td>Stanford University</td>
-                        <td>2024-03-15</td>
-                        <td><span class="status-badge replied">Replied</span></td>
-                        <td>2 days</td>
-                    </tr>
-                    <tr>
-                        <td>Prof. Michael Chen</td>
-                        <td>MIT</td>
-                        <td>2024-03-14</td>
-                        <td><span class="status-badge sent">Sent</span></td>
-                        <td>-</td>
-                    </tr>
-                    <tr>
-                        <td>Dr. Emily Rodriguez</td>
-                        <td>UC Berkeley</td>
-                        <td>2024-03-13</td>
-                        <td><span class="status-badge replied">Replied</span></td>
-                        <td>1 day</td>
-                    </tr>
-                    <tr>
-                        <td>Prof. David Kim</td>
-                        <td>Harvard University</td>
-                        <td>2024-03-12</td>
-                        <td><span class="status-badge replied">Replied</span></td>
-                        <td>3 days</td>
-                    </tr>
-                    <tr>
-                        <td>Dr. Lisa Wang</td>
-                        <td>Carnegie Mellon</td>
-                        <td>2024-03-11</td>
-                        <td><span class="status-badge sent">Sent</span></td>
-                        <td>-</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="emails-list" style="max-height: 400px; overflow-y: auto;">
+            <div id="emails-list-container"></div>
         </div>
     </div>
+
+    <template id="email-row-template">
+        <div class="email-row" style="border-bottom: 1px solid #ddd; padding: 10px 0; margin: 0 5px;">
+            <div class="email-row-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 0 5px;">
+                <div>
+                    <strong class="email-professor"></strong> — <span class="email-university"></span>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <span class="email-date" style="margin-right: 10px;"></span>
+                    <span class="email-status" style="margin-right: 5px;"></span>
+                    <i class="fas fa-chevron-down expand-icon" style="transition: transform 0.2s;"></i>
+                </div>
+            </div>
+            <div class="email-body" style="margin-top: 10px; color: #555; display: none; padding: 0 5px;">
+                <div class="email-content" style="white-space: pre-wrap; font-family: inherit;"></div>
+            </div>
+        </div>
+    </template>
+
 </div>
 
 <script>
@@ -221,13 +127,76 @@ function updateStats() {
     .then(data => {
       document.querySelector(".metric-value.open-rate").textContent = data.open_rate + "%";
       document.querySelector(".metric-subtext.open-rate").textContent = `${data.total_opened} of ${data.total_sent} emails`;
-
       document.querySelector(".metric-value.total-sent").textContent = data.total_sent;
       document.querySelector(".metric-value.total-opened").textContent = data.total_opened;
     });
 }
 
-setInterval(updateStats, 10000); // every 10 seconds
+let expandedEmails = new Set();
+
+function updateEmailsList() {
+  fetch("https://8f6a48d46a7d.ngrok-free.app/sent-emails/")
+    .then(response => response.json())
+    .then(emails => {
+      const container = document.getElementById('emails-list-container');
+      const template = document.getElementById('email-row-template').content;
+      container.innerHTML = '';
+
+      if (emails.length === 0) {
+        const emptyMessage = document.createElement('div');
+        emptyMessage.textContent = "No emails sent yet. Create your portfolio and send emails to get started!";
+        emptyMessage.style.padding = "10px";
+        emptyMessage.style.color = "#555";
+        emptyMessage.style.textAlign = "center";
+        container.appendChild(emptyMessage);
+        return;
+      }
+
+      emails.forEach(email => {
+        const clone = template.cloneNode(true);
+        clone.querySelector('.email-professor').textContent = email.professor_email;
+        clone.querySelector('.email-university').textContent = email.university;
+        clone.querySelector('.email-date').textContent = email.date_sent;
+        clone.querySelector('.email-status').textContent = email.status;
+        clone.querySelector('.email-content').textContent = email.email_body;
+
+        const row = clone.querySelector('.email-row');
+        const header = clone.querySelector('.email-row-header');
+        const body = clone.querySelector('.email-body');
+        const icon = clone.querySelector('.expand-icon');
+
+        row.addEventListener('click', () => {
+        const key = email.professor_email + email.date_sent;
+        if (body.style.display === 'none' || body.style.display === '') {
+            body.style.display = 'block';
+            icon.style.transform = 'rotate(180deg)';
+            expandedEmails.add(key);
+        } else {
+            body.style.display = 'none';
+            icon.style.transform = 'rotate(0deg)';
+            expandedEmails.delete(key);
+        }
+        });
+
+
+        // Restore expanded state if previously opened
+        const key = email.professor_email + email.date_sent;
+        if (expandedEmails.has(key)) {
+          body.style.display = 'block';
+          icon.style.transform = 'rotate(180deg)';
+        }
+
+        container.appendChild(clone);
+      });
+    })
+    .catch(err => console.error("❌ Failed to fetch emails list:", err));
+}
+
+updateStats();
+setInterval(updateStats, 10000);
+
+updateEmailsList();
+setInterval(updateEmailsList, 10000);
 </script>
 
 {% endblock %}

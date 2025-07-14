@@ -381,3 +381,76 @@ body, .dashboard-container {
     background: #fff !important;
     min-height: 100vh;
 }
+/* Emails Sent Section Refined */
+.emails-card {
+    background: #fff;
+    border-radius: 22px;
+    box-shadow: 0 8px 32px 0 rgba(60,60,60,0.10);
+    border: none;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2.5rem;
+}
+
+.emails-list {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-top: 0.5rem;
+}
+
+.email-row {
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.75rem 0;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.email-row:hover {
+    background: var(--background-gray);
+}
+
+.email-row-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.email-row-header strong {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.email-university {
+    color: var(--text-secondary);
+    font-size: 0.98rem;
+}
+
+.email-date {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-right: 0.75rem;
+}
+
+.email-status {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-right: 0.5rem;
+}
+
+.expand-icon {
+    transition: transform 0.2s;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.email-body {
+    margin-top: 0.5rem;
+    padding-left: 0.2rem;
+    padding-right: 0.2rem;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    white-space: pre-wrap;
+    font-family: inherit;
+    display: none;
+    transition: all 0.2s ease-in-out;
+}
