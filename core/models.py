@@ -11,7 +11,8 @@ class EmailCredit(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
+    tos_accepted = models.BooleanField(default=False)
     # Add other fields as needed
 
     def get_profile_image(self):

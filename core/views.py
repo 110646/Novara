@@ -19,7 +19,7 @@ import stripe
 import traceback
 import json
 from openai.types.chat import ChatCompletionMessageParam
-from django.contrib.auth import logout
+from django.contrib.auth import logout as auth_logout
 from django.contrib import messages
 from storages.backends.s3boto3 import S3Boto3Storage
 from core.choices import MAJOR_CHOICES, CLASS_YEAR_CHOICES, US_UNIVERSITY_CHOICES
@@ -30,6 +30,7 @@ from datetime import datetime, timezone as dt_timezone
 from django.utils import timezone
 from core.models import SentEmailEvent, EmailCredit, SentEmailRecord
 from core.progress_tracker import user_progress
+from django.urls import reverse
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +48,7 @@ def home(request):
     return render(request, 'home.html')
 
 def custom_logout(request):
-    logout(request)
+    auth_logout(request)
     messages.success(request, "Logged out successfully.")
     return redirect('home')
 
@@ -612,3 +613,29 @@ def privacy_policy(request):
 
 def about(request):
     return render(request, 'about.html')
+
+def terms_of_service(request):
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'accept':
+            profile.tos_accepted = True
+            profile.save()
+            return redirect('dashboard')
+        elif action == 'decline':
+            auth_logout(request)
+            return redirect('account_login')
+    return render(request, 'terms_of_service.html')
+
+# After login, redirect to TOS if not accepted
+from django.utils.deprecation import MiddlewareMixin
+class TOSRedirectMiddleware(MiddlewareMixin):
+    def process_request(self, request):
+        if request.user.is_authenticated and not request.path.startswith('/terms-of-service'):
+            try:
+                profile = Profile.objects.get(user=request.user)
+                if not profile.tos_accepted:
+                    return redirect('terms_of_service')
+            except Profile.DoesNotExist:
+                return redirect('terms_of_service')
+        return None

@@ -325,3 +325,12 @@ select {
   height: 48px;
   line-height: 1.2;
 }
+.portfolio-sidebar > .compact-info-card {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 563px;
+  height: 563px;
+  max-height: 563px;
+}
