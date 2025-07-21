@@ -87,27 +87,13 @@
     </div>
 
     {% if portfolio and not editing %}
-    <div class="card info-card">
-      <div class="card-header">
-        <h2>Current Portfolio Information</h2>
-        <div class="last-updated">Last Updated: {{ portfolio.updated_at }}</div>
-      </div>
-      <div class="card-body">
-        <ul class="info-list">
-          <li><strong>Name:</strong> {{ portfolio.name }}</li>
-          <li><strong>Major:</strong> {{ portfolio.major }}</li>
-          <li><strong>Academic Level:</strong> {{ portfolio.class_year }}</li>
-          <li><strong>University:</strong> {{ portfolio.university }}</li>
-          <li><strong>Research Interests:</strong> {{ portfolio.research_interests }}</li>
-        </ul>
-      </div>
-    </div>
+    <!-- Removed Current Portfolio Information from the main/left side -->
     {% endif %}
 
     <div class="card action-card">
-      <div class="card-body">
-        <h3>Done Building Your Portfolio?</h3>
-        <a href="{% url 'send_emails' %}" class="btn btn-primary action-btn">Buy and Send Emails</a>
+      <div class="card-body" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+        <h3 style="text-align: center; width: 100%;">Done Building Your Portfolio?</h3>
+        <a href="{% url 'send_emails' %}" class="btn btn-primary action-btn" style="display: flex; justify-content: center; align-items: center;">Buy and Send Emails</a>
       </div>
     </div>
   </div>
@@ -146,6 +132,23 @@
         <div id="strengthLabel" class="strength-label">Getting Started</div>
       </div>
     </div>
+    {% if portfolio and not editing %}
+    <div class="card info-card compact-info-card">
+      <div class="card-header">
+        <h2>Current Portfolio Information</h2>
+        <div class="last-updated">Last Updated: {{ portfolio.updated_at }}</div>
+      </div>
+      <div class="card-body">
+        <ul class="info-list compact-info-list">
+          <li><strong>Name:</strong> {{ portfolio.name }}</li>
+          <li><strong>Major:</strong> {{ portfolio.major }}</li>
+          <li><strong>Academic Level:</strong> {{ portfolio.class_year }}</li>
+          <li><strong>University:</strong> {{ portfolio.university }}</li>
+          <li><strong>Research Interests:</strong> {{ portfolio.research_interests }}</li>
+        </ul>
+      </div>
+    </div>
+    {% endif %}
   </div>
 </div>
 

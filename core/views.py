@@ -606,3 +606,9 @@ def postmark_events_webhook(request):
     except Exception as e:
         logger.exception("❌ Failed to process Postmark event")
         return JsonResponse({"error": str(e)}, status=500)
+
+def privacy_policy(request):
+    return render(request, 'privacy_policy.html')
+
+def about(request):
+    return render(request, 'about.html')

@@ -2,7 +2,27 @@
 {% load static %}
 
 {% block content %}
+<script>document.body.classList.add('account-bg-white');</script>
 <link rel="stylesheet" href="{% static 'css/account.css' %}">
-<h1>Account Page</h1>
-<p>Manage your profile information here.</p>
+<div class="account-page-container">
+  <div class="account-sidebar">
+    <ul>
+      <li class="sidebar-link {% if request.path == '/account/' %}active{% endif %}"><a href="{% url 'account' %}">Settings</a></li>
+      <li class="sidebar-link {% if request.path == '/privacy-policy/' %}active{% endif %}"><a href="{% url 'privacy_policy' %}">Privacy Policy</a></li>
+      <li class="sidebar-link {% if request.path == '/about/' %}active{% endif %}"><a href="{% url 'about' %}">About</a></li>
+    </ul>
+  </div>
+  <div class="account-main">
+    <div class="card account-card">
+      {% if request.path == '/account/' %}
+      <div class="card-header">
+        <h1>Account Settings</h1>
+      </div>
+      {% endif %}
+      <div class="card-body">
+        {% block account_content %}{% endblock %}
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

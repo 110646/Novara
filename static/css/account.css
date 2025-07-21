@@ -1,0 +1,114 @@
+.account-page-container {
+  display: flex;
+  gap: 2.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 2rem 1.5rem;
+  background: #fff;
+}
+body.account-bg-white {
+  background: #fff !important;
+}
+.account-sidebar {
+  width: 220px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px 0 rgba(60,60,60,0.10);
+  padding: 2rem 0 2rem 0;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.account-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.sidebar-link {
+  margin-bottom: 1.2rem;
+}
+.sidebar-link:last-child {
+  margin-bottom: 0;
+}
+.sidebar-link a {
+  display: block;
+  padding: 0.9rem 2rem;
+  font-size: 1.13rem;
+  color: #222;
+  text-decoration: none;
+  border-radius: 8px 0 0 8px;
+  transition: background 0.18s, color 0.18s;
+}
+.sidebar-link.active a, .sidebar-link a:hover {
+  color: #FFD700;
+  font-weight: 700;
+  background: none;
+  border: none;
+}
+.account-main {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.account-card {
+  background: #fff;
+  border-radius: 22px;
+  box-shadow: 0 8px 32px 0 rgba(60,60,60,0.10);
+  border: none;
+  padding: 0;
+  overflow: hidden;
+}
+.account-card .card-header {
+  padding: 2rem 2rem 0.5rem 2rem;
+  background: none;
+  border-bottom: none;
+}
+.account-card .card-header h1 {
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: #222;
+  margin: 0 0 0.5rem 0;
+}
+.account-card .card-body {
+  padding: 1.5rem 2rem 2rem 2rem;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+.account-card .card-body ol {
+  list-style-position: outside;
+  padding-left: 2.2em;
+  margin-left: 0;
+}
+.account-card .card-body ol > li {
+  padding-left: 0.2em;
+  text-indent: 0;
+}
+.account-card .card-body ol > li::marker {
+  min-width: 2em;
+  display: inline-block;
+  text-align: right;
+}
+@media (max-width: 1024px) {
+  .account-page-container {
+    flex-direction: column;
+    gap: 2rem;
+    padding: 1.5rem 0.5rem;
+  }
+  .account-main, .account-sidebar {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+@media (max-width: 700px) {
+  .account-page-container {
+    flex-direction: column;
+    gap: 1.2rem;
+    padding: 0.5rem 0.1rem;
+  }
+  .account-card .card-header, .account-card .card-body {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}

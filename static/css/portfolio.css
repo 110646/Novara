@@ -291,3 +291,37 @@ body, .portfolio-page {
       padding-right: 1rem;
     }
   }
+.action-card .card-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.action-card h3 {
+  text-align: center;
+  width: 100%;
+}
+.action-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+select {
+  border: 1.5px solid #e9ecef;
+  border-radius: 8px;
+  padding: 0.7rem 2.5rem 0.7rem 1rem;
+  font-size: 1.05rem;
+  background: #f9f9fb;
+  color: #222;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23222" height="18" viewBox="0 0 24 24" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.2rem;
+  min-height: 48px;
+  height: 48px;
+  line-height: 1.2;
+}
