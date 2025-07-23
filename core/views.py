@@ -614,28 +614,5 @@ def privacy_policy(request):
 def about(request):
     return render(request, 'about.html')
 
-def terms_of_service(request):
-    profile, _ = Profile.objects.get_or_create(user=request.user)
-    if request.method == 'POST':
-        action = request.POST.get('action')
-        if action == 'accept':
-            profile.tos_accepted = True
-            profile.save()
-            return redirect('dashboard')
-        elif action == 'decline':
-            auth_logout(request)
-            return redirect('account_login')
-    return render(request, 'terms_of_service.html')
-
-# After login, redirect to TOS if not accepted
-from django.utils.deprecation import MiddlewareMixin
-class TOSRedirectMiddleware(MiddlewareMixin):
-    def process_request(self, request):
-        if request.user.is_authenticated and not request.path.startswith('/terms-of-service'):
-            try:
-                profile = Profile.objects.get(user=request.user)
-                if not profile.tos_accepted:
-                    return redirect('terms_of_service')
-            except Profile.DoesNotExist:
-                return redirect('terms_of_service')
-        return None
+def tos(request):
+    return render(request, 'tos.html')

@@ -51,7 +51,7 @@ urlpatterns = [
     path('log-sent-email/', core_views.log_sent_email, name='log_sent_email'),
     path('sent-emails/', core_views.sent_emails_list, name='sent_emails_list'),
     path('email-send-status/', core_views.email_send_status, name='email_send_status'),
-    path('terms-of-service/', core_views.terms_of_service, name='terms_of_service'),
+    path('tos/', core_views.tos, name='tos'),
 
 ]
 

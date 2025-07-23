@@ -9,6 +9,7 @@
     <ul>
       <li class="sidebar-link {% if request.path == '/account/' %}active{% endif %}"><a href="{% url 'account' %}">Settings</a></li>
       <li class="sidebar-link {% if request.path == '/privacy-policy/' %}active{% endif %}"><a href="{% url 'privacy_policy' %}">Privacy Policy</a></li>
+      <li class="sidebar-link {% if request.path == '/tos/' %}active{% endif %}"><a href="{% url 'tos' %}">Terms of Service</a></li>
       <li class="sidebar-link {% if request.path == '/about/' %}active{% endif %}"><a href="{% url 'about' %}">About</a></li>
     </ul>
   </div>
@@ -21,6 +22,7 @@
       {% endif %}
       <div class="card-body">
         {% block account_content %}{% endblock %}
+        {% block tos_content %}{% endblock %}
       </div>
     </div>
   </div>
