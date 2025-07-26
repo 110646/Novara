@@ -8,8 +8,15 @@
   <div class="account-sidebar">
     <ul>
       <li class="sidebar-link {% if request.path == '/account/' %}active{% endif %}"><a href="{% url 'account' %}">Settings</a></li>
-      <li class="sidebar-link {% if request.path == '/privacy-policy/' %}active{% endif %}"><a href="{% url 'privacy_policy' %}">Privacy Policy</a></li>
-      <li class="sidebar-link {% if request.path == '/tos/' %}active{% endif %}"><a href="{% url 'tos' %}">Terms of Service</a></li>
+      <li class="sidebar-link data-privacy-toggle">
+        <span class="data-privacy-label" style="font-weight:600; padding-left:2rem; cursor:pointer; display:block; padding:0.9rem 2rem;">
+          Data & Privacy
+        </span>
+        <ul class="data-privacy-submenu" style="padding-left:1.5rem; margin-top:0.5rem; overflow:hidden; transition:max-height 0.3s ease;">
+          <li class="sidebar-link {% if request.path == '/privacy-policy/' %}active{% endif %}" style="margin-bottom:0.5rem;"><a href="{% url 'privacy_policy' %}">Privacy Policy</a></li>
+          <li class="sidebar-link {% if request.path == '/tos/' %}active{% endif %}"><a href="{% url 'tos' %}">Terms of Service</a></li>
+        </ul>
+      </li>
       <li class="sidebar-link {% if request.path == '/about/' %}active{% endif %}"><a href="{% url 'about' %}">About</a></li>
     </ul>
   </div>
@@ -27,4 +34,35 @@
     </div>
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const dataPrivacyToggle = document.querySelector('.data-privacy-toggle');
+  const dataPrivacyLabel = document.querySelector('.data-privacy-label');
+  const dataPrivacySubmenu = document.querySelector('.data-privacy-submenu');
+  
+  // Set initial state - expanded if on privacy policy or tos page
+  const isOnPrivacyOrTos = window.location.pathname === '/privacy-policy/' || window.location.pathname === '/tos/';
+  if (!isOnPrivacyOrTos) {
+    dataPrivacySubmenu.style.maxHeight = '0px';
+  } else {
+    dataPrivacySubmenu.style.maxHeight = dataPrivacySubmenu.scrollHeight + 'px';
+  }
+  
+  dataPrivacyLabel.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const isExpanded = dataPrivacySubmenu.style.maxHeight !== '0px';
+    
+    if (isExpanded) {
+      // Collapse
+      dataPrivacySubmenu.style.maxHeight = '0px';
+    } else {
+      // Expand
+      dataPrivacySubmenu.style.maxHeight = dataPrivacySubmenu.scrollHeight + 'px';
+    }
+  });
+});
+</script>
 {% endblock %}

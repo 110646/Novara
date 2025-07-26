@@ -111,11 +111,8 @@ def log_sent_email(request):
         university = data.get('university')
         email_body = data.get('email_body')
         smtp_id = data.get('smtp_id')
-
         try:
             user = User.objects.get(id=user_id)
-
-            # Log the actual sent email
             SentEmailRecord.objects.create(
                 user=user,
                 professor_email=professor_email,
@@ -123,14 +120,10 @@ def log_sent_email(request):
                 email_body=email_body,
                 smtp_id=smtp_id
             )
-
             return JsonResponse({'status': 'success'})
-
         except User.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
-
     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
-
 
 @login_required
 def account(request):
@@ -564,7 +557,7 @@ def postmark_events_webhook(request):
 
         metadata = event.get("Metadata", {})
         user_id = metadata.get("user_id")
-        professor_id = metadata.get("professor_id")  # optional
+        professor_id = metadata.get("professor_id")
         logger.info("✅ Extracted metadata: user_id=%s, professor_id=%s", user_id, professor_id)
 
         if not user_id:
@@ -577,7 +570,7 @@ def postmark_events_webhook(request):
             logger.warning("⚠️ No matching user found for ID: %s", user_id)
             return JsonResponse({"error": "User not found"}, status=404)
 
-        # Parse timestamp (fallback to now)
+        # Timestamp parsing
         raw_ts = event.get("DeliveredAt") or event.get("ReceivedAt") or event.get("BouncedAt")
         try:
             timestamp_dt = datetime.strptime(raw_ts, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt_timezone.utc) if raw_ts else timezone.now()
@@ -585,14 +578,14 @@ def postmark_events_webhook(request):
             logger.warning("⚠️ Failed to parse timestamp: %s", raw_ts)
             timestamp_dt = timezone.now()
 
-        # Create SentEmailEvent log
+        # Store the event in SentEmailEvent
         SentEmailEvent.objects.create(
             user=user,
             email=event.get("Recipient"),
             event_type=event.get("RecordType"),
             timestamp=timestamp_dt,
             smtp_id=event.get("MessageID", ""),
-            user_agent="",  # Postmark doesn't send this
+            user_agent="",  # Not provided by Postmark
             response=event.get("Details", ""),
             custom_args=metadata
         )
@@ -600,32 +593,14 @@ def postmark_events_webhook(request):
 
         # 🔥 Update SentEmailRecord if it's an Open event
         if event.get("RecordType") == "Open":
-            smtp_id = event.get("MessageID", "")
-            logger.info("🔍 Looking for SentEmailRecord with smtp_id: %s", smtp_id)
-
             try:
-                record = SentEmailRecord.objects.get(user=user, smtp_id=smtp_id)
+                record = SentEmailRecord.objects.get(user=user, smtp_id=event.get("MessageID", ""))
                 if record.status != "Opened":
                     record.status = "Opened"
                     record.save()
-                    logger.info("✅ Updated status to Opened for %s", record.professor_email)
+                    logger.info("✅ Updated SentEmailRecord status to Opened for smtp_id: %s", event.get("MessageID"))
             except SentEmailRecord.DoesNotExist:
-                logger.warning("⚠️ No SentEmailRecord found for smtp_id: %s", smtp_id)
-                
-                # Log all known smtp_ids for this user for debugging
-                known_ids = list(SentEmailRecord.objects.filter(user=user).values_list("smtp_id", flat=True))
-                logger.warning("Known smtp_ids for user %s: %s", user_id, known_ids)
-
-                # Optional fallback by professor email
-                fallback_email = event.get("Recipient")
-                fallback = SentEmailRecord.objects.filter(user=user, professor_email=fallback_email).order_by('-date_sent').first()
-                if fallback:
-                    if fallback.status != "Opened":
-                        fallback.status = "Opened"
-                        fallback.save()
-                        logger.info("✅ Fallback matched by email: %s", fallback.professor_email)
-                else:
-                    logger.warning("❌ No fallback match by email either: %s", fallback_email)
+                logger.warning("⚠️ No SentEmailRecord found for smtp_id: %s", event.get("MessageID"))
 
         return JsonResponse({"status": "ok"})
 

@@ -454,3 +454,162 @@ body, .dashboard-container {
     display: none;
     transition: all 0.2s ease-in-out;
 }
+
+/* Terms of Service Acceptance Modal */
+.tos-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.tos-modal-content {
+  background: #fff;
+  border-radius: 18px;
+  max-width: 500px;
+  width: 90vw;
+  box-shadow: 0 8px 32px 0 rgba(60,60,60,0.18);
+  animation: slideIn 0.3s ease-out;
+}
+
+.tos-modal-header {
+  padding: 2rem 2rem 1rem 2rem;
+  border-bottom: 1px solid #eee;
+}
+
+.tos-modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #222;
+}
+
+.tos-modal-body {
+  padding: 1.5rem 2rem;
+}
+
+.tos-modal-body p {
+  margin: 0 0 1.5rem 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #444;
+}
+
+.tos-link {
+  color: #FFD700;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.tos-link:hover {
+  text-decoration: underline;
+}
+
+.tos-checkbox-container {
+  margin-bottom: 1.5rem;
+}
+
+.tos-checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #222;
+  font-weight: 500;
+}
+
+.tos-checkbox {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  height: 20px;
+  width: 20px;
+  background-color: #fff;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  margin-right: 12px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.tos-checkbox:checked ~ .checkmark {
+  background-color: #FFD700;
+  border-color: #FFD700;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 6px;
+  top: 2px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.tos-checkbox:checked ~ .checkmark:after {
+  display: block;
+}
+
+.tos-modal-footer {
+  padding: 1rem 2rem 2rem 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.tos-accept-btn {
+  background: #FFD700;
+  color: #222;
+  border: none;
+  padding: 12px 32px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.tos-accept-btn:hover:not(:disabled) {
+  background: #e6c200;
+  transform: translateY(-1px);
+}
+
+.tos-accept-btn:disabled {
+  background: #ccc;
+  color: #888;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

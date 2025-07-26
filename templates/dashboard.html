@@ -6,6 +6,28 @@
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
+<!-- Terms of Service Acceptance Popup -->
+<div id="tosAcceptanceModal" class="tos-modal-overlay" style="display: none;">
+  <div class="tos-modal-content">
+    <div class="tos-modal-header">
+      <h2>Welcome to Novara!</h2>
+    </div>
+    <div class="tos-modal-body">
+      <p>By clicking the checkbox below, you are accepting our <a href="{% url 'tos' %}" target="_blank" class="tos-link">Terms of Service</a>.</p>
+      <div class="tos-checkbox-container">
+        <label class="tos-checkbox-label">
+          <input type="checkbox" id="tosAcceptCheckbox" class="tos-checkbox">
+          <span class="checkmark"></span>
+          I accept the Terms of Service
+        </label>
+      </div>
+    </div>
+    <div class="tos-modal-footer">
+      <button id="tosAcceptButton" class="tos-accept-btn" disabled>Continue</button>
+    </div>
+  </div>
+</div>
+
 <div class="dashboard-container">
     <div class="welcome-section">
         <h1>Welcome, {{ user.get_full_name|default:user.email }}!</h1>
@@ -199,4 +221,47 @@ updateEmailsList();
 setInterval(updateEmailsList, 10000);
 </script>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Check if user has accepted TOS
+  const hasAcceptedTOS = localStorage.getItem('novara_tos_accepted');
+  
+  if (!hasAcceptedTOS) {
+    // Show TOS acceptance modal
+    const modal = document.getElementById('tosAcceptanceModal');
+    const checkbox = document.getElementById('tosAcceptCheckbox');
+    const acceptButton = document.getElementById('tosAcceptButton');
+    
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    // Disable all navigation except dashboard and logout
+    const navLinks = document.querySelectorAll('.nav-link:not([href*="dashboard"]):not([onclick*="showLogoutModal"])');
+    navLinks.forEach(link => {
+      link.style.pointerEvents = 'none';
+      link.style.opacity = '0.5';
+    });
+    
+    // Handle checkbox change
+    checkbox.addEventListener('change', function() {
+      acceptButton.disabled = !this.checked;
+    });
+    
+    // Handle accept button click
+    acceptButton.addEventListener('click', function() {
+      if (checkbox.checked) {
+        localStorage.setItem('novara_tos_accepted', 'true');
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+        
+        // Re-enable all navigation
+        navLinks.forEach(link => {
+          link.style.pointerEvents = '';
+          link.style.opacity = '';
+        });
+      }
+    });
+  }
+});
+</script>
 {% endblock %}

@@ -90,6 +90,30 @@ body.account-bg-white {
   display: inline-block;
   text-align: right;
 }
+.account-sidebar ul ul {
+  padding-left: 1.2rem;
+  margin-top: 0.2rem;
+}
+.account-sidebar ul ul .sidebar-link {
+  margin-bottom: 0.5rem;
+}
+.account-sidebar ul ul .sidebar-link a {
+  font-size: 1rem;
+  padding: 0.7rem 1.5rem;
+  border-radius: 6px 0 0 6px;
+}
+
+.data-privacy-label {
+  transition: color 0.18s;
+}
+
+.data-privacy-label:hover {
+  color: #FFD700;
+}
+
+.data-privacy-submenu {
+  transition: max-height 0.3s ease;
+}
 @media (max-width: 1024px) {
   .account-page-container {
     flex-direction: column;
