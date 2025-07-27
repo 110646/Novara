@@ -7,11 +7,13 @@ export default {
       console.log(`📨 Sending ${professors.length} emails`);
 
       for (const prof of professors) {
-        const personalized = template
+        let personalized = template
           .replace(/{{\s*professor_name\s*}}|{\s*professor_name\s*}/g, prof.last_name)
           .replace(/{{\s*university\s*}}|{\s*university\s*}/g, prof.university)
           .replace(/{{\s*major\s*}}|{\s*major\s*}/g, student.major)
           .replace(/{{\s*student_name\s*}}|{\s*student_name\s*}/g, student.name);
+
+        personalized = personalized.replace(/{\s*[^}]+}/g, "your research");
 
         const payload = {
           From: `${student.name} <research@connectnovara.com>`,
@@ -45,8 +47,11 @@ export default {
           console.error("❌ Postmark error:", error);
         }
 
+        const postmarkData = await res.json(); // ✅ NEW
+        const messageId = postmarkData.MessageID || null;
+
         // ✅ Log the sent email to your Django backend
-        const logRes = await fetch("https://8f6a48d46a7d.ngrok-free.app/log-sent-email/", {
+        const logRes = await fetch("https://8de0dc7cb3b6.ngrok-free.app/log-sent-email/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -56,7 +61,7 @@ export default {
             professor_email: prof.email,
             university: prof.university,
             email_body: personalized,
-            smtp_id: null  // You can update this if Postmark returns a message ID
+            smtp_id: messageId
           })
         });
 
