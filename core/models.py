@@ -13,7 +13,9 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
     tos_accepted = models.BooleanField(default=False)
-    # Add other fields as needed
+    age = models.IntegerField(blank=True, null=True)
+    major = models.CharField(max_length=255, blank=True, null=True)
+    university = models.CharField(max_length=255, blank=True, null=True)
 
     def get_profile_image(self):
         if self.image:

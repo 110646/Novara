@@ -127,7 +127,88 @@ def log_sent_email(request):
 
 @login_required
 def account(request):
-    return render(request, 'account.html')
+    if request.method == 'POST':
+        # Handle profile form submission
+        user = request.user
+        profile, created = Profile.objects.get_or_create(user=user)
+        
+        # Update user fields
+        user.first_name = request.POST.get('first_name', '')
+        user.last_name = request.POST.get('last_name', '')
+        user.save()
+        
+        # Update profile fields
+        if 'profile_image' in request.FILES:
+            profile.image = request.FILES['profile_image']
+        
+        profile.age = request.POST.get('age') or None
+        profile.major = request.POST.get('major', '')
+        profile.university = request.POST.get('university', '')
+        profile.save()
+        
+        # Synchronize with Supabase portfolio data
+        try:
+            headers = {
+                "apikey": SUPABASE_API_KEY,
+                "Authorization": f"Bearer {SUPABASE_API_KEY}",
+                "Content-Type": "application/json"
+            }
+            
+            # Get current portfolio data
+            params = {"user_id": f"eq.{user.id}"}
+            response = httpx.get(f"{SUPABASE_URL}/rest/v1/portfolios", headers=headers, params=params)
+            portfolio_data = response.json()[0] if response.status_code == 200 and response.json() else {}
+            
+            # Prepare update payload
+            full_name = f"{user.first_name} {user.last_name}".strip()
+            update_payload = {
+                "name": full_name if full_name else user.email,
+                "major": profile.major,
+                "university": profile.university,
+                "updated_at": now().isoformat()
+            }
+            
+            if portfolio_data:
+                # Update existing portfolio
+                httpx.patch(
+                    f"{SUPABASE_URL}/rest/v1/portfolios?user_id=eq.{user.id}",
+                    headers=headers,
+                    json=update_payload
+                )
+            else:
+                # Create new portfolio entry
+                create_payload = {
+                    "user_id": int(user.id),
+                    "email": user.email,
+                    **update_payload
+                }
+                httpx.post(
+                    f"{SUPABASE_URL}/rest/v1/portfolios",
+                    headers=headers,
+                    json=create_payload
+                )
+                
+        except Exception as e:
+            print(f"❌ Error syncing with Supabase: {e}")
+        
+        messages.success(request, 'Profile updated successfully!')
+        return redirect('account')
+    
+    # Get choices for dropdowns
+    from .choices import MAJOR_CHOICES, US_UNIVERSITY_CHOICES
+    
+    # Get payment history data
+    payment_history = EmailCredit.objects.filter(user=request.user).order_by('-purchased_at')
+    latest_payment = payment_history.first()
+    
+    context = {
+        'major_choices': MAJOR_CHOICES,
+        'university_choices': US_UNIVERSITY_CHOICES,
+        'payment_history': payment_history,
+        'latest_payment': latest_payment,
+    }
+    
+    return render(request, 'account.html', context)
 
 @login_required
 def payments(request):
@@ -239,6 +320,22 @@ def portfolio(request):
                     headers={**headers, "Content-Type": "application/json"},
                     json=payload
                 )
+                
+            # Synchronize with Django Profile model
+            profile, created = Profile.objects.get_or_create(user=user)
+            
+            # Update user name if it changed
+            if name and name != user.get_full_name():
+                name_parts = name.split(' ', 1)
+                user.first_name = name_parts[0]
+                user.last_name = name_parts[1] if len(name_parts) > 1 else ''
+                user.save()
+            
+            # Update profile fields
+            profile.major = major
+            profile.university = university
+            profile.save()
+            
         except Exception:
             traceback.print_exc()
 

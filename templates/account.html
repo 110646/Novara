@@ -8,6 +8,7 @@
   <div class="account-sidebar">
     <ul>
       <li class="sidebar-link {% if request.path == '/account/' %}active{% endif %}"><a href="{% url 'account' %}">Settings</a></li>
+      <li class="sidebar-link {% if request.path == '/account/' %}active{% endif %}"><a href="#payments-history">Payments History</a></li>
       <li class="sidebar-link data-privacy-toggle">
         <span class="data-privacy-label" style="font-weight:600; padding-left:2rem; cursor:pointer; display:block; padding:0.9rem 2rem;">
           Data & Privacy
@@ -24,11 +25,136 @@
     <div class="card account-card">
       {% if request.path == '/account/' %}
       <div class="card-header">
-        <h1>Account Settings</h1>
+        <h1>Settings</h1>
       </div>
       {% endif %}
       <div class="card-body">
-        {% block account_content %}{% endblock %}
+        {% block account_content %}
+        {% if request.path == '/account/' %}
+        {% if messages %}
+        <div class="messages">
+          {% for message in messages %}
+          <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+            {{ message }}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        
+        <div class="settings-section">
+          <h2>Profile Information</h2>
+          <p class="section-description">Update your personal information. Changes here will also update your portfolio.</p>
+          
+          <form method="post" enctype="multipart/form-data" class="profile-form">
+            {% csrf_token %}
+            
+            <div class="profile-image-section">
+              <div class="profile-image-container">
+                <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default_user.png' %}{% endif %}" alt="Profile Picture" id="profile-image-preview" class="profile-image" />
+                <div class="image-upload-overlay">
+                  <i class="fas fa-camera"></i>
+                  <span>Change Photo</span>
+                </div>
+              </div>
+              <input type="file" id="profile-image-input" name="profile_image" accept="image/*" style="display: none;" />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="id_first_name">First Name <span class="required">*</span></label>
+                <input type="text" name="first_name" id="id_first_name" value="{{ user.first_name|default:'' }}" required />
+              </div>
+              <div class="form-group">
+                <label for="id_last_name">Last Name <span class="required">*</span></label>
+                <input type="text" name="last_name" id="id_last_name" value="{{ user.last_name|default:'' }}" required />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="id_age">Age</label>
+                <input type="number" name="age" id="id_age" value="{{ user.profile.age|default:'' }}" min="13" max="120" />
+              </div>
+              <div class="form-group">
+                <label for="id_major">Major</label>
+                <select name="major" id="id_major">
+                  <option value="">Select Major</option>
+                  {% for val, label in major_choices %}
+                  <option value="{{ val }}" {% if user.profile.major == val %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="id_university">University</label>
+              <select name="university" id="id_university">
+                <option value="">Select University</option>
+                {% for val, label in university_choices %}
+                <option value="{{ val }}" {% if user.profile.university == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="save-btn">
+                <i class="fas fa-save"></i>
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+        
+        <!-- Payments History Section -->
+        <div class="settings-section" id="payments-history">
+          <h2>Payments History</h2>
+          <p class="section-description">View your email purchase history and recent transactions.</p>
+          
+          {% if latest_payment %}
+          <div class="latest-payment-summary">
+            <h3>Latest Purchase</h3>
+            <div class="payment-summary-card">
+              <div class="payment-info">
+                <div class="payment-amount">${{ latest_payment.count|add:0|floatformat:2 }}</div>
+                <div class="payment-details">
+                  <span class="email-count">{{ latest_payment.count }} emails purchased</span>
+                  <span class="purchase-date">{{ latest_payment.purchased_at|date:"F j, Y" }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+          
+          {% if payment_history %}
+          <div class="payment-history-table">
+            <h3>All Transactions</h3>
+            <table class="payment-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Emails Purchased</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for payment in payment_history %}
+                <tr>
+                  <td>{{ payment.purchased_at|date:"M j, Y" }}</td>
+                  <td>{{ payment.count }} emails</td>
+                  <td>${{ payment.count|add:0|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="no-payments">
+            <p>No payment history found. Purchase emails to see your transaction history here.</p>
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+        {% endblock %}
         {% block tos_content %}{% endblock %}
       </div>
     </div>
@@ -63,6 +189,27 @@ document.addEventListener('DOMContentLoaded', function() {
       dataPrivacySubmenu.style.maxHeight = dataPrivacySubmenu.scrollHeight + 'px';
     }
   });
+
+  // Profile image upload functionality
+  const profileImageContainer = document.querySelector('.profile-image-container');
+  const profileImageInput = document.getElementById('profile-image-input');
+  const profileImagePreview = document.getElementById('profile-image-preview');
+
+  if (profileImageContainer && profileImageInput) {
+    profileImageContainer.addEventListener('click', function() {
+      profileImageInput.click();
+    });
+
+    profileImageInput.addEventListener('change', function() {
+      if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          profileImagePreview.src = e.target.result;
+        };
+        reader.readAsDataURL(this.files[0]);
+      }
+    });
+  }
 });
 </script>
 {% endblock %}
