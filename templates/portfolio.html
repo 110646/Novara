@@ -65,18 +65,45 @@
 
           <div class="form-group">
             <label for="id_resume">Resume (PDF)</label>
-            {% if portfolio.resume_url %}
-              <div class="resume-display">
-                <span class="form-hint">Uploaded Resume:</span>
-                <a href="{{ portfolio.resume_url }}" target="_blank">{{ resume_filename }}</a>
-                {% if editing %}
-                <button type="submit" name="delete_resume" value="1" class="btn btn-danger btn-sm ml-2">Delete</button>
-                {% endif %}
+            
+            <!-- File Upload Container -->
+            <div class="file-upload-container">
+              {% if portfolio.resume_url %}
+                <!-- File Display (when file is uploaded) -->
+                <div class="file-display" id="fileDisplay">
+                  <div class="file-info">
+                    <i class="fas fa-file-pdf file-icon"></i>
+                    <span class="file-name">{{ resume_filename }}</span>
+                  </div>
+                  {% if editing %}
+                  <button type="button" class="file-delete-btn" title="Delete file" onclick="deleteExistingFile()">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                  {% endif %}
+                </div>
+              {% endif %}
+              
+              <!-- Upload Area (always present, hidden when file exists) -->
+              <div class="upload-area" id="uploadArea" {% if portfolio.resume_url %}style="display: none;"{% endif %}>
+                <div class="upload-content">
+                  <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                  <p class="upload-text">Click to upload or drag and drop</p>
+                  <p class="upload-hint">PDF files only</p>
+                </div>
+                <input type="file" name="resume" id="id_resume" accept=".pdf" {% if not editing %}disabled{% endif %} />
               </div>
-            {% else %}
-              <p class="form-hint">No resume uploaded yet.</p>
-            {% endif %}
-            <input type="file" name="resume" id="id_resume" {% if not editing %}disabled{% endif %} />
+              
+              <!-- Progress Bar (hidden by default) -->
+              <div class="upload-progress" id="uploadProgress" style="display: none;">
+                <div class="progress-container">
+                  <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                  </div>
+                  <div class="progress-text" id="progressText">0%</div>
+                </div>
+                <div class="progress-status" id="progressStatus">Preparing upload...</div>
+              </div>
+            </div>
           </div>
 
           {% if editing %}
@@ -157,38 +184,220 @@
     let filled = 0;
     const total = 6;
 
-    if (document.getElementById("id_name").value.trim()) filled++;
-    if (document.getElementById("id_class_year").value.trim()) filled++;
-    if (document.getElementById("id_university").value.trim()) filled++;
-    if (document.getElementById("id_major").value.trim()) filled++;
-    if (document.getElementById("id_research_interests").value.trim()) filled++;
+    // Check form fields - handle both enabled and disabled states
+    const nameField = document.getElementById("id_name");
+    const classYearField = document.getElementById("id_class_year");
+    const universityField = document.getElementById("id_university");
+    const majorField = document.getElementById("id_major");
+    const researchInterestsField = document.getElementById("id_research_interests");
 
+    // Check if fields have values (works for both enabled and disabled fields)
+    if (nameField && nameField.value.trim()) filled++;
+    if (classYearField && classYearField.value.trim()) filled++;
+    if (universityField && universityField.value.trim()) filled++;
+    if (majorField && majorField.value.trim()) filled++;
+    if (researchInterestsField && researchInterestsField.value.trim()) filled++;
+
+    // Check for resume file - multiple ways to detect
     const resumeInput = document.getElementById("id_resume");
-    const resumeUploaded = document.querySelector(".resume-display a");
-    if (resumeInput.files.length > 0 || resumeUploaded) filled++;
+    const fileDisplay = document.querySelector(".file-display");
+    const uploadProgress = document.getElementById("uploadProgress");
+    
+    // Check if file is selected, displayed, or being uploaded
+    // Also check if there's a file display element (existing uploaded file)
+    if (resumeInput && (resumeInput.files.length > 0 || fileDisplay || (uploadProgress && uploadProgress.style.display !== "none"))) {
+      filled++;
+    } else if (fileDisplay) {
+      // If there's a file display element, count it as filled (for existing files after form submission)
+      filled++;
+    }
 
     const percent = Math.round((filled / total) * 100);
     const bar = document.getElementById("strengthBarFill");
-    bar.style.width = percent + "%";
-    bar.classList.toggle("complete", percent === 100);
-
+    if (bar) {
+      bar.style.width = percent + "%";
+      bar.classList.toggle("complete", percent === 100);
+    }
 
     let label = "Getting Started";
     if (percent >= 100) label = "Done!";
     else if (percent >= 70) label = "Almost There";
     else if (percent >= 40) label = "In Progress";
-    document.getElementById("strengthLabel").innerText = label;
+    
+    const strengthLabel = document.getElementById("strengthLabel");
+    if (strengthLabel) {
+      strengthLabel.innerText = label;
+    }
+
   }
 
+  // File Upload Progress Simulation
+  function simulateUploadProgress() {
+    const progressBar = document.getElementById("uploadProgress");
+    const progressFill = document.getElementById("progressFill");
+    const progressText = document.getElementById("progressText");
+    const progressStatus = document.getElementById("progressStatus");
+    const uploadArea = document.getElementById("uploadArea");
+    
+    progressBar.style.display = "block";
+    uploadArea.style.display = "none";
+    
+    // Update strength calculation immediately when upload starts
+    calculateStrength();
+    
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += Math.random() * 15;
+      if (progress > 100) progress = 100;
+      
+      progressFill.style.width = progress + "%";
+      progressText.textContent = Math.round(progress) + "%";
+      
+      if (progress < 30) {
+        progressStatus.textContent = "Preparing upload...";
+      } else if (progress < 70) {
+        progressStatus.textContent = "Uploading file...";
+      } else if (progress < 100) {
+        progressStatus.textContent = "Processing...";
+      } else {
+        progressStatus.textContent = "Upload complete!";
+        clearInterval(interval);
+        
+        // Hide progress and show file display after a short delay
+        setTimeout(() => {
+          progressBar.style.display = "none";
+          showFileDisplay();
+        }, 1000);
+      }
+    }, 200);
+  }
 
-  calculateStrength();
+  function showFileDisplay() {
+    const fileInput = document.getElementById("id_resume");
+    const file = fileInput.files[0];
+    
+    if (file) {
+      const uploadArea = document.getElementById("uploadArea");
+      const fileDisplay = document.getElementById("fileDisplay");
+      
+      // Create file display HTML
+      const fileDisplayHTML = `
+        <div class="file-display" id="fileDisplay">
+          <div class="file-info">
+            <i class="fas fa-file-pdf file-icon"></i>
+            <span class="file-name">${file.name}</span>
+          </div>
+          <button type="button" class="file-delete-btn" title="Delete file" onclick="deleteFile()">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      `;
+      
+      uploadArea.style.display = "none";
+      uploadArea.insertAdjacentHTML("afterend", fileDisplayHTML);
+      calculateStrength();
+    }
+  }
 
-  ["id_name", "id_class_year", "id_university", "id_major", "id_research_interests", "id_resume"].forEach(id => {
+  function deleteFile() {
+    const fileInput = document.getElementById("id_resume");
+    const fileDisplay = document.getElementById("fileDisplay");
+    const uploadArea = document.getElementById("uploadArea");
+    
+    fileInput.value = "";
+    if (fileDisplay) {
+      fileDisplay.remove();
+    }
+    uploadArea.style.display = "block";
+    calculateStrength(); // Update strength when file is deleted
+  }
+
+  function deleteExistingFile() {
+    const fileDisplay = document.getElementById("fileDisplay");
+    const uploadArea = document.getElementById("uploadArea");
+    const resumeInput = document.getElementById("id_resume");
+    
+    // Clear the file input
+    if (resumeInput) {
+      resumeInput.value = "";
+    }
+    
+    // Remove the file display
+    if (fileDisplay) {
+      fileDisplay.remove();
+    }
+    
+    // Show the upload area
+    if (uploadArea) {
+      uploadArea.style.display = "block";
+      // Re-initialize drag and drop for the upload area
+      setupDragAndDrop();
+    }
+    
+    // Update strength calculation
+    calculateStrength();
+  }
+
+  // Drag and Drop functionality
+  function setupDragAndDrop() {
+    const uploadArea = document.getElementById("uploadArea");
+    const fileInput = document.getElementById("id_resume");
+    
+    if (!uploadArea) return;
+    
+    uploadArea.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      uploadArea.classList.add("dragover");
+    });
+    
+    uploadArea.addEventListener("dragleave", (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove("dragover");
+    });
+    
+    uploadArea.addEventListener("drop", (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove("dragover");
+      
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        fileInput.files = files;
+        calculateStrength(); // Update strength immediately when file is dropped
+        simulateUploadProgress();
+      }
+    });
+  }
+
+  // Initialize
+  calculateStrength(); // Initial calculation
+  setupDragAndDrop();
+
+  // Event listeners for form fields
+  ["id_name", "id_class_year", "id_university", "id_major", "id_research_interests"].forEach(id => {
     const el = document.getElementById(id);
     if (el) {
       el.addEventListener("input", calculateStrength);
       el.addEventListener("change", calculateStrength); 
     }
+  });
+
+  // File input change handler
+  const resumeInput = document.getElementById("id_resume");
+  if (resumeInput) {
+    resumeInput.addEventListener("change", function() {
+      if (this.files.length > 0) {
+        calculateStrength(); // Update strength immediately when file is selected
+        simulateUploadProgress();
+      }
+    });
+  }
+
+  // Also calculate strength when the page loads to handle existing data
+  document.addEventListener('DOMContentLoaded', function() {
+    // Small delay to ensure all elements are properly rendered
+    setTimeout(() => {
+      calculateStrength();
+    }, 100);
   });
 </script>
 

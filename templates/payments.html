@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% load static %}
+{% load math_filters %}
+
+{% block content %}
+<script>document.body.classList.add('account-bg-white');</script>
+<link rel="stylesheet" href="{% static 'css/account.css' %}">
+<div class="account-page-container">
+  <div class="account-sidebar">
+    <ul>
+      <li class="sidebar-link {% if request.path == '/account/' %}active{% endif %}"><a href="{% url 'account' %}">Settings</a></li>
+      <li class="sidebar-link {% if request.path == '/payments/' %}active{% endif %}"><a href="{% url 'payments' %}">Payments History</a></li>
+      <li class="sidebar-link data-privacy-toggle">
+        <span class="data-privacy-label" style="font-weight:600; padding-left:2rem; cursor:pointer; display:block; padding:0.9rem 2rem;">
+          Data & Privacy
+        </span>
+        <ul class="data-privacy-submenu" style="padding-left:1.5rem; margin-top:0.5rem; overflow:hidden; transition:max-height 0.3s ease;">
+          <li class="sidebar-link {% if request.path == '/privacy-policy/' %}active{% endif %}" style="margin-bottom:0.5rem;"><a href="{% url 'privacy_policy' %}">Privacy Policy</a></li>
+          <li class="sidebar-link {% if request.path == '/tos/' %}active{% endif %}"><a href="{% url 'tos' %}">Terms of Service</a></li>
+        </ul>
+      </li>
+      <li class="sidebar-link {% if request.path == '/about/' %}active{% endif %}"><a href="{% url 'about' %}">About</a></li>
+    </ul>
+  </div>
+  <div class="account-main">
+    <div class="card account-card">
+      <div class="card-header">
+        <h1>Payments History</h1>
+      </div>
+      <div class="card-body">
+        <div class="settings-section">
+          <h2>Payment Summary</h2>
+          <p class="section-description">View your email purchase history and recent transactions.</p>
+          
+          {% if payment_history %}
+          <div class="payment-summary-stats">
+            <div class="stat-card">
+              <div class="stat-value">{{ total_credits }}</div>
+              <div class="stat-label">Total Emails Purchased</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">${{ total_spent|floatformat:2 }}</div>
+              <div class="stat-label">Total Amount Spent</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">{{ payment_history.count }}</div>
+              <div class="stat-label">Total Transactions</div>
+            </div>
+          </div>
+          
+          {% if latest_payment %}
+          <div class="latest-payment-summary">
+            <h3>Latest Purchase</h3>
+            <div class="payment-summary-card">
+              <div class="payment-info">
+                <div class="payment-amount">${{ latest_payment.count|multiply:0.20|floatformat:2 }}</div>
+                <div class="payment-details">
+                  <span class="email-count">{{ latest_payment.count }} emails purchased</span>
+                  <span class="purchase-date">{{ latest_payment.purchased_at|date:"F j, Y" }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+          
+          <div class="payment-history-table">
+            <h3>All Transactions</h3>
+            <table class="payment-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Emails Purchased</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for payment in payment_history %}
+                <tr>
+                  <td>{{ payment.purchased_at|date:"M j, Y" }}</td>
+                  <td>{{ payment.count }} emails</td>
+                  <td>${{ payment.count|multiply:0.20|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="no-payments">
+            <div class="empty-state">
+              <i class="fas fa-credit-card" style="font-size: 3rem; color: #ddd; margin-bottom: 1rem;"></i>
+              <h3>No Payment History</h3>
+              <p>You haven't made any email purchases yet. Purchase emails to see your transaction history here.</p>
+              <a href="{% url 'send_emails' %}" class="save-btn">
+                <i class="fas fa-shopping-cart"></i>
+                Buy Emails
+              </a>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const dataPrivacyToggle = document.querySelector('.data-privacy-toggle');
+  const dataPrivacyLabel = document.querySelector('.data-privacy-label');
+  const dataPrivacySubmenu = document.querySelector('.data-privacy-submenu');
+  
+  // Set initial state - expanded if on privacy policy or tos page
+  const isOnPrivacyOrTos = window.location.pathname === '/privacy-policy/' || window.location.pathname === '/tos/';
+  if (!isOnPrivacyOrTos) {
+    dataPrivacySubmenu.style.maxHeight = '0px';
+  } else {
+    dataPrivacySubmenu.style.maxHeight = dataPrivacySubmenu.scrollHeight + 'px';
+  }
+  
+  dataPrivacyLabel.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const isExpanded = dataPrivacySubmenu.style.maxHeight !== '0px';
+    
+    if (isExpanded) {
+      // Collapse
+      dataPrivacySubmenu.style.maxHeight = '0px';
+    } else {
+      // Expand
+      dataPrivacySubmenu.style.maxHeight = dataPrivacySubmenu.scrollHeight + 'px';
+    }
+  });
+});
+</script>
+{% endblock %} 

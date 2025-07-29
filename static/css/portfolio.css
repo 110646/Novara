@@ -290,6 +290,35 @@ body, .portfolio-page {
       padding-left: 1rem;
       padding-right: 1rem;
     }
+    
+    .upload-area {
+      padding: 1.5rem;
+    }
+    
+    .upload-icon {
+      font-size: 2rem;
+    }
+    
+    .upload-text {
+      font-size: 1rem;
+    }
+    
+    .file-display {
+      padding: 0.8rem 1rem;
+    }
+    
+    .file-name {
+      font-size: 0.9rem;
+    }
+    
+    .progress-container {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .progress-text {
+      text-align: center;
+    }
   }
 .action-card .card-body {
   display: flex;
@@ -333,4 +362,164 @@ select {
   min-height: 563px;
   height: 563px;
   max-height: 563px;
+}
+
+/* File Upload Styles */
+.file-upload-container {
+  position: relative;
+  width: 100%;
+}
+
+.upload-area {
+  border: 2px dashed #e9ecef;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  background: #f9f9fb;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-area:hover {
+  border-color: #FFD700;
+  background: #fffbe6;
+}
+
+.upload-area input[type="file"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.upload-content {
+  pointer-events: none;
+}
+
+.upload-icon {
+  font-size: 2.5rem;
+  color: #FFD700;
+  margin-bottom: 1rem;
+}
+
+.upload-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #222;
+  margin: 0 0 0.5rem 0;
+}
+
+.upload-hint {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+}
+
+/* File Display Styles */
+.file-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border: 1.5px solid #e9ecef;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.file-display:hover {
+  border-color: #FFD700;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.1);
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.file-icon {
+  font-size: 1.5rem;
+  color: #e74c3c;
+}
+
+.file-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #222;
+}
+
+.file-delete-btn {
+  background: none;
+  border: none;
+  color: #e74c3c;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.file-delete-btn:hover {
+  background: #fff0f0;
+  color: #c0392b;
+}
+
+/* Progress Bar Styles */
+.upload-progress {
+  margin-top: 1rem;
+}
+
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 8px;
+  background: #f1f1f1;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+
+.progress-text {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #222;
+  min-width: 40px;
+  text-align: right;
+}
+
+.progress-status {
+  font-size: 0.85rem;
+  color: #666;
+  text-align: center;
+}
+
+/* Drag and Drop States */
+.upload-area.dragover {
+  border-color: #FFD700;
+  background: #fffbe6;
+  transform: scale(1.02);
+}
+
+.upload-area.dragover .upload-icon {
+  color: #FFA500;
 }

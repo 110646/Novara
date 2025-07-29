@@ -197,27 +197,28 @@ def account(request):
     # Get choices for dropdowns
     from .choices import MAJOR_CHOICES, US_UNIVERSITY_CHOICES
     
-    # Get payment history data
-    payment_history = EmailCredit.objects.filter(user=request.user).order_by('-purchased_at')
-    latest_payment = payment_history.first()
-    
     context = {
         'major_choices': MAJOR_CHOICES,
         'university_choices': US_UNIVERSITY_CHOICES,
-        'payment_history': payment_history,
-        'latest_payment': latest_payment,
     }
     
     return render(request, 'account.html', context)
 
 @login_required
 def payments(request):
-    credits = EmailCredit.objects.filter(user=request.user).order_by('-purchased_at')
-    total = sum(c.count for c in credits)
-    return render(request, 'payments.html', {
-        'credits': credits,
-        'total_credits': total
-    })
+    payment_history = EmailCredit.objects.filter(user=request.user).order_by('-purchased_at')
+    latest_payment = payment_history.first()
+    total_credits = sum(c.count for c in payment_history)
+    total_spent = total_credits * 0.20  # $0.20 per email
+    
+    context = {
+        'payment_history': payment_history,
+        'latest_payment': latest_payment,
+        'total_credits': total_credits,
+        'total_spent': total_spent,
+    }
+    
+    return render(request, 'payments.html', context)
 
 @login_required
 def email_send_status(request):

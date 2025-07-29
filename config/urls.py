@@ -40,6 +40,7 @@ urlpatterns = [
     path("dashboard/stats/", core_views.dashboard_stats, name="dashboard_stats"),
     path('portfolio/', core_views.portfolio, name='portfolio'),
     path('account/', core_views.account, name='account'),
+    path('payments/', core_views.payments, name='payments'),
     path('privacy-policy/', core_views.privacy_policy, name='privacy_policy'),
     path('about/', core_views.about, name='about'),
     path('send-emails/', core_views.send_emails_page, name='send_emails'),
