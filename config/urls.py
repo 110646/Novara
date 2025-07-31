@@ -42,6 +42,7 @@ urlpatterns = [
     path('account/', core_views.account, name='account'),
     path('payments/', core_views.payments, name='payments'),
     path('privacy-policy/', core_views.privacy_policy, name='privacy_policy'),
+    path('refund-policy/', core_views.refund_policy, name='refund_policy'),
     path('about/', core_views.about, name='about'),
     path('send-emails/', core_views.send_emails_page, name='send_emails'),
     path('create-checkout-session/', core_views.create_checkout_session, name='create_checkout_session'),

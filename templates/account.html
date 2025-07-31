@@ -15,7 +15,8 @@
         </span>
         <ul class="data-privacy-submenu" style="padding-left:1.5rem; margin-top:0.5rem; overflow:hidden; transition:max-height 0.3s ease;">
           <li class="sidebar-link {% if request.path == '/privacy-policy/' %}active{% endif %}" style="margin-bottom:0.5rem;"><a href="{% url 'privacy_policy' %}">Privacy Policy</a></li>
-          <li class="sidebar-link {% if request.path == '/tos/' %}active{% endif %}"><a href="{% url 'tos' %}">Terms of Service</a></li>
+          <li class="sidebar-link {% if request.path == '/tos/' %}active{% endif %}" style="margin-bottom:0.5rem;"><a href="{% url 'tos' %}">Terms of Service</a></li>
+          <li class="sidebar-link {% if request.path == '/refund-policy/' %}active{% endif %}"><a href="{% url 'refund_policy' %}">Refund Policy</a></li>
         </ul>
       </li>
       <li class="sidebar-link {% if request.path == '/about/' %}active{% endif %}"><a href="{% url 'about' %}">About</a></li>
@@ -76,24 +77,46 @@
                 <input type="number" name="age" id="id_age" value="{{ user.profile.age|default:'' }}" min="13" max="120" />
               </div>
               <div class="form-group">
-                <label for="id_major">Major</label>
-                <select name="major" id="id_major">
-                  <option value="">Select Major</option>
-                  {% for val, label in major_choices %}
-                  <option value="{{ val }}" {% if user.profile.major == val %}selected{% endif %}>{{ label }}</option>
-                  {% endfor %}
+                <label for="id_graduation_year">Expected Graduation Year</label>
+                <input type="number" name="graduation_year" id="id_graduation_year" value="{{ user.profile.graduation_year|default:'' }}" min="2024" max="2035" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="id_research_experience">Research Experience (Years)</label>
+                <select name="research_experience" id="id_research_experience">
+                  <option value="">Select Experience Level</option>
+                  <option value="0" {% if user.profile.research_experience == '0' %}selected{% endif %}>No experience</option>
+                  <option value="1" {% if user.profile.research_experience == '1' %}selected{% endif %}>1 year</option>
+                  <option value="2" {% if user.profile.research_experience == '2' %}selected{% endif %}>2 years</option>
+                  <option value="3" {% if user.profile.research_experience == '3' %}selected{% endif %}>3+ years</option>
                 </select>
+              </div>
+              <div class="form-group">
+                <label for="id_gpa">GPA (Optional)</label>
+                <input type="number" name="gpa" id="id_gpa" value="{{ user.profile.gpa|default:'' }}" min="0.0" max="4.0" step="0.01" placeholder="e.g., 3.75" />
               </div>
             </div>
 
             <div class="form-group">
-              <label for="id_university">University</label>
-              <select name="university" id="id_university">
-                <option value="">Select University</option>
-                {% for val, label in university_choices %}
-                <option value="{{ val }}" {% if user.profile.university == val %}selected{% endif %}>{{ label }}</option>
-                {% endfor %}
-              </select>
+              <label for="id_linkedin_url">LinkedIn Profile URL</label>
+              <input type="url" name="linkedin_url" id="id_linkedin_url" value="{{ user.profile.linkedin_url|default:'' }}" placeholder="https://linkedin.com/in/yourprofile" />
+            </div>
+
+            <div class="form-group">
+              <label for="id_github_url">GitHub Profile URL (Optional)</label>
+              <input type="url" name="github_url" id="id_github_url" value="{{ user.profile.github_url|default:'' }}" placeholder="https://github.com/yourusername" />
+            </div>
+
+            <div class="form-group">
+              <label for="id_research_interests">Research Interests</label>
+              <textarea name="research_interests" id="id_research_interests" rows="3" placeholder="e.g., Machine Learning, Computer Vision, Natural Language Processing">{{ user.profile.research_interests|default:'' }}</textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="id_skills">Technical Skills</label>
+              <textarea name="skills" id="id_skills" rows="3" placeholder="e.g., Python, TensorFlow, PyTorch, SQL, JavaScript">{{ user.profile.skills|default:'' }}</textarea>
             </div>
 
             <div class="form-actions">
@@ -118,8 +141,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const dataPrivacyLabel = document.querySelector('.data-privacy-label');
   const dataPrivacySubmenu = document.querySelector('.data-privacy-submenu');
   
-  // Set initial state - expanded if on privacy policy or tos page
-  const isOnPrivacyOrTos = window.location.pathname === '/privacy-policy/' || window.location.pathname === '/tos/';
+                // Set initial state - expanded if on privacy policy, tos, or refund policy page
+              const isOnPrivacyOrTos = window.location.pathname === '/privacy-policy/' || window.location.pathname === '/tos/' || window.location.pathname === '/refund-policy/';
   if (!isOnPrivacyOrTos) {
     dataPrivacySubmenu.style.maxHeight = '0px';
   } else {

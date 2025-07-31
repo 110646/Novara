@@ -142,8 +142,13 @@ def account(request):
             profile.image = request.FILES['profile_image']
         
         profile.age = request.POST.get('age') or None
-        profile.major = request.POST.get('major', '')
-        profile.university = request.POST.get('university', '')
+        profile.graduation_year = request.POST.get('graduation_year') or None
+        profile.research_experience = request.POST.get('research_experience', '')
+        profile.gpa = request.POST.get('gpa') or None
+        profile.linkedin_url = request.POST.get('linkedin_url', '')
+        profile.github_url = request.POST.get('github_url', '')
+        profile.research_interests = request.POST.get('research_interests', '')
+        profile.skills = request.POST.get('skills', '')
         profile.save()
         
         # Synchronize with Supabase portfolio data
@@ -163,8 +168,8 @@ def account(request):
             full_name = f"{user.first_name} {user.last_name}".strip()
             update_payload = {
                 "name": full_name if full_name else user.email,
-                "major": profile.major,
-                "university": profile.university,
+                "research_interests": profile.research_interests,
+                "skills": profile.skills,
                 "updated_at": now().isoformat()
             }
             
@@ -194,13 +199,7 @@ def account(request):
         messages.success(request, 'Profile updated successfully!')
         return redirect('account')
     
-    # Get choices for dropdowns
-    from .choices import MAJOR_CHOICES, US_UNIVERSITY_CHOICES
-    
-    context = {
-        'major_choices': MAJOR_CHOICES,
-        'university_choices': US_UNIVERSITY_CHOICES,
-    }
+    context = {}
     
     return render(request, 'account.html', context)
 
@@ -714,3 +713,6 @@ def about(request):
 
 def tos(request):
     return render(request, 'tos.html')
+
+def refund_policy(request):
+    return render(request, 'refund_policy.html')

@@ -163,6 +163,8 @@
     }
 
     function confirmLogout() {
+      // Set flag to indicate user was logged in
+      sessionStorage.setItem('wasLoggedIn', 'true');
       window.location.href = "{% url 'logout' %}";
     }
     </script>
@@ -346,7 +348,6 @@
       flex-direction: column;
       align-items: flex-start;
       position: relative;
-      top: -50px;
       right: 150px;
     }
     .side-nav-links.main-links {
@@ -370,6 +371,7 @@
       gap: 10px;
       right: 125px;
       position: relative;
+      top: 0;
     }
     .side-nav-links.social-links a {
       font-size: 0.9rem;
@@ -398,6 +400,9 @@
         right: 0;
         top: 0;
       }
+      .side-nav-links.main-links {
+        margin-top: 60px;
+      }
       .side-nav-links.main-links a {
         font-size: 1.1rem;
       }
@@ -407,8 +412,30 @@
     const hamburgerBtn = document.getElementById('hamburgerBtn');
     const sideNav = document.getElementById('sideNav');
     const closeNavBtn = document.getElementById('closeNavBtn');
+    
+    // Check if user was previously logged in (after logout)
+    const wasLoggedIn = sessionStorage.getItem('wasLoggedIn');
+    const isCurrentlyLoggedOut = !document.querySelector('.main-nav .nav-link:not(.signup-btn)');
+    
+    // Adjust positioning if user just logged out
+    if (wasLoggedIn && isCurrentlyLoggedOut) {
+      const mainLinks = document.querySelector('.side-nav-links.main-links');
+      const socialLinks = document.querySelector('.side-nav-links.social-links');
+      
+      if (mainLinks) {
+        mainLinks.style.marginTop = '120px';
+      }
+      if (socialLinks) {
+        socialLinks.style.marginTop = '80px';
+      }
+      
+      // Clear the flag after applying the adjustment
+      sessionStorage.removeItem('wasLoggedIn');
+    }
+    
     hamburgerBtn.onclick = () => sideNav.classList.add('open');
     closeNavBtn.onclick = () => sideNav.classList.remove('open');
+    
     // Close nav on link click, but exclude email links
     document.querySelectorAll('.side-nav-links a').forEach(link => {
       link.onclick = () => {

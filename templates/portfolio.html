@@ -141,8 +141,8 @@
           </form>
         </div>
         <div class="professor-name">{{ portfolio.name|default:user.get_full_name|default:user.email }}</div>
-        <div class="professor-university">{{ portfolio.university|default:user.profile.university|default:'University' }}</div>
-        <div class="professor-major"><span>Major</span><br><strong>{{ portfolio.major|default:user.profile.major|default:'Major' }}</strong></div>
+        <div class="professor-university">{{ portfolio.university|default:'University' }}</div>
+        <div class="professor-major"><span>Research Experience</span><br><strong>{{ user.profile.research_experience|default:'Add experience...' }}</strong></div>
         <div class="professor-interests"><span>Research Interests</span><br><span class="interests-list">{{ portfolio.research_interests|default:'Add interests...' }}</span></div>
       </div>
     </div>
@@ -168,10 +168,11 @@
       <div class="card-body">
         <ul class="info-list compact-info-list">
           <li><strong>Name:</strong> {{ portfolio.name }}</li>
-          <li><strong>Major:</strong> {{ portfolio.major }}</li>
+          <li><strong>Research Experience:</strong> {{ user.profile.research_experience|default:'Not specified' }}</li>
           <li><strong>Academic Level:</strong> {{ portfolio.class_year }}</li>
-          <li><strong>University:</strong> {{ portfolio.university }}</li>
+          <li><strong>Graduation Year:</strong> {{ user.profile.graduation_year|default:'Not specified' }}</li>
           <li><strong>Research Interests:</strong> {{ portfolio.research_interests }}</li>
+          <li><strong>Technical Skills:</strong> {{ user.profile.skills|default:'Not specified' }}</li>
         </ul>
       </div>
     </div>
@@ -187,15 +188,15 @@
     // Check form fields - handle both enabled and disabled states
     const nameField = document.getElementById("id_name");
     const classYearField = document.getElementById("id_class_year");
-    const universityField = document.getElementById("id_university");
-    const majorField = document.getElementById("id_major");
+    const graduationYearField = document.getElementById("id_graduation_year");
+    const researchExperienceField = document.getElementById("id_research_experience");
     const researchInterestsField = document.getElementById("id_research_interests");
 
     // Check if fields have values (works for both enabled and disabled fields)
     if (nameField && nameField.value.trim()) filled++;
     if (classYearField && classYearField.value.trim()) filled++;
-    if (universityField && universityField.value.trim()) filled++;
-    if (majorField && majorField.value.trim()) filled++;
+    if (graduationYearField && graduationYearField.value.trim()) filled++;
+    if (researchExperienceField && researchExperienceField.value.trim()) filled++;
     if (researchInterestsField && researchInterestsField.value.trim()) filled++;
 
     // Check for resume file - multiple ways to detect
@@ -373,7 +374,7 @@
   setupDragAndDrop();
 
   // Event listeners for form fields
-  ["id_name", "id_class_year", "id_university", "id_major", "id_research_interests"].forEach(id => {
+  ["id_name", "id_class_year", "id_graduation_year", "id_research_experience", "id_research_interests"].forEach(id => {
     const el = document.getElementById(id);
     if (el) {
       el.addEventListener("input", calculateStrength);

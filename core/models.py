@@ -14,8 +14,13 @@ class Profile(models.Model):
     image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
     tos_accepted = models.BooleanField(default=False)
     age = models.IntegerField(blank=True, null=True)
-    major = models.CharField(max_length=255, blank=True, null=True)
-    university = models.CharField(max_length=255, blank=True, null=True)
+    graduation_year = models.IntegerField(blank=True, null=True)
+    research_experience = models.CharField(max_length=10, blank=True, null=True)
+    gpa = models.DecimalField(max_digits=3, decimal_places=2, blank=True, null=True)
+    linkedin_url = models.URLField(blank=True, null=True)
+    github_url = models.URLField(blank=True, null=True)
+    research_interests = models.TextField(blank=True, null=True)
+    skills = models.TextField(blank=True, null=True)
 
     def get_profile_image(self):
         if self.image:
