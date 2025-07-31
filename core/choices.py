@@ -87,6 +87,7 @@ CLASS_YEAR_CHOICES = [
 
 US_UNIVERSITY_CHOICES = [
    ('', 'Select University'),
+   ('test', 'test'),
    ('Aaniiih Nakoda College', 'Aaniiih Nakoda College'),
    ('Abraham Baldwin Agricultural College', 'Abraham Baldwin Agricultural College'),
    ('Academy of Art University', 'Academy of Art University'),
