@@ -1,6 +1,5 @@
 #Form Choices
 MAJOR_CHOICES = [
-    ('', 'Select Major'),  # Placeholder
     ('Accounting', 'Accounting'), ('Aerospace Engineering', 'Aerospace Engineering'),
     ('test', 'test'),
     ('Agricultural Business and Management', 'Agricultural Business and Management'),
@@ -73,7 +72,6 @@ MAJOR_CHOICES = [
 ]
 
 CLASS_YEAR_CHOICES = [
-    ('', 'Select Academic Level'), 
     ('High School Student', 'High School Student'),
     ('Undergraduate Freshman', 'Undergraduate Freshman'),
     ('Undergraduate Sophomore', 'Undergraduate Sophomore'),
@@ -86,7 +84,6 @@ CLASS_YEAR_CHOICES = [
 ]
 
 US_UNIVERSITY_CHOICES = [
-   ('', 'Select University'),
    ('test', 'test'),
    ('Aaniiih Nakoda College', 'Aaniiih Nakoda College'),
    ('Abraham Baldwin Agricultural College', 'Abraham Baldwin Agricultural College'),

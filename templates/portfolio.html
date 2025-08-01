@@ -168,11 +168,15 @@
       <div class="card-body">
         <ul class="info-list compact-info-list">
           <li><strong>Name:</strong> {{ portfolio.name }}</li>
-          <li><strong>Research Experience:</strong> {{ user.profile.research_experience|default:'Not specified' }}</li>
           <li><strong>Academic Level:</strong> {{ portfolio.class_year }}</li>
-          <li><strong>Graduation Year:</strong> {{ user.profile.graduation_year|default:'Not specified' }}</li>
+          <li><strong>University:</strong> {{ portfolio.university }}</li>
+          <li><strong>Major:</strong> {{ portfolio.major }}</li>
           <li><strong>Research Interests:</strong> {{ portfolio.research_interests }}</li>
-          <li><strong>Technical Skills:</strong> {{ user.profile.skills|default:'Not specified' }}</li>
+          {% if portfolio.resume_url %}
+          <li><strong>Resume:</strong> Uploaded</li>
+          {% else %}
+          <li><strong>Resume:</strong> Not uploaded</li>
+          {% endif %}
         </ul>
       </div>
     </div>
@@ -183,20 +187,20 @@
 <script>
   function calculateStrength() {
     let filled = 0;
-    const total = 6;
+    const total = 6; // 6 fields: name, class_year, university, major, research_interests, resume
 
     // Check form fields - handle both enabled and disabled states
     const nameField = document.getElementById("id_name");
     const classYearField = document.getElementById("id_class_year");
-    const graduationYearField = document.getElementById("id_graduation_year");
-    const researchExperienceField = document.getElementById("id_research_experience");
+    const universityField = document.getElementById("id_university");
+    const majorField = document.getElementById("id_major");
     const researchInterestsField = document.getElementById("id_research_interests");
 
     // Check if fields have values (works for both enabled and disabled fields)
     if (nameField && nameField.value.trim()) filled++;
     if (classYearField && classYearField.value.trim()) filled++;
-    if (graduationYearField && graduationYearField.value.trim()) filled++;
-    if (researchExperienceField && researchExperienceField.value.trim()) filled++;
+    if (universityField && universityField.value.trim()) filled++;
+    if (majorField && majorField.value.trim()) filled++;
     if (researchInterestsField && researchInterestsField.value.trim()) filled++;
 
     // Check for resume file - multiple ways to detect
@@ -205,11 +209,13 @@
     const uploadProgress = document.getElementById("uploadProgress");
     
     // Check if file is selected, displayed, or being uploaded
-    // Also check if there's a file display element (existing uploaded file)
-    if (resumeInput && (resumeInput.files.length > 0 || fileDisplay || (uploadProgress && uploadProgress.style.display !== "none"))) {
+    if (resumeInput && resumeInput.files.length > 0) {
       filled++;
     } else if (fileDisplay) {
       // If there's a file display element, count it as filled (for existing files after form submission)
+      filled++;
+    } else if (uploadProgress && uploadProgress.style.display !== "none") {
+      // If upload is in progress, count it as filled
       filled++;
     }
 
@@ -217,13 +223,24 @@
     const bar = document.getElementById("strengthBarFill");
     if (bar) {
       bar.style.width = percent + "%";
-      bar.classList.toggle("complete", percent === 100);
+      
+      // Remove all color classes first
+      bar.classList.remove("yellow", "complete");
+      
+      // Add appropriate color class based on filled count
+      if (filled >= 3 && filled <= 5) {
+        bar.classList.add("yellow");
+      } else if (filled === 6) {
+        bar.classList.add("complete");
+      }
+      // For 1-2 fields, no additional class needed (defaults to red)
     }
 
     let label = "Getting Started";
-    if (percent >= 100) label = "Done!";
-    else if (percent >= 70) label = "Almost There";
-    else if (percent >= 40) label = "In Progress";
+    if (filled === 6) label = "Complete!";
+    else if (filled >= 3) label = "Good Progress";
+    else if (filled >= 1) label = "Getting Started";
+    else label = "Empty";
     
     const strengthLabel = document.getElementById("strengthLabel");
     if (strengthLabel) {
@@ -374,7 +391,7 @@
   setupDragAndDrop();
 
   // Event listeners for form fields
-  ["id_name", "id_class_year", "id_graduation_year", "id_research_experience", "id_research_interests"].forEach(id => {
+  ["id_name", "id_class_year", "id_university", "id_major", "id_research_interests"].forEach(id => {
     const el = document.getElementById(id);
     if (el) {
       el.addEventListener("input", calculateStrength);
