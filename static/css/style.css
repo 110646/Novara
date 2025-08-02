@@ -194,6 +194,28 @@ body.dark-mode .submit-btn:hover {
     animation-delay: 4s;
 }
 
+/* Beta Badge */
+.logo {
+  position: relative;
+}
+
+.logo::after {
+  content: 'BETA';
+  position: absolute;
+  top: -5px;
+  right: -20px;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: #222;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 12px;
+  transform: rotate(0deg);
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
 /* Additional large circles */
 .shape-7 {
     width: 250px;

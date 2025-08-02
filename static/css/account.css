@@ -15,10 +15,11 @@ body.account-bg-white {
   border-radius: 18px;
   box-shadow: 0 8px 32px 0 rgba(60,60,60,0.10);
   padding: 2rem 0 2rem 0;
-  min-height: 400px;
+  height: fit-content;
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  flex-shrink: 0;
 }
 .account-sidebar ul {
   list-style: none;
@@ -39,6 +40,9 @@ body.account-bg-white {
   text-decoration: none;
   border-radius: 8px 0 0 8px;
   transition: background 0.18s, color 0.18s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .sidebar-link.active a, .sidebar-link a:hover {
   color: #FFD700;
@@ -47,11 +51,118 @@ body.account-bg-white {
   border: none;
 }
 .account-main {
-  flex: 2;
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  padding: 0;
+  min-width: 0;
 }
+
+/* Blur effect only for settings page */
+body.settings-page .account-main {
+  position: relative;
+}
+
+/* Disable clicking on content underneath blur */
+body.settings-page .account-main .settings-section,
+body.settings-page .account-main .profile-form,
+body.settings-page .account-main .form-block:not(.google-account-block) {
+  pointer-events: none;
+}
+
+body.settings-page .account-main::before {
+  content: '';
+  position: absolute;
+  top: -120px; /* Position below the connected accounts block */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  z-index: 10;
+  pointer-events: none;
+}
+
+body.settings-page .account-main::after {
+  content: 'Closed for Beta Testing';
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  z-index: 11;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+body.settings-page .account-main:hover::after {
+  opacity: 1;
+}
+
+/* Alternative approach for better browser support */
+.account-main.settings-blur {
+  position: relative;
+}
+
+/* Disable clicking on content underneath blur */
+.account-main.settings-blur .settings-section,
+.account-main.settings-blur .profile-form,
+.account-main.settings-blur .form-block:not(.google-account-block) {
+  pointer-events: none;
+}
+
+.account-main.settings-blur::before {
+  content: '';
+  position: absolute;
+  top: 300px; /* Position below the connected accounts block */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.account-main.settings-blur::after {
+  content: 'Closed for Beta Testing';
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  z-index: 11;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.account-main.settings-blur:hover::after {
+  opacity: 1;
+}
+.page-header {
+  margin-bottom: 1rem;
+}
+
+.page-header h1 {
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: #222;
+  margin: 0 0 0.5rem 0;
+}
+
 .account-card {
   background: #fff;
   border-radius: 22px;
@@ -188,11 +299,77 @@ body.account-bg-white {
 
 /* Profile Information Form */
 .profile-form {
-  max-width: 600px;
+  width: 100%;
+}
+
+.form-block {
+  width: 100%;
+}
+
+.form-block {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 16px 0 rgba(60,60,60,0.08);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border: 1px solid #f0f0f0;
+}
+
+.form-block h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #FFD700;
+}
+
+.google-account-block {
+  background: linear-gradient(135deg, #4285f4 0%, #34a853 50%, #fbbc05 75%, #ea4335 100%);
+  color: white;
+  width: 100%;
+}
+
+.google-account-block h3 {
+  color: white;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.google-account-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.google-logo {
+  width: 50px;
+  height: 50px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #4285f4;
+}
+
+.account-details {
+  flex: 1;
+}
+
+.account-type {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.3rem;
+}
+
+.account-email {
+  font-size: 0.9rem;
+  opacity: 0.9;
 }
 
 .settings-section {
-  margin-bottom: 3rem;
+  margin-bottom: 1.5rem;
 }
 
 .settings-section h2 {
@@ -274,10 +451,15 @@ body.account-bg-white {
   color: white;
   opacity: 0;
   transition: opacity 0.3s ease;
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .profile-image-container:hover .image-upload-overlay {
   opacity: 1;
+  transform: none;
 }
 
 .image-upload-overlay i {
@@ -591,9 +773,8 @@ body.account-bg-white {
     gap: 1.2rem;
     padding: 0.5rem 0.1rem;
   }
-  .account-card .card-header, .account-card .card-body {
-    padding-left: 1rem;
-    padding-right: 1rem;
+  .form-block {
+    padding: 1rem;
   }
 }
 

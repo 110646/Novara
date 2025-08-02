@@ -6,27 +6,7 @@
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-<!-- Terms of Service Acceptance Popup -->
-<div id="tosAcceptanceModal" class="tos-modal-overlay" style="display: none;">
-  <div class="tos-modal-content">
-    <div class="tos-modal-header">
-      <h2>Welcome to Novara!</h2>
-    </div>
-    <div class="tos-modal-body">
-      <p>By clicking the checkbox below, you are accepting our <a href="{% url 'tos' %}" target="_blank" class="tos-link">Terms of Service</a>.</p>
-      <div class="tos-checkbox-container">
-        <label class="tos-checkbox-label">
-          <input type="checkbox" id="tosAcceptCheckbox" class="tos-checkbox">
-          <span class="checkmark"></span>
-          I accept the Terms of Service
-        </label>
-      </div>
-    </div>
-    <div class="tos-modal-footer">
-      <button id="tosAcceptButton" class="tos-accept-btn" disabled>Continue</button>
-    </div>
-  </div>
-</div>
+
 
 <div class="dashboard-container">
     <div class="welcome-section">
@@ -112,12 +92,27 @@
     </div>
 
     <!-- Emails Sent Section -->
-    <div class="emails-card" style="padding: 20px; border-radius: 12px;">
+    <div class="emails-card">
         <div class="card-header">
-            <h2>Emails Sent</h2>
-            {{ total_sent }}<p>emails sent</p>
+            <div class="header-content">
+                <h2>Recent Emails</h2>
+                <div class="email-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">{{ total_sent }}</span>
+                        <span class="stat-label">Total Sent</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">{{ total_opened }}</span>
+                        <span class="stat-label">Opened</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">{{ open_rate }}%</span>
+                        <span class="stat-label">Open Rate</span>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="emails-list" style="max-height: 400px; overflow-y: auto;">
+        <div class="emails-list">
             <div id="emails-list-container"></div>
         </div>
     </div>
@@ -179,7 +174,12 @@ function updateEmailsList() {
         clone.querySelector('.email-professor').textContent = email.professor_email;
         clone.querySelector('.email-university').textContent = email.university;
         clone.querySelector('.email-date').textContent = email.date_sent;
-        clone.querySelector('.email-status').textContent = email.status;
+        
+        // Format status with proper styling
+        const statusElement = clone.querySelector('.email-status');
+        statusElement.textContent = email.status;
+        statusElement.classList.add(email.status.toLowerCase());
+        
         clone.querySelector('.email-content').textContent = email.email_body;
 
         const row = clone.querySelector('.email-row');
@@ -221,47 +221,5 @@ updateEmailsList();
 setInterval(updateEmailsList, 10000);
 </script>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Check if user has accepted TOS
-  const hasAcceptedTOS = localStorage.getItem('novara_tos_accepted');
-  
-  if (!hasAcceptedTOS) {
-    // Show TOS acceptance modal
-    const modal = document.getElementById('tosAcceptanceModal');
-    const checkbox = document.getElementById('tosAcceptCheckbox');
-    const acceptButton = document.getElementById('tosAcceptButton');
-    
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    
-    // Disable all navigation except dashboard and logout
-    const navLinks = document.querySelectorAll('.nav-link:not([href*="dashboard"]):not([onclick*="showLogoutModal"])');
-    navLinks.forEach(link => {
-      link.style.pointerEvents = 'none';
-      link.style.opacity = '0.5';
-    });
-    
-    // Handle checkbox change
-    checkbox.addEventListener('change', function() {
-      acceptButton.disabled = !this.checked;
-    });
-    
-    // Handle accept button click
-    acceptButton.addEventListener('click', function() {
-      if (checkbox.checked) {
-        localStorage.setItem('novara_tos_accepted', 'true');
-        modal.style.display = 'none';
-        document.body.style.overflow = '';
-        
-        // Re-enable all navigation
-        navLinks.forEach(link => {
-          link.style.pointerEvents = '';
-          link.style.opacity = '';
-        });
-      }
-    });
-  }
-});
-</script>
+
 {% endblock %}

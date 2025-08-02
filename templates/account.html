@@ -22,16 +22,12 @@
       <li class="sidebar-link {% if request.path == '/about/' %}active{% endif %}"><a href="{% url 'about' %}">About</a></li>
     </ul>
   </div>
-  <div class="account-main">
-    <div class="card account-card">
+  <div class="account-main{% if request.path == '/account/' %} settings-blur{% endif %}">
       {% if request.path == '/account/' %}
-      <div class="card-header">
+    <div class="page-header">
         <h1>Settings</h1>
       </div>
-      {% endif %}
-      <div class="card-body">
-        {% block account_content %}
-        {% if request.path == '/account/' %}
+    
         {% if messages %}
         <div class="messages">
           {% for message in messages %}
@@ -41,6 +37,30 @@
           {% endfor %}
         </div>
         {% endif %}
+    
+    <!-- Google Account Block -->
+    <div class="form-block google-account-block">
+      <h3>Connected Account</h3>
+      <div class="google-account-info">
+        <div class="google-logo">
+          <i class="fab fa-google"></i>
+        </div>
+        <div class="account-details">
+          <div class="account-type">Google Account</div>
+          <div class="account-email">
+            {% if user.email %}
+              {{ user.email }}
+            {% elif user.socialaccount_set.first.extra_data.email %}
+              {{ user.socialaccount_set.first.extra_data.email }}
+            {% elif user.username and '@' in user.username %}
+              {{ user.username }}
+            {% else %}
+              {{ user.username }}@gmail.com
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
         
         <div class="settings-section">
           <h2>Profile Information</h2>
@@ -60,6 +80,9 @@
               <input type="file" id="profile-image-input" name="profile_image" accept="image/*" style="display: none;" />
             </div>
 
+            <!-- Block 1: Names and Age -->
+            <div class="form-block">
+              <h3>Personal Information</h3>
             <div class="form-row">
               <div class="form-group">
                 <label for="id_first_name">First Name <span class="required">*</span></label>
@@ -70,18 +93,27 @@
                 <input type="text" name="last_name" id="id_last_name" value="{{ user.last_name|default:'' }}" required />
               </div>
             </div>
-
             <div class="form-row">
               <div class="form-group">
                 <label for="id_age">Age</label>
                 <input type="number" name="age" id="id_age" value="{{ user.profile.age|default:'' }}" min="13" max="120" />
               </div>
-              <div class="form-group">
-                <label for="id_graduation_year">Expected Graduation Year</label>
-                <input type="number" name="graduation_year" id="id_graduation_year" value="{{ user.profile.graduation_year|default:'' }}" min="2024" max="2035" />
               </div>
             </div>
 
+            <!-- Block 2: Academic Information -->
+            <div class="form-block">
+              <h3>Academic Information</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="id_graduation_year">Expected Graduation Year</label>
+                  <input type="number" name="graduation_year" id="id_graduation_year" value="{{ user.profile.graduation_year|default:'' }}" min="2024" max="2035" />
+                </div>
+                <div class="form-group">
+                  <label for="id_gpa">GPA (Optional)</label>
+                  <input type="number" name="gpa" id="id_gpa" value="{{ user.profile.gpa|default:'' }}" min="0.0" max="4.0" step="0.01" placeholder="e.g., 3.75" />
+                </div>
+              </div>
             <div class="form-row">
               <div class="form-group">
                 <label for="id_research_experience">Research Experience (Years)</label>
@@ -93,30 +125,32 @@
                   <option value="3" {% if user.profile.research_experience == '3' %}selected{% endif %}>3+ years</option>
                 </select>
               </div>
-              <div class="form-group">
-                <label for="id_gpa">GPA (Optional)</label>
-                <input type="number" name="gpa" id="id_gpa" value="{{ user.profile.gpa|default:'' }}" min="0.0" max="4.0" step="0.01" placeholder="e.g., 3.75" />
               </div>
             </div>
 
+            <!-- Block 3: URLs and Skills -->
+            <div class="form-block">
+              <h3>Professional Links & Skills</h3>
+              <div class="form-row">
             <div class="form-group">
               <label for="id_linkedin_url">LinkedIn Profile URL</label>
               <input type="url" name="linkedin_url" id="id_linkedin_url" value="{{ user.profile.linkedin_url|default:'' }}" placeholder="https://linkedin.com/in/yourprofile" />
             </div>
-
             <div class="form-group">
               <label for="id_github_url">GitHub Profile URL (Optional)</label>
               <input type="url" name="github_url" id="id_github_url" value="{{ user.profile.github_url|default:'' }}" placeholder="https://github.com/yourusername" />
             </div>
-
+              </div>
+              <div class="form-row">
             <div class="form-group">
               <label for="id_research_interests">Research Interests</label>
               <textarea name="research_interests" id="id_research_interests" rows="3" placeholder="e.g., Machine Learning, Computer Vision, Natural Language Processing">{{ user.profile.research_interests|default:'' }}</textarea>
             </div>
-
             <div class="form-group">
               <label for="id_skills">Technical Skills</label>
               <textarea name="skills" id="id_skills" rows="3" placeholder="e.g., Python, TensorFlow, PyTorch, SQL, JavaScript">{{ user.profile.skills|default:'' }}</textarea>
+                </div>
+              </div>
             </div>
 
             <div class="form-actions">
@@ -128,10 +162,8 @@
           </form>
         </div>
         {% endif %}
-        {% endblock %}
+        {% block account_content %}{% endblock %}
         {% block tos_content %}{% endblock %}
-      </div>
-    </div>
   </div>
 </div>
 

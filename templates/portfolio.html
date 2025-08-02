@@ -135,6 +135,10 @@
       <div class="card-body">
         <div class="professor-avatar" style="cursor:pointer;" onclick="document.getElementById('profile-image-input').click();">
           <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default_user.png' %}{% endif %}" alt="Profile Photo" id="profile-image-preview" />
+          <div class="image-upload-overlay">
+            <i class="fas fa-camera"></i>
+            <span>Change Photo</span>
+          </div>
           <form id="profile-image-form" method="post" enctype="multipart/form-data" style="display:none;">
             {% csrf_token %}
             <input type="file" id="profile-image-input" name="profile_image" accept="image/*" onchange="document.getElementById('profile-image-form').submit();" />
