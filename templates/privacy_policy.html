@@ -1,94 +1,150 @@
-{% extends "account.html" %}
-{% block account_content %}
-<div class="policy-content">
-<h1>Privacy Policy</h1>
-<p><strong>Effective Date: July 21, 2025</strong></p>
-<p>Novara ("we," "us," or "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and protect your personal information when you use our services ("Services") through our website or platform.</p>
+{% extends "base.html" %}
+{% load static %}
 
-<h2>1. Information We Collect</h2>
-<strong>a. Personal Information You Provide</strong>
-<ul>
-  <li>Name, email, phone number</li>
-  <li>Educational details (e.g., university, GPA, transcripts)</li>
-  <li>Professional documents (resume, portfolio, cover letters)</li>
-  <li>Career preferences, interests, and goals</li>
-  <li>Communications with professors and employers</li>
-</ul>
-<strong>b. Automated Data Collection</strong>
-<ul>
-  <li>Application submission records and status</li>
-  <li>Email engagement metrics (open/click rates)</li>
-  <li>Platform behavior and usage analytics</li>
-  <li>Device details and IP addresses</li>
-</ul>
-<strong>c. Third-Party Data Sources</strong>
-<ul>
-  <li>Public profiles (LinkedIn, GitHub, personal websites)</li>
-  <li>University/company directory data</li>
-  <li>Public research publications and academic records</li>
-</ul>
+{% block content %}
+<script>document.body.classList.add('account-bg-white');</script>
+<link rel="stylesheet" href="{% static 'css/account.css' %}">
+<div class="account-page-container">
+  <div class="account-sidebar">
+    <ul>
+      <li class="sidebar-link {% if request.path == '/account/' %}active{% endif %}"><a href="{% url 'account' %}">Settings</a></li>
+      <li class="sidebar-link {% if request.path == '/payments/' %}active{% endif %}"><a href="{% url 'payments' %}">Payments History</a></li>
+      <li class="sidebar-link data-privacy-toggle">
+        <span class="data-privacy-label" style="font-weight:600; padding-left:2rem; cursor:pointer; display:block; padding:0.9rem 2rem;">
+          Data & Privacy
+        </span>
+        <ul class="data-privacy-submenu" style="padding-left:1.5rem; margin-top:0.5rem; overflow:hidden; transition:max-height 0.3s ease;">
+          <li class="sidebar-link {% if request.path == '/privacy-policy/' %}active{% endif %}" style="margin-bottom:0.5rem;"><a href="{% url 'privacy_policy' %}">Privacy Policy</a></li>
+          <li class="sidebar-link {% if request.path == '/tos/' %}active{% endif %}" style="margin-bottom:0.5rem;"><a href="{% url 'tos' %}">Terms of Service</a></li>
+          <li class="sidebar-link {% if request.path == '/refund-policy/' %}active{% endif %}"><a href="{% url 'refund_policy' %}">Refund Policy</a></li>
+        </ul>
+      </li>
+      <li class="sidebar-link {% if request.path == '/about/' %}active{% endif %}"><a href="{% url 'about' %}">About</a></li>
+    </ul>
+  </div>
+  <div class="account-main">
+    <div class="policy-content">
+      <h1>Privacy Policy</h1>
+      <p><strong>Effective Date: July 21, 2025</strong></p>
+      <p>Novara ("we," "us," or "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and protect your personal information when you use our services ("Services") through our website or platform.</p>
 
-<h2>2. How We Use Your Information</h2>
-<p>Your information is used to:</p>
-<ul>
-  <li>Submit research/job applications on your behalf</li>
-  <li>Contact professors, recruiters, and hiring managers</li>
-  <li>Optimize matching algorithms and outreach strategies</li>
-  <li>Provide personalized career analytics and guidance</li>
-  <li>Improve, troubleshoot, and develop new features</li>
-</ul>
+      <h2>1. Information We Collect</h2>
+      <strong>a. Personal Information You Provide</strong>
+      <ul>
+        <li>Name, email, phone number</li>
+        <li>Educational details (e.g., university, GPA, transcripts)</li>
+        <li>Professional documents (resume, portfolio, cover letters)</li>
+        <li>Career preferences, interests, and goals</li>
+        <li>Communications with professors and employers</li>
+      </ul>
+      <strong>b. Automated Data Collection</strong>
+      <ul>
+        <li>Application submission records and status</li>
+        <li>Email engagement metrics (open/click rates)</li>
+        <li>Platform behavior and usage analytics</li>
+        <li>Device details and IP addresses</li>
+      </ul>
+      <strong>c. Third-Party Data Sources</strong>
+      <ul>
+        <li>Public profiles (LinkedIn, GitHub, personal websites)</li>
+        <li>University/company directory data</li>
+        <li>Public research publications and academic records</li>
+      </ul>
 
-<h2>3. Automated Services and Communication</h2>
-<p>By using Novara, you authorize us to:</p>
-<ul>
-  <li>Submit applications using your personal documents</li>
-  <li>Initiate contact with potential employers/professors</li>
-  <li>Follow up and schedule interviews (with your confirmation)</li>
-</ul>
-<p>We take care to craft accurate and professional communications, but you are responsible for reviewing final materials and responses.</p>
+      <h2>2. How We Use Your Information</h2>
+      <p>Your information is used to:</p>
+      <ul>
+        <li>Submit research/job applications on your behalf</li>
+        <li>Contact professors, recruiters, and hiring managers</li>
+        <li>Optimize matching algorithms and outreach strategies</li>
+        <li>Provide personalized career analytics and guidance</li>
+        <li>Improve, troubleshoot, and develop new features</li>
+      </ul>
 
-<h2>4. How We Share Information</h2>
-<p>We do not sell your personal data. We may share information:</p>
-<ul>
-  <li>With third-party tools that help us deliver services (e.g., email, scheduling, job boards)</li>
-  <li>With universities or companies as part of the application process</li>
-  <li>When required by law or legal processes</li>
-</ul>
+      <h2>3. Automated Services and Communication</h2>
+      <p>By using Novara, you authorize us to:</p>
+      <ul>
+        <li>Submit applications using your personal documents</li>
+        <li>Initiate contact with potential employers/professors</li>
+        <li>Follow up and schedule interviews (with your confirmation)</li>
+      </ul>
+      <p>We take care to craft accurate and professional communications, but you are responsible for reviewing final materials and responses.</p>
 
-<h2>5. Data Security</h2>
-<p>We use industry-standard encryption and security protocols to safeguard your data. However, no online system is 100% secure, and we cannot guarantee absolute security.</p>
+      <h2>4. How We Share Information</h2>
+      <p>We do not sell your personal data. We may share information:</p>
+      <ul>
+        <li>With third-party tools that help us deliver services (e.g., email, scheduling, job boards)</li>
+        <li>With universities or companies as part of the application process</li>
+        <li>When required by law or legal processes</li>
+      </ul>
 
-<h2>6. Data Retention</h2>
-<p>We retain your data while your account is active or as needed to provide our services. You may request deletion or correction at any time, subject to legal and operational limits.</p>
+      <h2>5. Data Security</h2>
+      <p>We use industry-standard encryption and security protocols to safeguard your data. However, no online system is 100% secure, and we cannot guarantee absolute security.</p>
 
-<h2>7. Your Privacy Rights</h2>
-<p>Depending on your location and applicable laws (e.g., GDPR, CCPA, FERPA), you may have the right to:</p>
-<ul>
-  <li>Access your personal data</li>
-  <li>Request corrections or deletions</li>
-  <li>Object to or restrict processing</li>
-  <li>Withdraw consent for data use</li>
-</ul>
+      <h2>6. Data Retention</h2>
+      <p>We retain your data while your account is active or as needed to provide our services. You may request deletion or correction at any time, subject to legal and operational limits.</p>
 
-<h2>8. Cookies and Tracking</h2>
-<p>We may use cookies and similar technologies to enhance user experience, analyze performance, and deliver personalized content.</p>
+      <h2>7. Your Privacy Rights</h2>
+      <p>Depending on your location and applicable laws (e.g., GDPR, CCPA, FERPA), you may have the right to:</p>
+      <ul>
+        <li>Access your personal data</li>
+        <li>Request corrections or deletions</li>
+        <li>Object to or restrict processing</li>
+        <li>Withdraw consent for data use</li>
+      </ul>
 
-<h2>9. Children's Privacy</h2>
-<p>Our services are not intended for children under 13. We do not knowingly collect personal data from minors without parental consent.</p>
+      <h2>8. Cookies and Tracking</h2>
+      <p>We may use cookies and similar technologies to enhance user experience, analyze performance, and deliver personalized content.</p>
 
-<h2>10. International Data Transfers</h2>
-<p>If you are located outside the U.S., please note that your data will be processed in the United States where our servers are located.</p>
+      <h2>9. Children's Privacy</h2>
+      <p>Our services are not intended for children under 13. We do not knowingly collect personal data from minors without parental consent.</p>
 
-<h2>11. Changes to This Policy</h2>
-<p>We may update this Privacy Policy from time to time. Material changes will be notified via email or platform alert.</p>
+      <h2>10. International Data Transfers</h2>
+      <p>If you are located outside the U.S., please note that your data will be processed in the United States where our servers are located.</p>
 
-<h2>12. Contact Us</h2>
-<p>If you have any questions or concerns about this Privacy Policy, contact us at:</p>
-<ul>
-  <li>Email: helpnovaraco@gmail.com</li>
-  <li>Address: 1000 Techwood Drive, Atlanta, GA 30318</li>
-  <li>Phone: 470 461 8251</li>
-</ul>
-<p>By using Novara, you consent to this Privacy Policy.</p>
+      <h2>11. Changes to This Policy</h2>
+      <p>We may update this Privacy Policy from time to time. Material changes will be notified via email or platform alert.</p>
+
+      <h2>12. Contact Us</h2>
+      <p>If you have any questions or concerns about this Privacy Policy, contact us at:</p>
+      <ul>
+        <li>Email: helpnovaraco@gmail.com</li>
+        <li>Address: 1000 Techwood Drive, Atlanta, GA 30318</li>
+        <li>Phone: 470 461 8251</li>
+      </ul>
+      <p>By using Novara, you consent to this Privacy Policy.</p>
+    </div>
+  </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const dataPrivacyToggle = document.querySelector('.data-privacy-toggle');
+  const dataPrivacyLabel = document.querySelector('.data-privacy-label');
+  const dataPrivacySubmenu = document.querySelector('.data-privacy-submenu');
+  
+  // Set initial state - expanded if on privacy policy, tos, or refund policy page
+  const isOnPrivacyOrTos = window.location.pathname === '/privacy-policy/' || window.location.pathname === '/tos/' || window.location.pathname === '/refund-policy/';
+  if (!isOnPrivacyOrTos) {
+    dataPrivacySubmenu.style.maxHeight = '0px';
+  } else {
+    dataPrivacySubmenu.style.maxHeight = dataPrivacySubmenu.scrollHeight + 'px';
+  }
+  
+  dataPrivacyLabel.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const isExpanded = dataPrivacySubmenu.style.maxHeight !== '0px';
+    
+    if (isExpanded) {
+      // Collapse
+      dataPrivacySubmenu.style.maxHeight = '0px';
+    } else {
+      // Expand
+      dataPrivacySubmenu.style.maxHeight = dataPrivacySubmenu.scrollHeight + 'px';
+    }
+  });
+});
+</script>
 {% endblock %} 

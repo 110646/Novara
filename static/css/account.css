@@ -230,12 +230,13 @@ body.settings-page .account-main:hover::after {
 
 /* Policy content styling */
 .policy-content {
-  max-height: 400px;
-  overflow-y: auto;
-  padding-right: 1rem;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  padding-left: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  line-height: 1.6;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   font-size: 1rem;
 }
 
@@ -253,6 +254,38 @@ body.settings-page .account-main:hover::after {
 .policy-content ul li::marker {
   color: #666;
   font-weight: 500;
+}
+
+.policy-content h1 {
+  color: #222;
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.policy-content h2 {
+  color: #222;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 2rem 0 1rem 0;
+  padding-top: 1rem;
+  border-top: 2px solid #f0f0f0;
+}
+
+.policy-content h2:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+
+.policy-content p {
+  margin-bottom: 1rem;
+  color: #444;
+}
+
+.policy-content strong {
+  color: #222;
+  font-weight: 600;
 }
 .account-card .card-body ol {
   list-style-position: outside;
