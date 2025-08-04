@@ -51,7 +51,7 @@ export default {
         const messageId = postmarkData.MessageID || null;
 
         // ✅ Log the sent email to your Django backend
-        const logRes = await fetch("https://8de0dc7cb3b6.ngrok-free.app/log-sent-email/", {
+        const logRes = await fetch("https://d66edfc7435b.ngrok-free.app/log-sent-email/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"

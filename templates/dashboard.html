@@ -118,7 +118,7 @@
     </div>
 
     <template id="email-row-template">
-        <div class="email-row" style="border-bottom: 1px solid #ddd; padding: 10px 0; margin: 0 5px;">
+        <div class="email-row" style="border-bottom: 1px solid #ddd; padding: 10px 0; margin: 2px 5px;">
             <div class="email-row-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 0 5px;">
                 <div>
                     <strong class="email-professor"></strong> — <span class="email-university"></span>
@@ -152,7 +152,7 @@ function updateStats() {
 let expandedEmails = new Set();
 
 function updateEmailsList() {
-  fetch("https://8f6a48d46a7d.ngrok-free.app/sent-emails/")
+  fetch("https://d66edfc7435b.ngrok-free.app/sent-emails/")
     .then(response => response.json())
     .then(emails => {
       const container = document.getElementById('emails-list-container');

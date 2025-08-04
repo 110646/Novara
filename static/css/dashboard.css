@@ -461,7 +461,7 @@ body, .dashboard-container {
 }
 
 .emails-list {
-    max-height: 400px;
+    max-height: 1800px;
     overflow-y: auto;
     padding-top: 0.5rem;
     border-radius: 12px;
