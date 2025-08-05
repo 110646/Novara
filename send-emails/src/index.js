@@ -13,8 +13,6 @@ export default {
           .replace(/{{\s*major\s*}}|{\s*major\s*}/g, student.major)
           .replace(/{{\s*student_name\s*}}|{\s*student_name\s*}/g, student.name);
 
-        personalized = personalized.replace(/{\s*[^}]+}/g, "your research");
-
         const payload = {
           From: `${student.name} <research@connectnovara.com>`,
           To: prof.email,
@@ -46,6 +44,10 @@ export default {
           const error = await res.text();
           console.error("Postmark error:", error);
         }
+
+        // Throttle to prevent Postmark rate limiting (adjust delay as needed)
+        await new Promise(resolve => setTimeout(resolve, 400));  
+
 
         const postmarkData = await res.json(); // NEW
         const messageId = postmarkData.MessageID || null;

@@ -466,7 +466,9 @@ select {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  height: 498px;
+  min-height: 545px;
+  height: 545px;
+  max-height: 545px;
 }
 
 /* File Upload Styles */
