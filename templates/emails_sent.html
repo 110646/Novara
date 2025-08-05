@@ -5,17 +5,30 @@
 <link rel="stylesheet" href="{% static 'css/loading_status.css' %}">
 
 <div class="dashboard-container">
-    <h1>Preparing Your Emails…</h1>
-    <p id="status-message" class="status-message">Initializing process. Please wait.</p>
+    <div class="loading-card">
+        <h1 class="loading-title">Preparing Your Emails…</h1>
+        <p id="status-message" class="status-message">Initializing process. Please wait.</p>
 
-    <div class="progress-wrapper">
-        <div class="progress-bar-background">
-            <div id="progress-bar" class="progress-bar-fill"></div>
+        <div class="progress-wrapper">
+            <div class="progress-bar-background">
+                <div id="progress-bar" class="progress-bar-fill"></div>
+            </div>
+            <div id="tip-container" class="tip-container">
+                <p id="tip-message" class="tip-message"></p>
+            </div>
         </div>
-        <p id="tip-message" class="tip-message"></p>
-    </div>
 
-    <a href="{% url 'dashboard' %}" id="dashboard-link" class="btn btn-primary">Go to Dashboard</a>
+        <div class="action-buttons">
+            <a href="{% url 'dashboard' %}" id="dashboard-link" class="btn btn-primary dashboard-btn">
+                <i class="fas fa-tachometer-alt"></i>
+                Go to Dashboard
+            </a>
+            <a href="{% url 'portfolio' %}" class="btn btn-secondary portfolio-btn">
+                <i class="fas fa-user-graduate"></i>
+                View Portfolio
+            </a>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -29,14 +42,44 @@ const tips = [
     "Tip: Personalized emails increase response rates.",
     "Tip: Consider following up after a few days.",
     "Tip: Research each professor before reaching out!",
-    "Tip: Keep your email concise and focused."
+    "Tip: Keep your email concise and focused.",
+    "Tip: Follow up within 3-5 days for best results.",
+    "Tip: Customize each email for the specific professor.",
+    "Tip: Include your research interests in your emails."
 ];
 
 let tipIndex = 0;
-setInterval(() => {
-    tipMessage.textContent = tips[tipIndex];
-    tipIndex = (tipIndex + 1) % tips.length;
-}, 3000);
+let charIndex = 0;
+let isDeleting = false;
+
+function typeTip() {
+    const currentTip = tips[tipIndex];
+    let typeSpeed = isDeleting ? 30 : 80;
+
+    if (isDeleting) {
+        charIndex--;
+    } else {
+        charIndex++;
+    }
+
+    tipMessage.innerHTML = currentTip.substring(0, charIndex) + '<span class="typing-cursor"></span>';
+    
+    if (!isDeleting && charIndex === currentTip.length) {
+        // Pause at end of tip
+        isDeleting = true;
+        setTimeout(typeTip, 2000);
+    } else if (isDeleting && charIndex === 0) {
+        // Finished deleting
+        isDeleting = false;
+        tipIndex = (tipIndex + 1) % tips.length;
+        setTimeout(typeTip, 500); // Pause before typing next tip
+    } else {
+        setTimeout(typeTip, typeSpeed);
+    }
+}
+
+// Start the typing animation
+typeTip();
 
 function fetchStatus() {
     fetch("{% url 'email_send_status' %}")
@@ -46,12 +89,16 @@ function fetchStatus() {
             statusMessage.textContent = data.message;
 
             if (data.complete) {
-                statusMessage.textContent = "🎉 Emails sent successfully!";
+                statusMessage.innerHTML = '<i class="fas fa-check-circle"></i> Emails sent successfully!';
                 progressBar.style.background = "#28a745";  // Green on complete
-                dashboardLink.style.display = "inline-block";
+                dashboardLink.style.display = "inline-flex";
+                
+                // Show success animation
+                document.querySelector('.loading-card').classList.add('success');
+                
                 setTimeout(() => {
                     window.location.href = "{% url 'dashboard' %}";
-                }, 3000);
+                }, 5000);
             } else {
                 setTimeout(fetchStatus, 2000);
             }

@@ -1,44 +1,216 @@
 /* Progress Page Styles */
+body, .dashboard-container {
+    background: #fff !important;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
 .dashboard-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2.5rem 1.5rem 2rem 1.5rem;
-    background: #f7f8fa;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-card {
+    background: #fff;
+    border-radius: 22px;
+    box-shadow: 0 8px 32px 0 rgba(60,60,60,0.10);
+    padding: 3rem 2.5rem;
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.loading-card.success {
+    animation: successPulse 0.6s ease-in-out;
+}
+
+@keyframes successPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.loading-title {
+    font-size: 2.1rem;
+    font-weight: 800;
+    color: #222;
+    margin: 0 0 1rem 0;
 }
 
 .status-message {
     font-size: 1.2rem;
     color: #333;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.status-message i {
+    color: #28a745;
+    font-size: 1.3rem;
 }
 
 .progress-wrapper {
-    width: 80%;
-    max-width: 500px;
-    margin: 2rem auto;
+    width: 100%;
+    margin: 2rem 0;
 }
 
 .progress-bar-background {
-    background: #eee;
-    border-radius: 8px;
+    background: #f1f1f1;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    height: 12px;
+    margin-bottom: 1.5rem;
 }
 
 .progress-bar-fill {
-    height: 20px;
+    height: 100%;
     width: 0%;
-    background: var(--primary-color);
+    background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
     transition: width 0.5s ease, background 0.5s ease;
+    border-radius: 12px;
+}
+
+.tip-container {
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1rem;
 }
 
 .tip-message {
-    margin-top: 1rem;
-    color: #555;
+    color: #666;
     font-size: 1rem;
     font-style: italic;
+    text-align: center;
+    margin: 0;
+    position: relative;
+    min-height: 1.5rem;
+}
+
+.typing-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1.2em;
+    background-color: #FFD700;
+    margin-left: 2px;
+    animation: blink 1s infinite;
+    vertical-align: middle;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.dashboard-btn, .portfolio-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    min-width: 160px;
+    justify-content: center;
+}
+
+.dashboard-btn {
+    background: #FFD700;
+    color: #222;
+    border: 2px solid #FFD700;
+}
+
+.dashboard-btn:hover {
+    background: #FFC800;
+    border-color: #FFC800;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 215, 0, 0.3);
+}
+
+.portfolio-btn {
+    background: #fff;
+    color: #FFD700;
+    border: 2px solid #FFD700;
+}
+
+.portfolio-btn:hover {
+    background: #fffbe6;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 215, 0, 0.2);
+}
+
+.dashboard-btn i, .portfolio-btn i {
+    font-size: 1.1rem;
 }
 
 #dashboard-link {
     display: none;
-    margin-top: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 1rem;
+    }
+    
+    .loading-card {
+        padding: 2rem 1.5rem;
+        margin: 1rem;
+    }
+    
+    .loading-title {
+        font-size: 1.8rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .dashboard-btn, .portfolio-btn {
+        width: 100%;
+        max-width: 280px;
+    }
+}
+
+@media (max-width: 480px) {
+    .loading-card {
+        padding: 1.5rem 1rem;
+    }
+    
+    .loading-title {
+        font-size: 1.6rem;
+    }
+    
+    .status-message {
+        font-size: 1.1rem;
+    }
+    
+    .tip-message {
+        font-size: 0.9rem;
+    }
 }

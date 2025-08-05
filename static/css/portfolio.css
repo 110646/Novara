@@ -178,6 +178,67 @@ body, .portfolio-page {
   .professor-view-card {
     text-align: center;
     padding-bottom: 1.5rem;
+    position: relative;
+  }
+
+  .professor-view-card.professor-blur {
+    position: relative;
+  }
+
+  .professor-view-card.professor-blur::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 10;
+    pointer-events: none;
+    border-radius: 22px;
+  }
+
+  .professor-view-card.professor-blur::after {
+    content: 'Closed for Beta Testing';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    z-index: 11;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .professor-view-card.professor-blur:hover::after {
+    opacity: 1;
+  }
+
+  /* Disable clicking on content underneath blur */
+  .professor-view-card.professor-blur .card-body {
+    pointer-events: none;
+  }
+
+  .professor-view-card.professor-blur .card-header {
+    pointer-events: none;
+  }
+
+  /* Ensure the blur works properly */
+  .professor-view-card.professor-blur .card-header,
+  .professor-view-card.professor-blur .card-body,
+  .professor-view-card.professor-blur .professor-avatar,
+  .professor-view-card.professor-blur .professor-name,
+  .professor-view-card.professor-blur .professor-university,
+  .professor-view-card.professor-blur .professor-major,
+  .professor-view-card.professor-blur .professor-interests {
+    pointer-events: none;
   }
   .professor-icon {
     color: #FFD700;
