@@ -194,7 +194,7 @@ def account(request):
                 )
                 
         except Exception as e:
-            print(f"❌ Error syncing with Supabase: {e}")
+            print(f"Error syncing with Supabase: {e}")
         
         messages.success(request, 'Profile updated successfully!')
         return redirect('account')
@@ -254,7 +254,7 @@ def portfolio(request):
             request.session['just_created_portfolio'] = True
             editing = True
     except Exception as e:
-        print("❌ Error fetching Supabase portfolio:", e)
+        print("Error fetching Supabase portfolio:", e)
 
     # Handle profile image upload
     if request.method == 'POST' and 'profile_image' in request.FILES:
@@ -282,16 +282,16 @@ def portfolio(request):
                     key = portfolio_data["resume_url"].split("/")[-2] + "/" + portfolio_data["resume_url"].split("/")[-1]
                     s3.delete_object(Bucket="resume-uploads", Key=key)
             except Exception as e:
-                print("❌ Resume deletion error:", e)
+                print("Resume deletion error:", e)
 
         elif resume_file:
             try:
                 s3_storage = S3Boto3Storage()
                 path = s3_storage.save(f'resumes/{resume_file.name}', resume_file)
                 resume_url = s3_storage.url(path)
-                print(f"✅ Resume uploaded to R2: {resume_url}")
+                print(f"Resume uploaded to R2: {resume_url}")
             except Exception as e:
-                print("❌ Resume upload error:", e)
+                print("Resume upload error:", e)
 
         payload = {
             "user_id": int(user.id),
@@ -395,7 +395,7 @@ def stripe_webhook(request):
                 user = User.objects.get(id=user_id)
                 EmailCredit.objects.create(user=user, count=int(email_count))
 
-                # ✅ INIT user_progress here before sending emails
+                # INIT user_progress here before sending emails
                 user_progress[user.id] = {
                     "progress": 10,
                     "message": "Initializing...",
@@ -468,7 +468,7 @@ def create_checkout_session(request):
 @require_POST
 def generate_email_template(request):
     try:
-        logger.info("🚀 Starting email template generation")
+        logger.info(" Starting email template generation")
 
         name = request.POST.get("name")
         email = request.POST.get("email")
@@ -478,9 +478,9 @@ def generate_email_template(request):
         class_year = request.POST.get("class_year")
         resume_file = request.FILES.get("resume")
 
-        logger.debug(f"📥 Form data received: name={name}, email={email}, major={major}, university={university}, class_year={class_year}, interests={research_interests}")
+        logger.debug(f"Form data received: name={name}, email={email}, major={major}, university={university}, class_year={class_year}, interests={research_interests}")
         if not resume_file:
-            logger.warning("⚠️ Resume file is missing from POST request")
+            logger.warning("Resume file is missing from POST request")
             return JsonResponse({"error": "Resume file missing"}, status=400)
 
         prompt = f"""
@@ -517,19 +517,19 @@ Do not include a subject line.
 """.strip()
 
         client = OpenAI(api_key=settings.OPENAI_API_KEY)
-        logger.info("📡 Connected to OpenAI")
+        logger.info("Connected to OpenAI")
 
         # Step 1: Upload resume
-        logger.info("📤 Uploading resume to OpenAI")
+        logger.info("Uploading resume to OpenAI")
         file_upload = client.files.create(
             file=("resume.pdf", resume_file.read(), "application/pdf"),
             purpose="assistants"
         )
-        logger.debug(f"✅ Resume uploaded: file_id={file_upload.id}")
+        logger.debug(f"Resume uploaded: file_id={file_upload.id}")
 
         # Step 2: Create thread
         thread = client.beta.threads.create()
-        logger.debug(f"🧵 Thread created: thread_id={thread.id}")
+        logger.debug(f"Thread created: thread_id={thread.id}")
 
         # Step 3: Add message
         client.beta.threads.messages.create(
@@ -541,14 +541,14 @@ Do not include a subject line.
                 "tools": [{"type": "file_search"}]
             }]
         )
-        logger.info("📝 Prompt and resume attached to thread")
+        logger.info("Prompt and resume attached to thread")
 
         # Step 4: Run assistant
         run = client.beta.threads.runs.create(
             thread_id=thread.id,
             assistant_id=settings.OPENAI_ASSISTANT_ID,
         )
-        logger.debug(f"▶️ Run started: run_id={run.id}")
+        logger.debug(f"▶Run started: run_id={run.id}")
 
         # Step 5: Poll for result
         while True:
@@ -556,27 +556,27 @@ Do not include a subject line.
                 thread_id=thread.id,
                 run_id=run.id
             )
-            logger.debug(f"⏳ Run status: {run_status.status}")
+            logger.debug(f"Run status: {run_status.status}")
             if run_status.status == "completed":
-                logger.info("✅ Assistant run completed")
+                logger.info(" Assistant run completed")
                 break
             elif run_status.status in ["failed", "cancelled", "expired"]:
-                logger.error(f"❌ Run failed with status: {run_status.status}")
+                logger.error(f" Run failed with status: {run_status.status}")
                 return JsonResponse({"error": f"Run failed with status: {run_status.status}"}, status=500)
             time.sleep(2)
 
         # Step 6: Retrieve message
         messages = client.beta.threads.messages.list(thread_id=thread.id)
-        logger.debug(f"📨 Retrieved {len(messages.data)} message(s)")
+        logger.debug(f"Retrieved {len(messages.data)} message(s)")
 
         latest_message = messages.data[0]
         email_template = latest_message.content[0].text.value.strip()
-        logger.info("📬 Final email template generated")
+        logger.info("Final email template generated")
 
         return JsonResponse({"template": email_template})
 
     except Exception as e:
-        logger.exception("❌ OpenAI template generation failed")
+        logger.exception("OpenAI template generation failed")
         return JsonResponse({"error": str(e)}, status=500)
 
 
@@ -633,10 +633,10 @@ Message:
                 [to_email],
                 fail_silently=False,
             )
-            print(f"✅ Email sent successfully to {to_email}")
+            print(f"Email sent successfully to {to_email}")
             messages.success(request, 'Thank you for your message! We will get back to you soon.')
         except Exception as e:
-            print(f"❌ Email sending error: {str(e)}")
+            print(f"Email sending error: {str(e)}")
             messages.error(request, f'Sorry, there was an error sending your message: {str(e)}')
         
         return redirect('contact')
@@ -647,24 +647,24 @@ Message:
 @csrf_exempt
 def postmark_events_webhook(request):
     try:
-        logger.info("📩 Postmark webhook HIT!")
+        logger.info("Postmark webhook HIT!")
 
         event = json.loads(request.body)
-        logger.info("📬 Received Postmark Event:\n%s", json.dumps(event, indent=2))
+        logger.info("Received Postmark Event:\n%s", json.dumps(event, indent=2))
 
         metadata = event.get("Metadata", {})
         user_id = metadata.get("user_id")
         professor_id = metadata.get("professor_id")
-        logger.info("✅ Extracted metadata: user_id=%s, professor_id=%s", user_id, professor_id)
+        logger.info("Extracted metadata: user_id=%s, professor_id=%s", user_id, professor_id)
 
         if not user_id:
-            logger.warning("⚠️ Event missing user_id in metadata: %s", metadata)
+            logger.warning("Event missing user_id in metadata: %s", metadata)
             return JsonResponse({"error": "Missing user_id"}, status=400)
 
         try:
             user = User.objects.get(id=user_id)
         except User.DoesNotExist:
-            logger.warning("⚠️ No matching user found for ID: %s", user_id)
+            logger.warning("No matching user found for ID: %s", user_id)
             return JsonResponse({"error": "User not found"}, status=404)
 
         # Timestamp parsing
@@ -672,7 +672,7 @@ def postmark_events_webhook(request):
         try:
             timestamp_dt = datetime.strptime(raw_ts, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt_timezone.utc) if raw_ts else timezone.now()
         except Exception as e:
-            logger.warning("⚠️ Failed to parse timestamp: %s", raw_ts)
+            logger.warning("Failed to parse timestamp: %s", raw_ts)
             timestamp_dt = timezone.now()
 
         # Store the event in SentEmailEvent
@@ -686,23 +686,23 @@ def postmark_events_webhook(request):
             response=event.get("Details", ""),
             custom_args=metadata
         )
-        logger.info("✅ Stored Postmark event for user_id: %s", user_id)
+        logger.info("Stored Postmark event for user_id: %s", user_id)
 
-        # 🔥 Update SentEmailRecord if it's an Open event
+        # Update SentEmailRecord if it's an Open event
         if event.get("RecordType") == "Open":
             try:
                 record = SentEmailRecord.objects.get(user=user, smtp_id=event.get("MessageID", ""))
                 if record.status != "Opened":
                     record.status = "Opened"
                     record.save()
-                    logger.info("✅ Updated SentEmailRecord status to Opened for smtp_id: %s", event.get("MessageID"))
+                    logger.info("Updated SentEmailRecord status to Opened for smtp_id: %s", event.get("MessageID"))
             except SentEmailRecord.DoesNotExist:
-                logger.warning("⚠️ No SentEmailRecord found for smtp_id: %s", event.get("MessageID"))
+                logger.warning("No SentEmailRecord found for smtp_id: %s", event.get("MessageID"))
 
         return JsonResponse({"status": "ok"})
 
     except Exception as e:
-        logger.exception("❌ Failed to process Postmark event")
+        logger.exception("Failed to process Postmark event")
         return JsonResponse({"error": str(e)}, status=500)
 
 def privacy_policy(request):
