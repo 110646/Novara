@@ -95,7 +95,10 @@
     <div class="emails-card">
         <div class="card-header">
             <div class="header-content">
-                <h2>Recent Emails</h2>
+                <h2 style="display: flex; align-items: center; margin-left: -20px;">
+                    <i class="fas fa-align-justify" style="margin-right: 14px; color: #FFD700; font-size: 30px;"></i>
+                    Recent Emails
+                </h2>
                 <div class="email-stats">
                     <div class="stat-item">
                         <span class="stat-number">{{ total_sent }}</span>
@@ -151,8 +154,18 @@ function updateStats() {
 
 let expandedEmails = new Set();
 
+function getDayWithSuffix(day) {
+    if (day > 3 && day < 21) return day + 'th';
+    switch (day % 10) {
+        case 1:  return day + 'st';
+        case 2:  return day + 'nd';
+        case 3:  return day + 'rd';
+        default: return day + 'th';
+    }
+}
+
 function updateEmailsList() {
-  fetch("https://d66edfc7435b.ngrok-free.app/sent-emails/")
+  fetch("https://8766e808f575.ngrok-free.app/sent-emails/")
     .then(response => response.json())
     .then(emails => {
       const container = document.getElementById('emails-list-container');
@@ -161,7 +174,7 @@ function updateEmailsList() {
 
       if (emails.length === 0) {
         const emptyMessage = document.createElement('div');
-        emptyMessage.textContent = "No emails sent yet. Create your portfolio and send emails to get started!";
+        emptyMessage.textContent = "Please send your first emails to see your history.";
         emptyMessage.style.padding = "10px";
         emptyMessage.style.color = "#555";
         emptyMessage.style.textAlign = "center";
@@ -173,13 +186,23 @@ function updateEmailsList() {
         const clone = template.cloneNode(true);
         clone.querySelector('.email-professor').textContent = email.professor_email;
         clone.querySelector('.email-university').textContent = email.university;
-        clone.querySelector('.email-date').textContent = email.date_sent;
-        
+
+        // Format date to "August 5th, 2025 at 10:23"
+        const rawDate = new Date(email.date_sent);
+        const dayWithSuffix = getDayWithSuffix(rawDate.getDate());
+        const month = rawDate.toLocaleString('default', { month: 'long' });
+        const year = rawDate.getFullYear();
+        const hours = rawDate.getHours().toString().padStart(2, '0');
+        const minutes = rawDate.getMinutes().toString().padStart(2, '0');
+
+        const formattedDate = `${month} ${dayWithSuffix}, ${year} at ${hours}:${minutes}`;
+        clone.querySelector('.email-date').textContent = formattedDate;
+
         // Format status with proper styling
         const statusElement = clone.querySelector('.email-status');
         statusElement.textContent = email.status;
         statusElement.classList.add(email.status.toLowerCase());
-        
+
         clone.querySelector('.email-content').textContent = email.email_body;
 
         const row = clone.querySelector('.email-row');
@@ -188,18 +211,17 @@ function updateEmailsList() {
         const icon = clone.querySelector('.expand-icon');
 
         row.addEventListener('click', () => {
-        const key = email.professor_email + email.date_sent;
-        if (body.style.display === 'none' || body.style.display === '') {
-            body.style.display = 'block';
-            icon.style.transform = 'rotate(180deg)';
-            expandedEmails.add(key);
-        } else {
-            body.style.display = 'none';
-            icon.style.transform = 'rotate(0deg)';
-            expandedEmails.delete(key);
-        }
+          const key = email.professor_email + email.date_sent;
+          if (body.style.display === 'none' || body.style.display === '') {
+              body.style.display = 'block';
+              icon.style.transform = 'rotate(180deg)';
+              expandedEmails.add(key);
+          } else {
+              body.style.display = 'none';
+              icon.style.transform = 'rotate(0deg)';
+              expandedEmails.delete(key);
+          }
         });
-
 
         // Restore expanded state if previously opened
         const key = email.professor_email + email.date_sent;
@@ -211,7 +233,7 @@ function updateEmailsList() {
         container.appendChild(clone);
       });
     })
-    .catch(err => console.error("❌ Failed to fetch emails list:", err));
+    .catch(err => console.error("Failed to fetch emails list:", err));
 }
 
 updateStats();

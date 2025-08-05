@@ -1,10 +1,10 @@
 export default {
   async fetch(request, env) {
-    console.log("🔐 Using Postmark API token:", env.POSTMARK_API_TOKEN ? "✅ Loaded" : "❌ Not Found");
+    console.log("Using Postmark API token:", env.POSTMARK_API_TOKEN ? "Loaded" : "Not Found");
 
     try {
       const { template, student, professors } = await request.json();
-      console.log(`📨 Sending ${professors.length} emails`);
+      console.log(`Sending ${professors.length} emails`);
 
       for (const prof of professors) {
         let personalized = template
@@ -29,7 +29,7 @@ export default {
           }
         };
 
-        console.log("📦 Postmark Payload:", JSON.stringify(payload, null, 2));
+        console.log("Postmark Payload:", JSON.stringify(payload, null, 2));
 
         const res = await fetch("https://api.postmarkapp.com/email", {
           method: "POST",
@@ -41,17 +41,17 @@ export default {
           body: JSON.stringify(payload)
         });
 
-        console.log(`✅ Postmark response: ${res.status}`);
+        console.log(`Postmark response: ${res.status}`);
         if (res.status >= 400) {
           const error = await res.text();
-          console.error("❌ Postmark error:", error);
+          console.error("Postmark error:", error);
         }
 
-        const postmarkData = await res.json(); // ✅ NEW
+        const postmarkData = await res.json(); // NEW
         const messageId = postmarkData.MessageID || null;
 
-        // ✅ Log the sent email to your Django backend
-        const logRes = await fetch("https://d66edfc7435b.ngrok-free.app/log-sent-email/", {
+        // Log the sent email to your Django backend
+        const logRes = await fetch("https://8766e808f575.ngrok-free.app/log-sent-email/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -65,16 +65,16 @@ export default {
           })
         });
 
-        console.log(`📤 Django log response: ${logRes.status}`);
+        console.log(`Django log response: ${logRes.status}`);
         if (logRes.status >= 400) {
           const logError = await logRes.text();
-          console.error("❌ Django log error:", logError);
+          console.error("Django log error:", logError);
         }
       }
 
       return new Response("Emails sent and logged successfully");
     } catch (err) {
-      console.error("❌ Worker error:", err);
+      console.error("Worker error:", err);
       return new Response(`Error: ${err.message}`);
     }
   }

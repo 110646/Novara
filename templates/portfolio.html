@@ -167,7 +167,9 @@
     <div class="card info-card compact-info-card">
       <div class="card-header">
         <h2>Current Portfolio Information</h2>
-        <div class="last-updated">Last Updated: {{ portfolio.updated_at }}</div>
+        <div class="last-updated" data-updated-at="{{ portfolio.updated_at }}">
+          Last Updated: <span id="lastUpdatedText">{{ portfolio.updated_at }}</span>
+        </div>
       </div>
       <div class="card-body">
         <ul class="info-list compact-info-list">
@@ -421,6 +423,40 @@
       calculateStrength();
     }, 100);
   });
+</script>
+<script>
+function getDayWithSuffix(day) {
+    if (day > 3 && day < 21) return day + 'th';
+    switch (day % 10) {
+        case 1:  return day + 'st';
+        case 2:  return day + 'nd';
+        case 3:  return day + 'rd';
+        default: return day + 'th';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const lastUpdatedElement = document.querySelector('.last-updated');
+    if (lastUpdatedElement) {
+        const rawDateStr = lastUpdatedElement.getAttribute('data-updated-at');
+        if (rawDateStr) {
+            const rawDate = new Date(rawDateStr);
+
+            const dayWithSuffix = getDayWithSuffix(rawDate.getDate());
+            const month = rawDate.toLocaleString('default', { month: 'long' });
+            const year = rawDate.getFullYear();
+            const hours = rawDate.getHours().toString().padStart(2, '0');
+            const minutes = rawDate.getMinutes().toString().padStart(2, '0');
+
+            const formattedDate = `${month} ${dayWithSuffix}, ${year} at ${hours}:${minutes}`;
+
+            const lastUpdatedText = document.getElementById('lastUpdatedText');
+            if (lastUpdatedText) {
+                lastUpdatedText.textContent = formattedDate;
+            }
+        }
+    }
+});
 </script>
 
 {% endblock %}

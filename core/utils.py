@@ -12,7 +12,7 @@ from core.progress_tracker import user_progress
 
 SUPABASE_URL = "https://qdlguxijkkuujnaeuhqq.supabase.co"
 SUPABASE_API_KEY = settings.SUPABASE_SERVICE_ROLE_KEY
-OPENAI_TEMPLATE_ENDPOINT = "https://d66edfc7435b.ngrok-free.app/generate-email-template/"
+OPENAI_TEMPLATE_ENDPOINT = "https://8766e808f575.ngrok-free.app/generate-email-template/"
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
