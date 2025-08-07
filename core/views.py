@@ -608,40 +608,7 @@ def send_emails_page(request):
         'stripe_public_key': settings.STRIPE_PUBLIC_KEY
     })
 
-def contact(request):
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        message = request.POST.get('message')
-        
-        # Send email
-        subject = f"Contact Form: {name}"
-        email_message = f"""
-From: {name} ({email})
 
-Message:
-{message}
-        """
-        to_email = 'helpnovaraco@gmail.com'
-        
-        try:
-            # Send the email
-            send_mail(
-                subject,
-                email_message,
-                'noreply@novara.com',  # From email
-                [to_email],
-                fail_silently=False,
-            )
-            print(f"Email sent successfully to {to_email}")
-            messages.success(request, 'Thank you for your message! We will get back to you soon.')
-        except Exception as e:
-            print(f"Email sending error: {str(e)}")
-            messages.error(request, f'Sorry, there was an error sending your message: {str(e)}')
-        
-        return redirect('contact')
-    
-    return render(request, 'contact.html')
 
 @require_POST
 @csrf_exempt

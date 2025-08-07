@@ -6,7 +6,7 @@ from django.conf.urls.static import static
 from django.shortcuts import render
 from django.views.generic.base import RedirectView
 from core.views import (
-    home, dashboard, portfolio, account, contact, postmark_events_webhook,dashboard_stats, log_sent_email, sent_emails_list
+    home, dashboard, portfolio, account, postmark_events_webhook,dashboard_stats, log_sent_email, sent_emails_list
 )
 
 urlpatterns = [
@@ -33,7 +33,6 @@ urlpatterns = [
     # Public
     path('', core_views.home, name='home'),
     path('login/', lambda request: render(request, 'login.html'), name='account_login'),
-    path('contact/', core_views.contact, name='contact'),
 
     # Protected
     path('dashboard/', core_views.dashboard, name='dashboard'),
