@@ -647,7 +647,7 @@ Message:
 @csrf_exempt
 def postmark_events_webhook(request):
     try:
-        logger.info("Postmark webhook HIT!")
+        logger.info("📩 Postmark webhook HIT!")
 
         event = json.loads(request.body)
         logger.info("Received Postmark Event:\n%s", json.dumps(event, indent=2))
@@ -667,7 +667,7 @@ def postmark_events_webhook(request):
             logger.warning("No matching user found for ID: %s", user_id)
             return JsonResponse({"error": "User not found"}, status=404)
 
-        # Timestamp parsing
+        # Extract timestamp
         raw_ts = event.get("DeliveredAt") or event.get("ReceivedAt") or event.get("BouncedAt")
         try:
             timestamp_dt = datetime.strptime(raw_ts, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt_timezone.utc) if raw_ts else timezone.now()
@@ -675,10 +675,18 @@ def postmark_events_webhook(request):
             logger.warning("Failed to parse timestamp: %s", raw_ts)
             timestamp_dt = timezone.now()
 
-        # Store the event in SentEmailEvent
+        logger.debug("📨 Incoming Postmark event: %s", event)
+
+        # Get recipient email (different keys for Delivered/Open vs Bounce)
+        recipient_email = event.get("Recipient") or event.get("Email")
+        if not recipient_email:
+            logger.error("❌ Postmark event missing recipient email: %s", event)
+            return JsonResponse({"error": "Missing recipient email"}, status=400)
+
+        # Save SentEmailEvent
         SentEmailEvent.objects.create(
             user=user,
-            email=event.get("Recipient"),
+            email=recipient_email,
             event_type=event.get("RecordType"),
             timestamp=timestamp_dt,
             smtp_id=event.get("MessageID", ""),
@@ -686,23 +694,23 @@ def postmark_events_webhook(request):
             response=event.get("Details", ""),
             custom_args=metadata
         )
-        logger.info("Stored Postmark event for user_id: %s", user_id)
+        logger.info("✅ Stored Postmark event for user_id: %s", user_id)
 
-        # Update SentEmailRecord if it's an Open event
+        # Update SentEmailRecord if Open event
         if event.get("RecordType") == "Open":
             try:
                 record = SentEmailRecord.objects.get(user=user, smtp_id=event.get("MessageID", ""))
                 if record.status != "Opened":
                     record.status = "Opened"
                     record.save()
-                    logger.info("Updated SentEmailRecord status to Opened for smtp_id: %s", event.get("MessageID"))
+                    logger.info("📬 Updated SentEmailRecord status to Opened for smtp_id: %s", event.get("MessageID"))
             except SentEmailRecord.DoesNotExist:
                 logger.warning("No SentEmailRecord found for smtp_id: %s", event.get("MessageID"))
 
         return JsonResponse({"status": "ok"})
 
     except Exception as e:
-        logger.exception("Failed to process Postmark event")
+        logger.exception("❌ Failed to process Postmark event")
         return JsonResponse({"error": str(e)}, status=500)
 
 def privacy_policy(request):

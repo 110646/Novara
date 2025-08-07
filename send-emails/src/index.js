@@ -6,77 +6,109 @@ export default {
       const { template, student, professors } = await request.json();
       console.log(`Sending ${professors.length} emails`);
 
-      for (const prof of professors) {
-        let personalized = template
-          .replace(/{{\s*professor_name\s*}}|{\s*professor_name\s*}/g, prof.last_name)
-          .replace(/{{\s*university\s*}}|{\s*university\s*}/g, prof.university)
-          .replace(/{{\s*major\s*}}|{\s*major\s*}/g, student.major)
-          .replace(/{{\s*student_name\s*}}|{\s*student_name\s*}/g, student.name);
+      let sentCount = 0;
 
-        const payload = {
-          From: `${student.name} <research@connectnovara.com>`,
-          To: prof.email,
-          Subject: `Research Opportunity – Inquiry from ${student.name}`,
-          TextBody: personalized,
-          HtmlBody: personalized.replace(/\n/g, "<br>"),
-          ReplyTo: student.email,
-          TrackOpens: true,
-          Metadata: {
-            user_id: String(student.id),
-            professor_id: prof.id
+      // Safety net: Remove bracketed sentences and format into paragraphs
+      function cleanAndFormatTemplate(rawText) {
+        // Remove sentences containing square brackets
+        const cleanSentences = rawText
+          .split(/(?<=[.?!])\s+/) // Split by sentence endings
+          .filter(sentence => !sentence.includes("[") && !sentence.includes("]"));
+
+        // Group sentences into 3–4 sentence paragraphs
+        const paragraphs = [];
+        let buffer = [];
+
+        for (const sentence of cleanSentences) {
+          buffer.push(sentence);
+          if (buffer.length >= 3) {
+            paragraphs.push(buffer.join(" "));
+            buffer = [];
           }
-        };
-
-        console.log("Postmark Payload:", JSON.stringify(payload, null, 2));
-
-        const res = await fetch("https://api.postmarkapp.com/email", {
-          method: "POST",
-          headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            "X-Postmark-Server-Token": env.POSTMARK_API_TOKEN
-          },
-          body: JSON.stringify(payload)
-        });
-
-        console.log(`Postmark response: ${res.status}`);
-        if (res.status >= 400) {
-          const error = await res.text();
-          console.error("Postmark error:", error);
+        }
+        if (buffer.length > 0) {
+          paragraphs.push(buffer.join(" "));
         }
 
-        // Throttle to prevent Postmark rate limiting (adjust delay as needed)
-        await new Promise(resolve => setTimeout(resolve, 400));  
-
-
-        const postmarkData = await res.json(); // NEW
-        const messageId = postmarkData.MessageID || null;
-
-        // Log the sent email to your Django backend
-        const logRes = await fetch("https://8766e808f575.ngrok-free.app/log-sent-email/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            user_id: student.id,
-            professor_email: prof.email,
-            university: prof.university,
-            email_body: personalized,
-            smtp_id: messageId
-          })
-        });
-
-        console.log(`Django log response: ${logRes.status}`);
-        if (logRes.status >= 400) {
-          const logError = await logRes.text();
-          console.error("Django log error:", logError);
-        }
+        return paragraphs.join("\n\n");
       }
 
-      return new Response("Emails sent and logged successfully");
+      for (const [i, prof] of professors.entries()) {
+        console.log(`📤 Sending email ${i + 1} to ${prof.email}`);
+
+        try {
+          // Step 1: Clean and format the template
+          const cleaned = cleanAndFormatTemplate(template);
+
+          // Step 2: Inject professor/student data
+          const personalized = cleaned
+            .replace(/{{\s*professor_name\s*}}|{\s*professor_name\s*}/g, prof.last_name)
+            .replace(/{{\s*university\s*}}|{\s*university\s*}/g, prof.university)
+            .replace(/{{\s*major\s*}}|{\s*major\s*}/g, student.major)
+            .replace(/{{\s*student_name\s*}}|{\s*student_name\s*}/g, student.name);
+
+          const payload = {
+            From: `${student.name} <research@connectnovara.com>`,
+            To: prof.email,
+            Subject: `Research Opportunity – Inquiry from ${student.name}`,
+            TextBody: personalized,
+            HtmlBody: personalized.replace(/\n/g, "<br>"),
+            ReplyTo: student.email,
+            TrackOpens: true,
+            Metadata: {
+              user_id: String(student.id),
+              professor_id: prof.id
+            }
+          };
+
+          const res = await fetch("https://api.postmarkapp.com/email", {
+            method: "POST",
+            headers: {
+              "Accept": "application/json",
+              "Content-Type": "application/json",
+              "X-Postmark-Server-Token": env.POSTMARK_API_TOKEN
+            },
+            body: JSON.stringify(payload)
+          });
+
+          console.log(`📬 Postmark response ${res.status} for ${prof.email}`);
+          const postmarkData = await res.json().catch(() => ({}));
+          const messageId = postmarkData.MessageID || null;
+
+          if (res.status >= 400) {
+            console.error("❌ Postmark error:", postmarkData.Message || "Unknown error");
+            continue;
+          }
+
+          // Log to Django (fire-and-forget)
+          fetch("https://88e30c7be53f.ngrok-free.app/log-sent-email/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              user_id: student.id,
+              professor_email: prof.email,
+              university: prof.university,
+              email_body: personalized,
+              smtp_id: messageId
+            })
+          }).catch(err => {
+            console.warn("⚠️ Logging failed:", err.message);
+          });
+
+          sentCount++;
+        } catch (err) {
+          console.error(`🔥 Failed to send to ${prof.email}:`, err.message);
+          continue;
+        }
+
+        // Rate-limit pause
+        await new Promise((r) => setTimeout(r, 400));
+      }
+
+      console.log(`✅ Finished sending ${sentCount} out of ${professors.length} emails`);
+      return new Response("Emails sent and logged (fire-and-forget)");
     } catch (err) {
-      console.error("Worker error:", err);
+      console.error("❌ Worker error:", err.message);
       return new Response(`Error: ${err.message}`);
     }
   }

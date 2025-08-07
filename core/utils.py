@@ -9,10 +9,12 @@ from django.conf import settings
 import boto3
 import logging
 from core.progress_tracker import user_progress
+import httpx
+from time import sleep
 
 SUPABASE_URL = "https://qdlguxijkkuujnaeuhqq.supabase.co"
 SUPABASE_API_KEY = settings.SUPABASE_SERVICE_ROLE_KEY
-OPENAI_TEMPLATE_ENDPOINT = "https://8766e808f575.ngrok-free.app/generate-email-template/"
+OPENAI_TEMPLATE_ENDPOINT = "https://88e30c7be53f.ngrok-free.app/generate-email-template/"
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -109,22 +111,42 @@ def send_emails_after_payment(user_id, user_progress):
 
         user_progress[user_id] = {"progress": 60, "message": "Professors selected", "complete": False}
 
-        logger.info("📡 Sending to Cloudflare Worker")
-        worker_payload = {
-            "template": template,
-            "student": data,
-            "professors": selected_profs
+        logger.info("📡 Sending batched requests to Cloudflare Worker")
+
+        # Split professors into chunks of 10
+        def chunk_list(lst, size):
+            for i in range(0, len(lst), size):
+                yield lst[i:i + size]
+
+        batches = list(chunk_list(selected_profs, 6))
+        total_batches = len(batches)
+
+        for idx, batch in enumerate(batches):
+            logger.info("📦 Sending batch %d of %d", idx + 1, total_batches)
+
+            worker_payload = {
+                "template": template,
+                "student": data,
+                "professors": batch
+            }
+
+            try:
+                httpx.post(settings.CLOUDFLARE_WORKER_URL, json=worker_payload, timeout=3.0)
+            except httpx.ReadTimeout:
+                logger.info("✅ Worker batch %d triggered (timeout expected)", idx + 1)
+
+            # Optional delay between batches
+            sleep(1.5)
+
+        user_progress[user_id] = {
+            "progress": 100,
+            "message": f"{count} emails are being sent in background",
+            "complete": True
         }
-
-        worker_res = httpx.post(settings.CLOUDFLARE_WORKER_URL, json=worker_payload)
-        logger.info("✅ Cloudflare response: %s %s", worker_res.status_code, worker_res.text)
-
-        user_progress[user_id] = {"progress": 100, "message": "Emails sent successfully!", "complete": True}
 
     except Exception as e:
         logger.exception("❌ Unhandled exception in send_emails_after_payment")
         user_progress[user_id] = {"progress": 100, "message": "Failed: Internal error", "complete": True}
-
 
 from urllib.parse import urlparse, unquote
 
