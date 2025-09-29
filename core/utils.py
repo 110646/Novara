@@ -14,7 +14,7 @@ from time import sleep
 
 SUPABASE_URL = "https://qdlguxijkkuujnaeuhqq.supabase.co"
 SUPABASE_API_KEY = settings.SUPABASE_SERVICE_ROLE_KEY
-OPENAI_TEMPLATE_ENDPOINT = "https://88e30c7be53f.ngrok-free.app/generate-email-template/"
+OPENAI_TEMPLATE_ENDPOINT = "https://03f72c51c14d.ngrok-free.app/generate-email-template/"
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -124,6 +124,14 @@ def send_emails_after_payment(user_id, user_progress):
         for idx, batch in enumerate(batches):
             logger.info("📦 Sending batch %d of %d", idx + 1, total_batches)
 
+            # Update progress incrementally per batch
+            batch_progress = 60 + int((idx + 1) * (30 / total_batches))  # 60 to 90
+            user_progress[user_id] = {
+                "progress": batch_progress,
+                "message": f"Sending Emails...",
+                "complete": False
+            }
+
             worker_payload = {
                 "template": template,
                 "student": data,
@@ -135,7 +143,6 @@ def send_emails_after_payment(user_id, user_progress):
             except httpx.ReadTimeout:
                 logger.info("✅ Worker batch %d triggered (timeout expected)", idx + 1)
 
-            # Optional delay between batches
             sleep(1.5)
 
         user_progress[user_id] = {

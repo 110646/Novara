@@ -8,14 +8,12 @@ export default {
 
       let sentCount = 0;
 
-      // Safety net: Remove bracketed sentences and format into paragraphs
+
       function cleanAndFormatTemplate(rawText) {
-        // Remove sentences containing square brackets
         const cleanSentences = rawText
           .split(/(?<=[.?!])\s+/) // Split by sentence endings
           .filter(sentence => !sentence.includes("[") && !sentence.includes("]"));
 
-        // Group sentences into 3–4 sentence paragraphs
         const paragraphs = [];
         let buffer = [];
 
@@ -37,10 +35,8 @@ export default {
         console.log(`📤 Sending email ${i + 1} to ${prof.email}`);
 
         try {
-          // Step 1: Clean and format the template
           const cleaned = cleanAndFormatTemplate(template);
 
-          // Step 2: Inject professor/student data
           const personalized = cleaned
             .replace(/{{\s*professor_name\s*}}|{\s*professor_name\s*}/g, prof.last_name)
             .replace(/{{\s*university\s*}}|{\s*university\s*}/g, prof.university)
@@ -80,8 +76,7 @@ export default {
             continue;
           }
 
-          // Log to Django (fire-and-forget)
-          fetch("https://88e30c7be53f.ngrok-free.app/log-sent-email/", {
+          fetch("https://03f72c51c14d.ngrok-free.app/log-sent-email/", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

@@ -25,6 +25,7 @@ from storages.backends.s3boto3 import S3Boto3Storage
 from core.choices import MAJOR_CHOICES, CLASS_YEAR_CHOICES, US_UNIVERSITY_CHOICES
 from django.core.mail import send_mail
 import time
+from django.utils.timezone import localtime
 import logging
 from datetime import datetime, timezone as dt_timezone
 from django.utils import timezone
@@ -96,7 +97,7 @@ def sent_emails_list(request):
     data = [{
         "professor_email": email.professor_email,
         "university": email.university,
-        "date_sent": email.date_sent.strftime("%Y-%m-%d %H:%M"),
+        "date_sent": localtime(email.date_sent).isoformat(),
         "status": email.status,
         "email_body": email.email_body
     } for email in emails]
@@ -118,7 +119,8 @@ def log_sent_email(request):
                 professor_email=professor_email,
                 university=university,
                 email_body=email_body,
-                smtp_id=smtp_id
+                smtp_id=smtp_id,
+                date_sent=timezone.now(),
             )
             return JsonResponse({'status': 'success'})
         except User.DoesNotExist:
